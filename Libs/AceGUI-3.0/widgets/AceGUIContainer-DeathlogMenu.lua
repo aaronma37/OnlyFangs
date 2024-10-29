@@ -218,7 +218,7 @@ local function Constructor()
 	frame:SetScript("OnMouseDown", Frame_OnMouseDown)
 
 	local background_texture = frame:CreateTexture(nil, "BACKGROUND")
-	background_texture:SetTexture("Interface\\Artifacts/ArtifactUIRogue.PNG")
+	background_texture:SetTexture("Interface\\Artifacts/ArtifactUIWarlock.PNG")
 	background_texture:SetTexCoord(0, 0.8, 0, 0.5)
 	background_texture:SetVertexColor(1, 1, 1, 1)
 	background_texture:SetPoint("TOPLEFT", frame, "TOPLEFT", background_inset, -background_inset)

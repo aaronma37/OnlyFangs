@@ -181,15 +181,15 @@ local subtitle_data = {
 		end,
 	},
 	{
-		"Guild",
+		"+/- Points",
 		120,
 		function(_entry, _server_name)
 			return _entry["guild"] or ""
 		end,
 	},
 	{
-		"Zone/Instance",
-		100,
+		"Event",
+		200,
 		function(_entry, _server_name)
 			if _entry["map_id"] == nil then
 				if _entry["instance_id"] ~= nil then
@@ -203,28 +203,6 @@ local subtitle_data = {
 				return map_info.name
 			end
 			return "-----------"
-		end,
-	},
-	{
-		"Death Source",
-		140,
-		function(_entry, _server_name)
-			local _source = id_to_npc[_entry["source_id"]]
-				or environment_damage[_entry["source_id"]]
-				or deathlog_decode_pvp_source(_entry["source_id"])
-				or ""
-
-			if _source == "" and deathlogPredictSource then
-				_source = deathlogPredictSource(_entry["map_pos"], _entry["map_id"]) or ""
-			end
-			return _source
-		end,
-	},
-	{
-		"Last Words",
-		200,
-		function(_entry, _server_name)
-			return _entry["last_words"] or ""
 		end,
 	},
 }
@@ -337,6 +315,14 @@ local _deathlog_data = {}
 local _stats = {}
 local _log_normal_params = {}
 local initialized = false
+
+local function drawOverviewTab(container)
+	local _container = AceGUI:Create("SimpleGroup")
+	_container:SetFullWidth(true)
+	_container:SetFullHeight(true)
+	_container:SetLayout("Fill")
+	deathlog_tabcontainer:AddChild(_container)
+end
 
 local function drawLogTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
@@ -1143,54 +1129,6 @@ local function drawLogTab(container)
 	end)
 end
 
-local function drawWatchListTab(container)
-	local current_creature_id = nil
-	local update_functions = {}
-	local scroll_container = AceGUI:Create("SimpleGroup")
-	scroll_container:SetFullWidth(true)
-	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Fill")
-	deathlog_tabcontainer:AddChild(scroll_container)
-
-	local scroll_frame = AceGUI:Create("SimpleGroup")
-	scroll_frame:SetLayout("Flow")
-	scroll_container:AddChild(scroll_frame)
-
-	local title_label = AceGUI:Create("Heading")
-	title_label:SetFullWidth(true)
-	title_label:SetText("Watch List (Experimental)")
-	title_label.label:SetFont(Deathlog_L.menu_font, 24, "")
-	scroll_frame:AddChild(title_label)
-
-	local description_label = AceGUI:Create("Label")
-	description_label:SetFullWidth(true)
-	description_label:SetText(
-		"[Experimental] Add players of interest to a watch list.  If a player on this list dies while you are logged off, the deathlog system will try to notify you when you log in.  Add a description and icon to remember the player by."
-	)
-	description_label.label:SetFont(Deathlog_L.menu_font, 14, "")
-	description_label.label:SetTextColor(0.6, 0.6, 0.6, 1.0)
-	description_label.label:SetJustifyH("CENTER")
-	scroll_frame:AddChild(description_label)
-
-	local elements = {
-		Deathlog_WatchList(),
-	}
-
-	local function updateElements()
-		for _, v in ipairs(elements) do
-			v.updateMenuElement(scroll_frame)
-		end
-	end
-
-	updateElements()
-
-	scroll_frame.frame:HookScript("OnHide", function()
-		for _, v in ipairs(elements) do
-			v:Hide()
-		end
-	end)
-end
-
 local function drawCreatureStatisticsTab(container)
 	local current_creature_id = nil
 	local update_functions = {}
@@ -1453,8 +1391,8 @@ local function createDeathlogMenu()
 	_G["AceDeathlogMenu"] = ace_deathlog_menu.frame -- Close on <ESC>
 	tinsert(UISpecialFrames, "AceDeathlogMenu")
 
-	ace_deathlog_menu:SetTitle("Deathlog")
-	ace_deathlog_menu:SetVersion(GetAddOnMetadata("Deathlog", "Version"))
+	ace_deathlog_menu:SetTitle("OnlyFangs")
+	ace_deathlog_menu:SetVersion(GetAddOnMetadata("OnlyFangs", "Version"))
 	ace_deathlog_menu:SetStatusText("")
 	ace_deathlog_menu:SetLayout("Flow")
 	ace_deathlog_menu:SetHeight(_menu_height)
@@ -1503,8 +1441,8 @@ local function createDeathlogMenu()
 			drawCreatureStatisticsTab(container)
 		elseif group == "LogTab" then
 			drawLogTab(container)
-		elseif group == "WatchListTab" then
-			drawWatchListTab(container)
+		elseif group == "OverviewTab" then
+			drawOverviewTab(container)
 		end
 	end
 
