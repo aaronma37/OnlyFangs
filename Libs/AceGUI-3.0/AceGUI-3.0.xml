@@ -30,6 +30,4 @@
 	<Script file="widgets\AceGUIWidget-Label.lua"/>
 	<Script file="widgets\AceGUIWidget-MultiLineEditBox.lua"/>
 	<Script file="widgets\AceGUIWidget-Slider.lua"/>
-
-	<Script file="widgets\Deathlog_MiniLog.lua"/>
 </Ui>

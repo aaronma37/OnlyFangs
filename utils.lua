@@ -140,9 +140,6 @@ function deathlogPredictSource(entry_map_pos, entry_map_id)
 					if precomputed_heatmap_intensity[map_id][x][y] then
 						for k, v in pairs(precomputed_heatmap_creature_subset[map_id]) do
 							if v[x] and v[x][y] then
-								if id_to_npc[k] then
-									return id_to_npc[k] .. "*"
-								end
 								if environment_damage[k] then
 									return environment_damage[k] .. "*"
 								end
@@ -724,46 +721,6 @@ function deathlog_setTooltip(_name, _lvl, _guild, _race, _class, _source, _zone,
 			0.5
 		)
 	end
-
-	if deathlog_settings["minilog"]["tooltip_name"] and _name then
-		GameTooltip:AddLine(Deathlog_L.name_word .. ": " .. _name, 1, 1, 1)
-	end
-	if deathlog_settings["minilog"]["tooltip_guild"] and _guild then
-		GameTooltip:AddLine(Deathlog_L.guild_word .. ": " .. _guild, 1, 1, 1)
-	end
-
-	if deathlog_settings["minilog"]["tooltip_race"] and _race then
-		GameTooltip:AddLine(Deathlog_L.race_word .. ": " .. _race, 1, 1, 1)
-	end
-
-	if deathlog_settings["minilog"]["tooltip_class"] and _class then
-		GameTooltip:AddLine(Deathlog_L.class_word .. ": " .. _class, 1, 1, 1)
-	end
-	if deathlog_settings["colored_tooltips"] == nil or deathlog_settings["colored_tooltips"] == false then
-		if deathlog_settings["minilog"]["tooltip_killedby"] and _source then
-			GameTooltip:AddLine(Deathlog_L.killed_by_word .. ": " .. _source, 1, 1, 1)
-		end
-		if deathlog_settings["minilog"]["tooltip_zone"] and _zone then
-			GameTooltip:AddLine(Deathlog_L.zone_instance_word .. ": " .. _zone, 1, 1, 1)
-		end
-	else
-		if deathlog_settings["minilog"]["tooltip_killedby"] and _source then
-			GameTooltip:AddLine(Deathlog_L.killed_by_word .. ": |cfffda172" .. _source .. "|r", 1, 1, 1)
-		end
-		if deathlog_settings["minilog"]["tooltip_zone"] and _zone then
-			GameTooltip:AddLine(Deathlog_L.zone_instance_word .. ": |cff9fe2bf" .. _zone .. "|r", 1, 1, 1)
-		end
-	end
-
-	if deathlog_settings["minilog"]["tooltip_date"] and _date then
-		GameTooltip:AddLine(Deathlog_L.date_word .. ": " .. _date, 1, 1, 1)
-	end
-
-	if deathlog_settings["minilog"]["tooltip_lastwords"] then
-		if _last_words and _last_words ~= "" then
-			GameTooltip:AddLine(Deathlog_L.last_words_word .. ": " .. _last_words, 1, 1, 0, true)
-		end
-	end
 end
 
 function deathlog_encode_pvp_source(source_str)
@@ -820,72 +777,4 @@ function deathlog_encode_pvp_source(source_str)
 	end
 
 	return "-1"
-end
-
-function deathlog_decode_pvp_source(source_id)
-	if
-		source_id == nil
-		or source_id == "-1"
-		or source_id == -1
-		or id_to_npc[source_id]
-		or environment_damage[source_id]
-	then
-		return ""
-	end
-
-	local source_id_num = tonumber(source_id)
-
-	local retrievedPvPFlag = bit.band(bit.rshift(source_id_num, 21), 0x7)
-	if retrievedPvPFlag and retrievedPvPFlag ~= deathlog_pvp_flag.NONE then
-		local retrievedEnemyRace = bit.band(bit.rshift(source_id_num, 29), 0xFF)
-		local retrievedEnemyClass = bit.band(bit.rshift(source_id_num, 37), 0xFF)
-		local retrievedEnemyLevel = bit.band(bit.rshift(source_id_num, 45), 0xFF)
-
-		local enemyClass = ""
-		if retrievedEnemyRace and retrievedEnemyRace > 0 then
-			enemyClass = GetClassInfo(retrievedEnemyClass) or ""
-			if deathlog_class_colors[enemyClass] then
-				enemyClass = "|c" .. deathlog_class_colors[enemyClass]:GenerateHexColor() .. enemyClass .. "|r"
-			end
-		end
-
-		local enemyRace = ""
-		if retrievedEnemyRace and retrievedEnemyRace > 0 then
-			enemyRace = C_CreatureInfo.GetRaceInfo(retrievedEnemyRace)
-			if enemyRace then
-				enemyRace = enemyRace.raceName
-			else
-				enemyRace = ""
-			end
-		end
-
-		local enemyLevel = ""
-		if retrievedEnemyLevel and retrievedEnemyLevel > 0 then
-			enemyLevel = retrievedEnemyLevel
-		end
-
-		local source_name = "PvP"
-		if retrievedPvPFlag == deathlog_pvp_flag.DUEL_TO_DEATH then
-			source_name = "Duel to Death"
-		end
-
-		if enemyClass or enemyRace or enemyLevel then
-			local enemyTable = {}
-			if enemyLevel then
-				table.insert(enemyTable, "level " .. enemyLevel)
-			end
-			if enemyRace then
-				table.insert(enemyTable, enemyRace)
-			end
-			if enemyClass then
-				table.insert(enemyTable, enemyClass)
-			end
-
-			source_name = source_name .. " (" .. table.concat(enemyTable, " ") .. ")"
-		end
-
-		return source_name
-	end
-
-	return ""
 end

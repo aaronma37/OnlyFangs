@@ -16,15 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 --]]
-local addonName, addon = ...
+local addonName, ns = ...
 
-local save_precompute = false
-local use_precomputed = true
+-- Entry: (event_id, player, time, faction)
+local lru = ns.lru.new(100)
+
 local last_attack_source = nil
 local recent_msg = nil
 local general_stats = {}
 local log_normal_params = {}
-local class_data = {}
 local most_deadly_units = {
 	["all"] = { -- server
 		["all"] = { -- map_id
@@ -77,15 +77,6 @@ local function initMinimapButton()
 	end
 end
 
-local function loadWidgets()
-	Deathlog_minilog_applySettings(true)
-	Deathlog_CRTWidget_applySettings()
-	Deathlog_CTTWidget_applySettings()
-	Deathlog_HIWidget_applySettings()
-	Deathlog_HWMWidget_applySettings()
-	Deathlog_DeathAlertWidget_applySettings()
-end
-
 function Deathlog_LoadFromHardcore()
 	if Hardcore_Settings and Hardcore_Settings["death_log_entries"] then
 		print("Retrieving deathlog entries...")
@@ -127,31 +118,7 @@ end
 local function handleEvent(self, event, ...)
 	if event == "PLAYER_ENTERING_WORLD" then
 		initMinimapButton()
-		if deathlog_data[GetRealmName()] and deathlog_data_map[GetRealmName()] then
-			DeathNotificationLib_attachDB(deathlog_data[GetRealmName()], deathlog_data_map[GetRealmName()])
-		end
-		if use_precomputed then
-			general_stats = precomputed_general_stats
-			log_normal_params = precomputed_log_normal_params
-			dev_precomputed_general_stats = nil
-			dev_precomputed_log_normal_params = nil
-			dev_class_data = nil
-		else
-			Deathlog_LoadFromHardcore()
-			general_stats = deathlog_calculate_statistics(deathlog_data, nil)
-			log_normal_params = deathlog_calculateLogNormalParameters(deathlog_data)
-			class_data = deathlog_calculateClassData(deathlog_data)
-			if save_precompute then
-				dev_precomputed_general_stats = general_stats
-				dev_precomputed_log_normal_params = log_normal_params
-				dev_class_data = class_data
-			else
-				dev_precomputed_general_stats = nil
-				dev_precomputed_log_normal_params = nil
-			end
-		end
 		most_deadly_units["all"]["all"]["all"] = deathlogGetOrdered(general_stats, { "all", "all", "all", nil })
-		loadWidgets()
 	end
 end
 
@@ -255,59 +222,3 @@ local options = {
 
 LibStub("AceConfig-3.0"):RegisterOptionsTable("Deathlog", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Deathlog", "Deathlog", nil)
-
-local function newEntry(_player_data, _checksum, num_peer_checks, in_guild)
-	local realmName = GetRealmName()
-	if deathlog_data == nil then
-		deathlog_data = {}
-	end
-
-	if deathlog_data_map == nil then
-		deathlog_data_map = {}
-	end
-
-	if deathlog_data[realmName] == nil then
-		deathlog_data[realmName] = {}
-	end
-
-	if deathlog_data_map[realmName] == nil then
-		deathlog_data_map[realmName] = {}
-	end
-
-	local function deathlog_modified_fletcher16(_player_data)
-		local function deathlog_fletcher16(name, guild, level, source)
-			local data = name .. (guild or "") .. level .. source
-			local sum1 = 0
-			local sum2 = 0
-			for index = 1, #data do
-				sum1 = (sum1 + string.byte(string.sub(data, index, index))) % 255
-				sum2 = (sum2 + sum1) % 255
-			end
-			return name .. "-" .. bit.bor(bit.lshift(sum2, 8), sum1)
-		end
-		return deathlog_fletcher16(
-			_player_data["name"],
-			_player_data["guild"],
-			_player_data["level"],
-			_player_data["source_id"]
-		)
-	end
-
-	local modified_checksum = deathlog_modified_fletcher16(_player_data)
-	deathlog_data[realmName][modified_checksum] = _player_data
-	deathlog_widget_minilog_createEntry(_player_data)
-	Deathlog_DeathAlertPlay(_player_data)
-	deathlog_data_map[realmName][_player_data["name"]] = modified_checksum
-end
-
--- Hook to DeathNotificationLib
-DeathNotificationLib_HookOnNewEntry(newEntry)
-
--- local b = C_Timer.NewTicker(0.5, function()
--- DeathNotificationLib_queryTarget("Hogbishop", UnitName("player"))
--- DeathNotificationLib_queryYell("Hogbishop")
--- end)
-
--- DeathNotificationLib_HookOnNewEntrySecure(function()
--- 	print("secure!")
--- end)
