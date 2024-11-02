@@ -13,6 +13,7 @@
 
 lru.lua
 events/event_globals.lua
+events/milestones/first_to_sixty.lua
 
 Localization/strings_cn.lua
 Localization/strings_de.lua
@@ -30,6 +31,7 @@ embeds.xml
 utils.lua
 id_to_display_id.lua
 
+distributed_log_utils.lua
 menu.lua
 
 precomputed_stats.lua

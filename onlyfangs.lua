@@ -19,19 +19,7 @@ along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 local addonName, ns = ...
 
 -- Entry: (event_id, player, time, faction)
-local lru = ns.lru.new(100)
-ns.claimed_milestones = {}
-ns.distributed_log = {}
-ns.distributed_log.points = {} -- race -> int
-function aggregateLog()
-	for k, v in pairs(ns.distributed_log.points) do
-		v = 0
-	end
-	for k, v in pairs(lru.map) do
-		local event_log = v[1]
-		ns.event[event_log.event_id].aggregrate(ns.distributed_log, event_log)
-	end
-end
+ns.distributed_log = ns.lru.new(100)
 
 local last_attack_source = nil
 local recent_msg = nil

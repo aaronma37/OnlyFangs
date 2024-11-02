@@ -7,7 +7,7 @@ ns.event_id = {
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
-	ns.id_event[tostring(v)] = k
+	ns.id_event[v] = k
 end
 
 for k in pairs(ns.event_id) do

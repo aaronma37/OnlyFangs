@@ -43,11 +43,9 @@ deathlog_strings_en = {
 		Hunter = "hunter",
 	},
 	tab_table = {
-		{ value = "ClassStatisticsTab", text = "Class Statistics" },
-		{ value = "CreatureStatisticsTab", text = "Creature Statistics" },
 		{ value = "InstanceStatisticsTab", text = "Achievements" },
 		{ value = "StatisticsTab", text = "Milestones" },
-		{ value = "LogTab", text = "Events" },
+		{ value = "LogTab", text = "Log" },
 		{ value = "OverviewTab", text = "Overview" },
 	},
 	instance_tbl = {

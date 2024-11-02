@@ -19,6 +19,7 @@ along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 --]]
 --
 --
+local addonName, ns = ...
 
 deathlog_instance_tbl = Deathlog_L.instance_tbl
 
@@ -75,7 +76,7 @@ for k, _ in pairs(deathlog_class_tbl) do
 end
 deathlog_class_colors["Shaman"]:SetRGBA(36 / 255, 89 / 255, 255 / 255, 1)
 
-deathlog_race_tbl = {
+ns.race_id = {
 	["Human"] = 1,
 	["Orc"] = 2,
 	["Dwarf"] = 3,
@@ -84,6 +85,16 @@ deathlog_race_tbl = {
 	["Tauren"] = 6,
 	["Gnome"] = 7,
 	["Troll"] = 8,
+}
+ns.id_race = {
+	[1] = "Human",
+	[2] = "Orc",
+	[3] = "Dwarf",
+	[4] = "Night Elf",
+	[5] = "Undead",
+	[6] = "Tauren",
+	[7] = "Gnome",
+	[8] = "Troll",
 }
 -- sort function from stack overflow
 local function spairs(t, order)

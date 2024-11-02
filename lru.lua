@@ -136,6 +136,10 @@ function lru.new(max_size, max_bytes)
 		end
 	end
 
+	local function getMap(_)
+		return map
+	end
+
 	-- returns iterator for keys and values
 	local function lru_pairs()
 		return mynext, nil, nil
@@ -147,6 +151,7 @@ function lru.new(max_size, max_bytes)
 			set = set,
 			delete = delete,
 			pairs = lru_pairs,
+			getMap = getMap,
 		},
 		__pairs = lru_pairs,
 	}

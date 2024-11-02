@@ -12,7 +12,8 @@ _event.description = "First to reach level 60 gets this milestone!"
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)
-	distributed_log.points[event_log.race] = distributed_log.points[event_log.race] + _event.pts
+	local race_name = ns.id_race[event_log[2]]
+	distributed_log.points[race_name] = distributed_log.points[race_name] + _event.pts
 end
 
 -- Registers

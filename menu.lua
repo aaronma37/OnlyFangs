@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 --]]
 --
+
+local addonName, ns = ...
+
 local _menu_width = 1100
 local _inner_menu_width = 800
 local _menu_height = 600
@@ -37,7 +40,7 @@ local main_font = Deathlog_L.main_font
 local deathlog_tabcontainer = nil
 
 local class_tbl = deathlog_class_tbl
-local race_tbl = deathlog_race_tbl
+local race_tbl = ns.race_id
 local zone_tbl = deathlog_zone_tbl
 local instance_tbl = Deathlog_L.instance_map
 
@@ -295,19 +298,9 @@ local function setDeathlogMenuLogData(data)
 		end
 	end
 	if #ordered == 1 then
-		deathlog_menu:SetStatusText(
-			#ordered
-				.. " search result/"
-				.. precomputed_general_stats["all"]["all"]["all"]["all"]["num_entries"]
-				.. " preprocessed"
-		)
+		deathlog_menu:SetStatusText("")
 	else
-		deathlog_menu:SetStatusText(
-			#ordered
-				.. " search results/"
-				.. precomputed_general_stats["all"]["all"]["all"]["all"]["num_entries"]
-				.. " preprocessed"
-		)
+		deathlog_menu:SetStatusText("")
 	end
 end
 
@@ -330,10 +323,6 @@ local function drawLogTab(container)
 	scroll_container:SetFullHeight(true)
 	scroll_container:SetLayout("Fill")
 	deathlog_tabcontainer:AddChild(scroll_container)
-
-	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("Flow")
-	scroll_container:AddChild(scroll_frame)
 
 	local name_filter = nil
 	local guidl_filter = nil
@@ -393,552 +382,75 @@ local function drawLogTab(container)
 		return true
 	end
 
-	local class_search_box = AceGUI:Create("Icon")
-	class_search_box:SetWidth(50)
-	class_search_box:SetHeight(50)
-	class_search_box:SetDisabled(true)
-	scroll_frame:AddChild(class_search_box)
+	local scroll_frame = AceGUI:Create("ScrollFrame")
+	scroll_frame:SetLayout("Flow")
+	scroll_container:AddChild(scroll_frame)
 
-	--- Server dropdown
-	if font_container.server_dd == nil then
-		font_container.server_dd = CreateFrame("Frame", nil, font_container, "UIDropDownMenuTemplate")
-		font_container.server_dd.val = ""
-	end
+	local header_frame = AceGUI:Create("InlineGroup")
+	header_frame:SetLayout("Flow")
+	header_frame:SetFullWidth(true)
+	header_frame:SetHeight(100)
+	scroll_frame:AddChild(header_frame)
 
-	local function serverDD(frame, level, menuList)
-		local info = UIDropDownMenu_CreateInfo()
+	local score1 = AceGUI:Create("InteractiveLabel")
+	score1:SetWidth(100)
+	score1:SetHeight(60)
+	score1:SetText("   " .. ns.getScore("Tauren") .. " pts")
+	score1:SetImage("Interface\\Glues/CHARACTERCREATE\\UI-CHARACTERCREATE-RACES.PNG")
+	score1.image:SetTexCoord(0, 0.25, 0.25, 0.5)
+	score1:SetImageSize(50, 50)
+	score1.label:SetFont(main_font, 14, "")
+	header_frame:AddChild(score1)
 
-		info.text, info.checked, info.func =
-			"", font_container.server_dd.val == "", function()
-				font_container.server_dd.val = ""
-				UIDropDownMenu_SetText(font_container.server_dd, font_container.server_dd.val)
-			end
-		UIDropDownMenu_AddButton(info)
+	local space1 = AceGUI:Create("Label")
+	space1:SetWidth(140)
+	space1:SetHeight(60)
+	header_frame:AddChild(space1)
 
-		for server_name, _ in pairs(_deathlog_data) do
-			info.text, info.checked, info.func =
-				server_name, font_container.server_dd.val == server_name, function()
-					font_container.server_dd.val = server_name
-					UIDropDownMenu_SetText(font_container.server_dd, font_container.server_dd.val)
-				end
-			UIDropDownMenu_AddButton(info)
-		end
-	end
+	local score2 = AceGUI:Create("InteractiveLabel")
+	score2:SetWidth(100)
+	score2:SetHeight(60)
+	score2:SetText("   " .. ns.getScore("Undead") .. " pts")
+	score2:SetImage("Interface\\Glues/CHARACTERCREATE\\UI-CHARACTERCREATE-RACES.PNG")
+	score2.image:SetTexCoord(0.25, 0.5, 0.25, 0.5)
+	score2:SetImageSize(50, 50)
+	score2.label:SetFont(main_font, 14, "")
+	header_frame:AddChild(score2)
 
-	font_container.server_dd:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT", -5, -20)
-	UIDropDownMenu_SetText(font_container.server_dd, font_container.server_dd.val)
-	UIDropDownMenu_SetWidth(font_container.server_dd, 80)
-	UIDropDownMenu_Initialize(font_container.server_dd, serverDD)
-	UIDropDownMenu_JustifyText(font_container.server_dd, "LEFT")
+	local space2 = AceGUI:Create("Label")
+	space2:SetWidth(140)
+	space2:SetHeight(60)
+	header_frame:AddChild(space2)
 
-	if font_container.server_dd.text == nil then
-		font_container.server_dd.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
+	local score3 = AceGUI:Create("InteractiveLabel")
+	score3:SetWidth(100)
+	score3:SetHeight(60)
+	score3:SetText("   " .. ns.getScore("Troll") .. " pts")
+	score3:SetImage("Interface\\Glues/CHARACTERCREATE\\UI-CHARACTERCREATE-RACES.PNG")
+	score3.image:SetTexCoord(0.5, 0.75, 0.25, 0.5)
+	score3:SetImageSize(50, 50)
+	score3.label:SetFont(main_font, 14, "")
+	header_frame:AddChild(score3)
 
-	font_container.server_dd.text:SetPoint("LEFT", font_container.server_dd, "LEFT", 20, 20)
-	font_container.server_dd.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.server_dd.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.server_dd.text:SetText("Server")
-	font_container.server_dd.text:Show()
+	local space3 = AceGUI:Create("Label")
+	space3:SetWidth(140)
+	space3:SetHeight(60)
+	header_frame:AddChild(space3)
 
-	--- Race dropdown
-	if font_container.race_dd == nil then
-		font_container.race_dd = CreateFrame("Frame", nil, font_container, "UIDropDownMenuTemplate")
-		font_container.race_dd.val = ""
-	end
+	local score4 = AceGUI:Create("InteractiveLabel")
+	score4:SetWidth(100)
+	score4:SetHeight(60)
+	score4:SetText("   " .. ns.getScore("Orc") .. " pts")
+	score4:SetImage("Interface\\Glues/CHARACTERCREATE\\UI-CHARACTERCREATE-RACES.PNG")
+	score4.image:SetTexCoord(0.75, 1, 0.25, 0.5)
+	score4:SetImageSize(50, 50)
+	score4.label:SetFont(main_font, 14, "")
+	header_frame:AddChild(score4)
 
-	local function raceDD(frame, level, menuList)
-		local info = UIDropDownMenu_CreateInfo()
-
-		local function setFilter()
-			local key = font_container.race_dd.val
-			if key ~= "" then
-				race_filter = function(_, _entry)
-					if race_tbl[key] == tonumber(_entry["race_id"]) then
-						return true
-					else
-						return false
-					end
-				end
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			else
-				race_filter = nil
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			end
-		end
-
-		info.text, info.checked, info.func =
-			"", font_container.race_dd.val == "", function()
-				font_container.race_dd.val = ""
-				UIDropDownMenu_SetText(font_container.race_dd, font_container.race_dd.val)
-				setFilter()
-			end
-		UIDropDownMenu_AddButton(info)
-
-		for race_name, _ in pairs(race_tbl) do
-			info.text, info.checked, info.func =
-				race_name, font_container.race_dd.val == race_name, function()
-					font_container.race_dd.val = race_name
-					UIDropDownMenu_SetText(font_container.race_dd, font_container.race_dd.val)
-					setFilter()
-				end
-			UIDropDownMenu_AddButton(info)
-		end
-	end
-
-	font_container.race_dd:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT", 90, -20)
-	UIDropDownMenu_SetText(font_container.race_dd, font_container.race_dd.val)
-	UIDropDownMenu_SetWidth(font_container.race_dd, 80)
-	UIDropDownMenu_Initialize(font_container.race_dd, raceDD)
-	UIDropDownMenu_JustifyText(font_container.race_dd, "LEFT")
-
-	if font_container.race_dd.text == nil then
-		font_container.race_dd.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-
-	font_container.race_dd.text:SetPoint("LEFT", font_container.race_dd, "LEFT", 20, 20)
-	font_container.race_dd.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.race_dd.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.race_dd.text:SetText("Race")
-	font_container.race_dd.text:Show()
-
-	--- Race dropdown
-	if font_container.class_dd == nil then
-		font_container.class_dd = CreateFrame("Frame", nil, font_container, "UIDropDownMenuTemplate")
-		font_container.class_dd.val = ""
-	end
-
-	local function classDD(frame, level, menuList)
-		local info = UIDropDownMenu_CreateInfo()
-
-		local function setFilter()
-			local key = font_container.class_dd.val
-			if key ~= "" then
-				class_filter = function(_, _entry)
-					if class_tbl[key] == tonumber(_entry["class_id"]) then
-						return true
-					else
-						return false
-					end
-				end
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			else
-				class_filter = nil
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			end
-		end
-
-		info.text, info.checked, info.func =
-			"", font_container.class_dd.val == "", function()
-				font_container.class_dd.val = ""
-				UIDropDownMenu_SetText(font_container.class_dd, font_container.class_dd.val)
-				setFilter()
-			end
-		UIDropDownMenu_AddButton(info)
-
-		for class_name, _ in pairs(class_tbl) do
-			info.text, info.checked, info.func =
-				class_name, font_container.class_dd.val == class_name, function()
-					font_container.class_dd.val = class_name
-					UIDropDownMenu_SetText(font_container.class_dd, font_container.class_dd.val)
-					setFilter()
-				end
-			UIDropDownMenu_AddButton(info)
-		end
-	end
-
-	font_container.class_dd:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT", 185, -20)
-	UIDropDownMenu_SetText(font_container.class_dd, font_container.class_dd.val)
-	UIDropDownMenu_SetWidth(font_container.class_dd, 80)
-	UIDropDownMenu_Initialize(font_container.class_dd, classDD)
-	UIDropDownMenu_JustifyText(font_container.class_dd, "LEFT")
-
-	if font_container.class_dd.text == nil then
-		font_container.class_dd.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-
-	font_container.class_dd.text:SetPoint("LEFT", font_container.class_dd, "LEFT", 20, 20)
-	font_container.class_dd.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.class_dd.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.class_dd.text:SetText("Class")
-	font_container.class_dd.text:Show()
-
-	--- Zone dropdown
-	if font_container.zone_dd == nil then
-		font_container.zone_dd = CreateFrame("Frame", nil, font_container, "UIDropDownMenuTemplate")
-		font_container.zone_dd.val = ""
-	end
-
-	local function zoneDD(frame, level, menuList)
-		local info = UIDropDownMenu_CreateInfo()
-
-		local function setFilter()
-			local key = font_container.zone_dd.val
-			if key ~= "" then
-				zone_filter = function(_, _entry)
-					if
-						(zone_tbl[key] and zone_tbl[key] == tonumber(_entry["map_id"]))
-						or (instance_tbl[key] and instance_tbl[key] == tonumber(_entry["instance_id"]))
-					then
-						return true
-					else
-						return false
-					end
-				end
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			else
-				zone_filter = nil
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			end
-		end
-
-		info.text, info.checked, info.func =
-			"", font_container.zone_dd.val == "", function()
-				font_container.zone_dd.val = ""
-				UIDropDownMenu_SetText(font_container.zone_dd, font_container.zone_dd.val)
-				setFilter()
-			end
-		UIDropDownMenu_AddButton(info)
-
-		for zone_name, _ in pairs(zone_tbl) do
-			info.text, info.checked, info.func =
-				zone_name, font_container.zone_dd.val == zone_name, function()
-					font_container.zone_dd.val = zone_name
-					UIDropDownMenu_SetText(font_container.zone_dd, font_container.zone_dd.val)
-					setFilter()
-				end
-			UIDropDownMenu_AddButton(info)
-		end
-
-		-- for zone_name, _ in pairs(instance_tbl) do
-		-- 	info.text, info.checked, info.func =
-		-- 		zone_name, font_container.zone_dd.val == zone_name, function()
-		-- 			font_container.zone_dd.val = zone_name
-		-- 			UIDropDownMenu_SetText(font_container.zone_dd, font_container.zone_dd.val)
-		-- 			setFilter()
-		-- 		end
-		-- 	UIDropDownMenu_AddButton(info)
-		-- end
-	end
-
-	font_container.zone_dd:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT", 280, -20)
-	UIDropDownMenu_SetText(font_container.zone_dd, font_container.zone_dd.val)
-	UIDropDownMenu_SetWidth(font_container.zone_dd, 80)
-	UIDropDownMenu_Initialize(font_container.zone_dd, zoneDD)
-	UIDropDownMenu_JustifyText(font_container.zone_dd, "LEFT")
-
-	if font_container.zone_dd.text == nil then
-		font_container.zone_dd.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-
-	font_container.zone_dd.text:SetPoint("LEFT", font_container.zone_dd, "LEFT", 20, 20)
-	font_container.zone_dd.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.zone_dd.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.zone_dd.text:SetText("Zone")
-	font_container.zone_dd.text:Show()
-
-	--- Instance dropdown
-	if font_container.instance_dd == nil then
-		font_container.instance_dd = CreateFrame("Frame", nil, font_container, "UIDropDownMenuTemplate")
-		font_container.instance_dd.val = ""
-	end
-
-	local function zoneDD(frame, level, menuList)
-		local info = UIDropDownMenu_CreateInfo()
-
-		local function setFilter()
-			local key = font_container.instance_dd.val
-			if key ~= "" then
-				zone_filter = function(_, _entry)
-					if
-						(zone_tbl[key] and zone_tbl[key] == tonumber(_entry["map_id"]))
-						or (instance_tbl[key] and instance_tbl[key] == tonumber(_entry["instance_id"]))
-					then
-						return true
-					else
-						return false
-					end
-				end
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			else
-				zone_filter = nil
-				clearDeathlogMenuLogData()
-				setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-			end
-		end
-
-		info.text, info.checked, info.func =
-			"", font_container.instance_dd.val == "", function()
-				font_container.instance_dd.val = ""
-				UIDropDownMenu_SetText(font_container.instance_dd, font_container.instance_dd.val)
-				setFilter()
-			end
-		UIDropDownMenu_AddButton(info)
-
-		for zone_name, _ in pairs(instance_tbl) do
-			info.text, info.checked, info.func =
-				zone_name, font_container.instance_dd.val == zone_name, function()
-					font_container.instance_dd.val = zone_name
-					UIDropDownMenu_SetText(font_container.instance_dd, font_container.instance_dd.val)
-					setFilter()
-				end
-			UIDropDownMenu_AddButton(info)
-		end
-	end
-
-	font_container.instance_dd:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT", 375, -20)
-	UIDropDownMenu_SetText(font_container.instance_dd, font_container.instance_dd.val)
-	UIDropDownMenu_SetWidth(font_container.instance_dd, 80)
-	UIDropDownMenu_Initialize(font_container.instance_dd, zoneDD)
-	UIDropDownMenu_JustifyText(font_container.instance_dd, "LEFT")
-
-	if font_container.instance_dd.text == nil then
-		font_container.instance_dd.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-
-	font_container.instance_dd.text:SetPoint("LEFT", font_container.instance_dd, "LEFT", 20, 20)
-	font_container.instance_dd.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.instance_dd.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.instance_dd.text:SetText("Dungeon")
-	font_container.instance_dd.text:Show()
-
-	-- Min lvl search
-	if font_container.min_level_box == nil then
-		font_container.min_level_box = CreateFrame("EditBox", nil, font_container, "InputBoxTemplate")
-	end
-	if font_container.min_level_box.text == nil then
-		font_container.min_level_box.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-	font_container.min_level_box:SetPoint("TOPLEFT", font_container.instance_dd, "TOPRIGHT", 0, 0)
-	font_container.min_level_box:SetPoint("BOTTOMLEFT", font_container.instance_dd, "TOPRIGHT", 0, -30)
-	font_container.min_level_box:SetWidth(50)
-	font_container.min_level_box:SetFont(Deathlog_L.menu_font, 14, "")
-	font_container.min_level_box:SetMovable(false)
-	font_container.min_level_box:SetBlinkSpeed(1)
-	font_container.min_level_box:SetAutoFocus(false)
-	font_container.min_level_box:SetMultiLine(false)
-	font_container.min_level_box:SetMaxLetters(20)
-	font_container.min_level_box:SetScript("OnEnterPressed", function()
-		local text = font_container.min_level_box:GetText()
-		if #text > 0 then
-			min_level_filter = function(_, _entry)
-				if tonumber(text) ~= nil and tonumber(text) < _entry["level"] then
-					return true
-				end
-				return false
-			end
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		else
-			min_level_filter = nil
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		end
-	end)
-
-	font_container.min_level_box.text:SetPoint("LEFT", font_container.min_level_box, "LEFT", 0, 15)
-	font_container.min_level_box.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.min_level_box.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.min_level_box.text:SetText("Min. Lvl")
-	font_container.min_level_box.text:Show()
-
-	-- Max lvl search
-	if font_container.max_level_box == nil then
-		font_container.max_level_box = CreateFrame("EditBox", nil, font_container, "InputBoxTemplate")
-	end
-	if font_container.max_level_box.text == nil then
-		font_container.max_level_box.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-	font_container.max_level_box:SetPoint("TOPLEFT", font_container.min_level_box, "TOPRIGHT", 5, 0)
-	font_container.max_level_box:SetPoint("BOTTOMLEFT", font_container.min_level_box, "TOPRIGHT", 5, -30)
-	font_container.max_level_box:SetWidth(50)
-	font_container.max_level_box:SetFont(Deathlog_L.menu_font, 14, "")
-	font_container.max_level_box:SetMovable(false)
-	font_container.max_level_box:SetBlinkSpeed(1)
-	font_container.max_level_box:SetAutoFocus(false)
-	font_container.max_level_box:SetMultiLine(false)
-	font_container.max_level_box:SetMaxLetters(20)
-	font_container.max_level_box:SetScript("OnEnterPressed", function()
-		local text = font_container.max_level_box:GetText()
-		if #text > 0 then
-			max_level_filter = function(_, _entry)
-				if tonumber(text) ~= nil and tonumber(text) < _entry["level"] then
-					return true
-				end
-				return false
-			end
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		else
-			max_level_filter = nil
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		end
-	end)
-
-	font_container.max_level_box.text:SetPoint("LEFT", font_container.max_level_box, "LEFT", 0, 15)
-	font_container.max_level_box.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.max_level_box.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.max_level_box.text:SetText("Max. Lvl")
-	font_container.max_level_box.text:Show()
-
-	-- Player search
-	if font_container.player_search_box == nil then
-		font_container.player_search_box = CreateFrame("EditBox", nil, font_container, "InputBoxTemplate")
-	end
-	if font_container.player_search_box.text == nil then
-		font_container.player_search_box.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-	font_container.player_search_box:SetPoint("TOPLEFT", font_container.max_level_box, "TOPRIGHT", 5, 0)
-	font_container.player_search_box:SetPoint("BOTTOMLEFT", font_container.max_level_box, "TOPRIGHT", 5, -30)
-	font_container.player_search_box:SetWidth(100)
-	font_container.player_search_box:SetFont(Deathlog_L.menu_font, 14, "")
-	font_container.player_search_box:SetMovable(false)
-	font_container.player_search_box:SetBlinkSpeed(1)
-	font_container.player_search_box:SetAutoFocus(false)
-	font_container.player_search_box:SetMultiLine(false)
-	font_container.player_search_box:SetMaxLetters(20)
-	font_container.player_search_box:SetScript("OnEnterPressed", function()
-		local text = font_container.player_search_box:GetText()
-		if #text > 0 then
-			name_filter = function(_, _entry)
-				if string.find(string.lower(_entry["name"]), string.lower(text)) then
-					return true
-				else
-					return false
-				end
-			end
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		else
-			name_filter = nil
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		end
-	end)
-
-	font_container.player_search_box.text:SetPoint("LEFT", font_container.player_search_box, "LEFT", 0, 15)
-	font_container.player_search_box.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.player_search_box.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.player_search_box.text:SetText("Player Name")
-	font_container.player_search_box.text:Show()
-
-	-- guild search
-	if font_container.guild_search_box == nil then
-		font_container.guild_search_box = CreateFrame("EditBox", nil, font_container, "InputBoxTemplate")
-	end
-	if font_container.guild_search_box.text == nil then
-		font_container.guild_search_box.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-	font_container.guild_search_box:SetPoint("TOPLEFT", font_container.player_search_box, "TOPRIGHT", 5, 0)
-	font_container.guild_search_box:SetPoint("BOTTOMLEFT", font_container.player_search_box, "TOPRIGHT", 5, -30)
-	font_container.guild_search_box:SetWidth(100)
-	font_container.guild_search_box:SetFont(Deathlog_L.menu_font, 14, "")
-	font_container.guild_search_box:SetMovable(false)
-	font_container.guild_search_box:SetBlinkSpeed(1)
-	font_container.guild_search_box:SetAutoFocus(false)
-	font_container.guild_search_box:SetMultiLine(false)
-	font_container.guild_search_box:SetMaxLetters(20)
-	font_container.guild_search_box:SetScript("OnEnterPressed", function()
-		local text = font_container.guild_search_box:GetText()
-		if #text > 0 then
-			guild_filter = function(_, _entry)
-				if string.find(string.lower(_entry["guild"]), string.lower(text)) then
-					return true
-				else
-					return false
-				end
-			end
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		else
-			guild_filter = nil
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		end
-	end)
-
-	font_container.guild_search_box.text:SetPoint("LEFT", font_container.guild_search_box, "LEFT", 0, 15)
-	font_container.guild_search_box.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.guild_search_box.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.guild_search_box.text:SetText("Guild Name")
-	font_container.guild_search_box.text:Show()
-
-	-- source search
-	if font_container.death_source_box == nil then
-		font_container.death_source_box = CreateFrame("EditBox", nil, font_container, "InputBoxTemplate")
-	end
-	if font_container.death_source_box.text == nil then
-		font_container.death_source_box.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-	font_container.death_source_box:SetPoint("TOPLEFT", font_container.guild_search_box, "TOPRIGHT", 5, 0)
-	font_container.death_source_box:SetPoint("BOTTOMLEFT", font_container.guild_search_box, "TOPRIGHT", 5, -30)
-	font_container.death_source_box:SetWidth(100)
-	font_container.death_source_box:SetFont(Deathlog_L.menu_font, 14, "")
-	font_container.death_source_box:SetMovable(false)
-	font_container.death_source_box:SetBlinkSpeed(1)
-	font_container.death_source_box:SetAutoFocus(false)
-	font_container.death_source_box:SetMultiLine(false)
-	font_container.death_source_box:SetMaxLetters(20)
-	font_container.death_source_box:SetScript("OnEnterPressed", function()
-		local text = font_container.death_source_box:GetText()
-		if #text > 0 then
-			death_source_filter = function(_, _entry) end
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		else
-			death_source_filter = nil
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		end
-	end)
-
-	font_container.death_source_box.text:SetPoint("LEFT", font_container.death_source_box, "LEFT", 0, 15)
-	font_container.death_source_box.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.death_source_box.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.death_source_box.text:SetText("Death Source")
-	font_container.death_source_box.text:Show()
-
-	if font_container.last_words_check_box == nil then
-		font_container.last_words_check_box =
-			CreateFrame("CheckButton", "deathlog_last_words_check_box", font_container, "ChatConfigCheckButtonTemplate")
-	end
-	if font_container.last_words_check_box.text == nil then
-		font_container.last_words_check_box.text = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	end
-
-	font_container.last_words_check_box:SetPoint("TOPLEFT", font_container.death_source_box, "TOPLEFT", 98, -5)
-	font_container.last_words_check_box:SetChecked(false)
-	font_container.last_words_check_box:SetScript("OnClick", function()
-		if font_container.last_words_check_box:GetChecked() == true then
-			last_words_filter = function(_, _entry)
-				if _entry and _entry["last_words"] and _entry["last_words"] ~= "" then
-					return true
-				end
-				return false
-			end
-
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		else
-			last_words_filter = nil
-			clearDeathlogMenuLogData()
-			setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
-		end
-	end)
-
-	font_container.last_words_check_box.text:SetPoint("LEFT", font_container.last_words_check_box, "LEFT", 21, 0)
-	font_container.last_words_check_box.text:SetFont(Deathlog_L.menu_font, 12, "")
-	font_container.last_words_check_box.text:SetTextColor(255 / 255, 215 / 255, 0)
-	font_container.last_words_check_box.text:SetText("Last Words Only")
-	font_container.last_words_check_box.text:Show()
+	local space4 = AceGUI:Create("Label")
+	space4:SetWidth(140)
+	space4:SetHeight(60)
+	header_frame:AddChild(space4)
 
 	local header_label = AceGUI:Create("InteractiveLabel")
 	header_label:SetFullWidth(true)
@@ -959,8 +471,9 @@ local function drawLogTab(container)
 
 	local deathlog_group = AceGUI:Create("ScrollFrame")
 	deathlog_group:SetFullWidth(true)
-	deathlog_group:SetHeight(440)
+	deathlog_group:SetHeight(340)
 	scroll_frame:AddChild(deathlog_group)
+	-- deathlog_group.frame:SetPoint("TOP", scroll_container.frame, "TOP", 0, -100)
 	font_container:SetParent(deathlog_group.frame)
 	-- font_container:SetPoint("TOP", deathlog_group.frame, "TOP", 0, -100)
 	font_container:SetHeight(400)
