@@ -145,6 +145,18 @@ function lru.new(max_size, max_bytes)
 		return mynext, nil, nil
 	end
 
+	local function getOldest(_)
+		return oldest
+	end
+
+	local function getNewest(_)
+		return newest
+	end
+
+	local function getSize(_)
+		return size
+	end
+
 	local mt = {
 		__index = {
 			get = get,
@@ -152,6 +164,9 @@ function lru.new(max_size, max_bytes)
 			delete = delete,
 			pairs = lru_pairs,
 			getMap = getMap,
+			getOldest = getOldest,
+			getNewest = getNewest,
+			getSize = getSize,
 		},
 		__pairs = lru_pairs,
 	}

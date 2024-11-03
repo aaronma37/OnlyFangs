@@ -197,8 +197,8 @@ function deathlogConvertStringDateUnix(s)
 	return time({ day = day, month = month, year = year, hour = hour, minute = minute, sec = sec }) + offset
 end
 
-function deathlog_fletcher16(name, guild, level, source)
-	local data = name .. (guild or "") .. level .. source
+ns.fletcher16 = function(name, race_id, entry_id, date)
+	local data = name .. race_id .. entry_id .. date
 	local sum1 = 0
 	local sum2 = 0
 	for index = 1, #data do
