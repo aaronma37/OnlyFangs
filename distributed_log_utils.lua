@@ -3,8 +3,11 @@ local addonName, ns = ...
 local CTL = _G.ChatThrottleLib
 local COMM_NAME = "OnlyFangsAddon"
 local COMM_COMMAND_HEARTBEAT = "HB"
+local COMM_COMMAND_DIRECT_EVENT = "DE"
 local COMM_COMMAND_DELIM = "|"
 local COMM_FIELD_DELIM = "~"
+local COMM_CHANNEL = "SAY"
+local HB_DUR = 1
 -- Node
 local VALUE_IDX = 1
 local KEY_IDX = 4
@@ -14,7 +17,6 @@ local RACE_IDX = 2
 local EVENT_IDX = 3
 
 local INIT_TIME = 1730639674
-print("VV", GetServerTime())
 
 local function adjustedTime()
 	return GetServerTime() - INIT_TIME
@@ -33,8 +35,12 @@ local estimated_score = {
 
 local distributed_log = ns.lru.new(100)
 ns.claimed_milestones = {}
-distributed_log.num_entries = 0
 distributed_log.points = {
+	["Human"] = 0,
+	["Gnome"] = 0,
+	["Night Elf"] = 0,
+	["Dwarf Elf"] = 0,
+	["Troll"] = -100,
 	["Orc"] = 100,
 	["Undead"] = 400,
 	["Tauren"] = 200,
@@ -74,22 +80,15 @@ ns.getScore = function(team_name)
 	return estimated_score[team_name]
 end
 
-for k, v in pairs(distributed_log:getMap()) do
-	for k2, v2 in ipairs(v[1]) do
-		print(k, v2)
-	end
-end
-
 ns.aggregateLog = function()
-	distributed_log.num_entries = 0
-	for k, v in pairs(distributed_log.points) do
-		v = 0
+	print("Aggregating")
+	for k, _ in pairs(distributed_log.points) do
+		distributed_log.points[k] = 0
 	end
 	for k, v in pairs(distributed_log:getMap()) do
 		local event_log = v[1]
 		local event_name = ns.id_event[event_log[event_id_idx]]
 		ns.event[event_name].aggregrate(distributed_log, event_log)
-		distributed_log.num_entries = distributed_log.num_entries + 1
 	end
 end
 
@@ -117,7 +116,10 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				_event_id
 			)
 			if distributed_log.get(_fletcher) == nil then
-				distributed_log:set(_fletcher, { tonumber(_date), tonumber(_race_id), tonumber(_event_id) })
+				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id) }
+				local _event_name = ns.id_event[tonumber(_event_id)]
+				distributed_log:set(_fletcher, _new_data)
+				ns.event[_event_name].aggregrate(distributed_log, _new_data)
 			end
 			if tonumber(_num_entries) > estimated_score_num_entries then
 				print("Update Estimated Score")
@@ -129,15 +131,24 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					["Troll"] = tonumber(_troll_score),
 				}
 			end
+		elseif command == COMM_COMMAND_DIRECT_EVENT then
+			local _fletcher, _date, _race_id, _event_id = string.split(COMM_FIELD_DELIM, data)
+			if distributed_log.get(_fletcher) == nil then
+				print("New Entry!", _fletcher, _date, _race_id, _event_id)
+				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id) }
+				local _event_name = ns.id_event[tonumber(_event_id)]
+				distributed_log:set(_fletcher, _new_data)
+				ns.event[_event_name].aggregrate(distributed_log, _new_data)
+			end
 		end
 	end
 end)
 
 -- Heartbeat
-C_Timer.NewTicker(1, function(self)
+C_Timer.NewTicker(HB_DUR, function(self)
 	local comm_message = COMM_COMMAND_HEARTBEAT
 		.. COMM_COMMAND_DELIM
-		.. distributed_log.num_entries
+		.. distributed_log:getSize()
 		.. COMM_FIELD_DELIM
 		.. distributed_log.points["Orc"]
 		.. COMM_FIELD_DELIM
@@ -149,5 +160,23 @@ C_Timer.NewTicker(1, function(self)
 		.. COMM_FIELD_DELIM
 		.. toMessage(distributed_log:getOldest())
 
-	CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, "SAY")
+	CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
 end)
+
+ns.sendEvent = function(event_name)
+	local _race, _, _ = UnitRace("Player")
+	local _fletcher, _event = ns.stampEvent(adjustedTime(), ns.race_id[_race], ns.event_id[event_name])
+	local comm_message = COMM_COMMAND_DIRECT_EVENT
+		.. COMM_COMMAND_DELIM
+		.. _fletcher
+		.. COMM_FIELD_DELIM
+		.. _event[DATE_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[RACE_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[EVENT_IDX]
+	CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+end
+
+ns.triggerEvent("FirstToSixty")
+-- ns.showToast("Yazpad", "warlock")

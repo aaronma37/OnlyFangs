@@ -309,13 +309,67 @@ local _stats = {}
 local _log_normal_params = {}
 local initialized = false
 
-local function drawOverviewTab(container)
-	local _container = AceGUI:Create("SimpleGroup")
-	_container:SetFullWidth(true)
-	_container:SetFullHeight(true)
-	_container:SetLayout("Fill")
-	deathlog_tabcontainer:AddChild(_container)
+local function makeEventTypeFrames(event_type)
+	local _frames = {}
+	for k, v in pairs(ns.event) do
+		if v.type == event_type then
+			local frame = CreateFrame("Frame", nil, WorldMapButton)
+			frame:SetFrameLevel(15000)
+			-- frame:SetAllPoints()
+			_frames[#_frames + 1] = frame
+			local SCALE = 0.8
+			frame:SetWidth(300 * SCALE)
+			frame:SetHeight(80 * SCALE)
+			frame.texture = frame:CreateTexture(nil, "OVERLAY")
+			frame.texture:SetAllPoints()
+			frame.texture:SetDrawLayer("OVERLAY", 6)
+			-- frame.texture:SetTexture("Interface\\LootFrame\\LegendaryToast") -- Legendary
+			frame.texture:SetTexture("Interface\\LootFrame\\LootToastAtlas") -- Horde
+			frame.texture:SetTexCoord(0, 0.28, 0.45, 0.8)
+			frame.texture:SetVertexColor(1000, 10, 1, 1)
+			frame.texture:SetAlpha(1)
+			frame.texture:Show()
+
+			frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+			frame.title:SetPoint("TOPLEFT", 100 * SCALE, -35 * SCALE)
+			frame.title:SetTextColor(128 / 255, 128 / 255, 128 / 255, 1) -- Unclaimed color
+			-- frame.title:SetTextColor(255 / 255, 128 / 255, 0, 1)
+			frame.title:SetJustifyH("LEFT")
+			frame.title:SetFont("Fonts\\blei00d.TTF", 28 * SCALE, "OUTLINE")
+			frame.title:SetText("Unclaimed")
+
+			frame.desc = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+			frame.desc:SetPoint("TOP", 10 * SCALE, -20 * SCALE)
+			frame.desc:SetTextColor(1, 0.8, 0, 1)
+			frame.desc:SetJustifyH("LEFT")
+			frame.desc:SetFont("Fonts\\blei00d.TTF", 14, "")
+			frame.desc:SetText(v.name)
+
+			frame.icon = frame:CreateTexture(nil, "OVERLAY")
+			frame.icon:SetPoint("LEFT", 35 * SCALE, -5 * SCALE)
+			frame.icon:SetHeight(frame:GetHeight() * 0.55)
+			frame.icon:SetWidth(frame:GetHeight() * 0.55)
+			frame.icon:SetDrawLayer("OVERLAY", 7)
+			frame.icon:SetTexture(v.icon_path)
+			frame.icon:Show()
+
+			frame:HookScript("OnEnter", function()
+				GameTooltip_SetDefaultAnchor(GameTooltip, WorldFrame)
+				GameTooltip:AddDoubleLine(v.description, "", 1, 1, 1, 0.5, 0.5, 0.5)
+				GameTooltip:Show()
+			end)
+			frame:HookScript("OnLeave", function()
+				GameTooltip:Hide()
+			end)
+		end
+	end
+	return _frames
 end
+local event_type_frames = {
+	["Failure"] = makeEventTypeFrames("Failure"),
+	["Achievement"] = makeEventTypeFrames("Achievement"),
+	["Milestone"] = makeEventTypeFrames("Milestone"),
+}
 
 local function drawLogTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
@@ -633,13 +687,40 @@ local function drawLogTab(container)
 	end)
 end
 
-local function drawCreatureStatisticsTab(container) end
+local function drawEventTypeTab(container, _title, _frames)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Flow")
+	deathlog_tabcontainer:AddChild(scroll_container)
 
-local function drawStatisticsTab(container) end
+	local header_frame = AceGUI:Create("SimpleGroup")
+	header_frame:SetLayout("Flow")
+	header_frame:SetFullWidth(true)
+	header_frame:SetHeight(100)
+	scroll_container:AddChild(header_frame)
 
-local function drawClassStatisticsTab(container) end
+	local title = AceGUI:Create("Label")
+	title:SetFullWidth(true)
+	title:SetHeight(60)
+	title:SetText(_title)
+	title:SetFont(main_font, 24, "")
+	title:SetJustifyH("CENTER")
+	header_frame:AddChild(title)
 
-local function drawInstanceStatisticsTab(container) end
+	local scroll_frame = AceGUI:Create("ScrollFrame")
+	scroll_frame:SetLayout("Flow")
+	scroll_container:AddChild(scroll_frame)
+
+	local c = 0
+	for k, v in pairs(_frames) do
+		v:Show()
+		v:SetParent(container.frame)
+		local SCALE = 1
+		v:SetPoint("TOPLEFT", c * 300, -100)
+		c = c + 1
+	end
+end
 
 local function createDeathlogMenu()
 	local ace_deathlog_menu = AceGUI:Create("DeathlogMenu")
@@ -686,10 +767,17 @@ local function createDeathlogMenu()
 
 	local function SelectGroup(container, event, group)
 		container:ReleaseChildren()
-		if group == "StatisticsTab" then
-			drawStatisticsTab(container)
-		elseif group == "InstanceStatisticsTab" then
-			drawInstanceStatisticsTab(container)
+		for _, v in pairs(event_type_frames) do
+			for _, v2 in pairs(v) do
+				v2:Hide()
+			end
+		end
+		if group == "FailureTab" then
+			drawEventTypeTab(container, "Failures", event_type_frames["Failure"])
+		elseif group == "StatisticsTab" then
+			drawEventTypeTab(container, "Milestones", event_type_frames["Milestone"])
+		elseif group == "AchievementsTab" then
+			drawEventTypeTab(container, "Achievements", event_type_frames["Achievement"])
 		elseif group == "ClassStatisticsTab" then
 			drawClassStatisticsTab(container)
 		elseif group == "CreatureStatisticsTab" then

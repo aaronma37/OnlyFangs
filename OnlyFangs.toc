@@ -13,7 +13,12 @@
 
 lru.lua
 events/event_globals.lua
+
 events/milestones/first_to_sixty.lua
+
+events/achievements/all_quests.lua
+
+events/failures/death.lua
 
 Localization/strings_cn.lua
 Localization/strings_de.lua
@@ -28,6 +33,7 @@ Localization/localization.lua
 
 embeds.xml
 
+toast.lua
 utils.lua
 id_to_display_id.lua
 

@@ -4,10 +4,44 @@ ns.event_order = {}
 ns.event_id = {
 	FirstToSixty = 1,
 	AdjustPoints = 2,
+	OfForgottenMemories = 3,
+	Death = 4,
+	HighChiefWinterfall = 5,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
 	ns.id_event[v] = k
+end
+
+ns.checkEvents = function()
+	local length_of_event = 0
+	for k, v in pairs(ns.event) do
+		length_of_event = length_of_event + 1
+		if ns.event_id[k] == nil then
+			print("MISSING EVENT ID", k)
+		end
+	end
+
+	local length_of_event_ids = 0
+	for k, v in pairs(ns.event_id) do
+		length_of_event_ids = length_of_event_ids + 1
+		if ns.event[k] == nil then
+			print("MISSING EVENT", k)
+		end
+	end
+
+	local length_of_id_events = 0
+	for k, v in pairs(ns.id_event) do
+		length_of_id_events = length_of_id_events + 1
+	end
+
+	if length_of_event_ids ~= length_of_id_events then
+		print("NUM MISMATCH 1")
+	end
+
+	if length_of_event ~= length_of_id_events then
+		print("NUM MISMATCH 2")
+	end
 end
 
 for k in pairs(ns.event_id) do
@@ -354,6 +388,12 @@ function SetAchievementTooltip(achievement_icon, achievement, _player_name)
 	achievement_icon:SetCallback("OnLeave", function(widget)
 		GameTooltip:Hide()
 	end)
+end
+
+ns.triggerEvent = function(event_name)
+	print("Triggering Event", event_name)
+	ns.showToast(event_name, ns.event[event_name].icon_path, ns.event[event_name].type)
+	ns.sendEvent(event_name)
 end
 
 -- function SetAchievementTooltipB(_tooltip, achievement)

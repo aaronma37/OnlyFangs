@@ -21,6 +21,7 @@ local addonName, ns = ...
 -- Entry: (event_id, player, time, faction)
 ns.distributed_log = ns.lru.new(100)
 
+ns.recent_level_up = nil -- KEEP GLOBAL
 local last_attack_source = nil
 local recent_msg = nil
 local general_stats = {}
@@ -119,6 +120,11 @@ local function handleEvent(self, event, ...)
 	if event == "PLAYER_ENTERING_WORLD" then
 		initMinimapButton()
 		most_deadly_units["all"]["all"]["all"] = deathlogGetOrdered(general_stats, { "all", "all", "all", nil })
+	elseif event == "PLAYER_LEVEL_UP" then
+		ns.recent_level_up = 1
+		C_Timer.After(3, function()
+			ns.recent_level_up = nil
+		end)
 	end
 end
 
@@ -138,6 +144,7 @@ SlashCmdList["DEATHLOG"] = SlashHandler
 
 local deathlog_event_handler = CreateFrame("Frame", "deathlog", nil, "BackdropTemplate")
 deathlog_event_handler:RegisterEvent("PLAYER_ENTERING_WORLD")
+deathlog_event_handler:RegisterEvent("PLAYER_LEVEL_UP")
 
 deathlog_event_handler:SetScript("OnEvent", handleEvent)
 
@@ -222,3 +229,5 @@ local options = {
 
 LibStub("AceConfig-3.0"):RegisterOptionsTable("Deathlog", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Deathlog", "Deathlog", nil)
+
+ns.checkEvents()
