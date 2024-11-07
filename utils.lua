@@ -96,6 +96,30 @@ ns.id_race = {
 	[7] = "Gnome",
 	[8] = "Troll",
 }
+
+ns.class_id = {
+	["Warrior"] = 1,
+	["Paladin"] = 2,
+	["Hunter"] = 3,
+	["Rogue"] = 4,
+	["Priest"] = 5,
+	["Shaman"] = 7,
+	["Mage"] = 8,
+	["Warlock"] = 9,
+	["Druid"] = 11,
+}
+
+ns.id_class = {
+	[1] = "Warrior",
+	[2] = "Paladin",
+	[3] = "Hunter",
+	[4] = "Rogue",
+	[5] = "Priest",
+	[7] = "Shaman",
+	[8] = "Mage",
+	[9] = "Warlock",
+	[11] = "Druid",
+}
 -- sort function from stack overflow
 local function spairs(t, order)
 	local keys = {}
@@ -231,6 +255,20 @@ function deathlogFilter(_deathlog_data, filter)
 
 	return filtered_death_log
 end
+
+-- ns.orderByfunction = function(_log, order_function)
+-- 	local unordered_list = {}
+-- 	local ordered = {}
+-- 	for server_name, entry_tbl in pairs(_log) do
+-- 		for _, v in pairs(entry_tbl) do
+-- 			unordered_list[#unordered_list + 1] = v
+-- 		end
+-- 	end
+-- 	for i, v in spairs(unordered_list, order_function) do
+-- 		table.insert(ordered, v)
+-- 	end
+-- 	return ordered
+-- end
 
 function deathlogOrderBy(_deathlog, order_function)
 	local unordered_list = {}

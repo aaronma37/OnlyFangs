@@ -391,14 +391,6 @@ function SetAchievementTooltip(achievement_icon, achievement, _player_name)
 end
 
 ns.triggerEvent = function(event_name)
-	print("Triggering Event", event_name)
 	ns.showToast(event_name, ns.event[event_name].icon_path, ns.event[event_name].type)
 	ns.sendEvent(event_name)
 end
-
--- function SetAchievementTooltipB(_tooltip, achievement)
--- 					-- _tooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
--- 					_tooltip:AddLine(achievement.title)
--- 					_tooltip:AddLine(achievement.description, 1, 1, 1, true)
--- 					_tooltip:AddDoubleLine(achievement.bl_text or "Starting Achievement", (achievement.pts or tostring(0)) .. "pts", 1, .82, 0, 1 ,.82, 0);
---   end

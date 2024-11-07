@@ -134,13 +134,6 @@ local subtitle_data = {
 		end,
 	},
 	{
-		"Lvl",
-		30,
-		function(_entry, _server_name)
-			return _entry["level"] or ""
-		end,
-	},
-	{
 		"Name",
 		90,
 		function(_entry, _server_name)
@@ -184,10 +177,28 @@ local subtitle_data = {
 		end,
 	},
 	{
-		"+/- Points",
+		"Points",
 		120,
 		function(_entry, _server_name)
 			return _entry["guild"] or ""
+		end,
+	},
+	{
+		"Type",
+		200,
+		function(_entry, _server_name)
+			if _entry["map_id"] == nil then
+				if _entry["instance_id"] ~= nil then
+					return deathlog_id_to_instance_tbl[_entry["instance_id"]] or _entry["instance_id"]
+				else
+					return "-----------"
+				end
+			end
+			local map_info = C_Map.GetMapInfo(_entry["map_id"])
+			if map_info then
+				return map_info.name
+			end
+			return "-----------"
 		end,
 	},
 	{
@@ -276,6 +287,26 @@ local function clearDeathlogMenuLogData()
 	end
 end
 
+local function setLogData()
+	local list = ns.logAsList()
+	for i = 1, max_rows do
+		local idx = (i + (page_number - 1) * max_rows)
+		if idx > #list then
+			break
+		end
+
+		local _event = list[idx]
+		local _event_name = ns.eventName(_event["Event"])
+		font_strings[i]["Name"]:SetText(_event["Name"])
+		font_strings[i]["Date"]:SetText(_event["Date"])
+		font_strings[i]["Race"]:SetText(_event["Race"])
+		font_strings[i]["Class"]:SetText(_event["Class"])
+		font_strings[i]["Event"]:SetText(_event_name)
+		font_strings[i]["Type"]:SetText(ns.event[_event_name].type)
+		font_strings[i]["Points"]:SetText(ns.event[_event_name].pts)
+	end
+end
+
 local function setDeathlogMenuLogData(data)
 	local ordered = deathlogOrderBy(data, function(t, a, b)
 		return tonumber(t[b]["date"]) < tonumber(t[a]["date"])
@@ -308,68 +339,6 @@ local _deathlog_data = {}
 local _stats = {}
 local _log_normal_params = {}
 local initialized = false
-
-local function makeEventTypeFrames(event_type)
-	local _frames = {}
-	for k, v in pairs(ns.event) do
-		if v.type == event_type then
-			local frame = CreateFrame("Frame", nil, WorldMapButton)
-			frame:SetFrameLevel(15000)
-			-- frame:SetAllPoints()
-			_frames[#_frames + 1] = frame
-			local SCALE = 0.8
-			frame:SetWidth(300 * SCALE)
-			frame:SetHeight(80 * SCALE)
-			frame.texture = frame:CreateTexture(nil, "OVERLAY")
-			frame.texture:SetAllPoints()
-			frame.texture:SetDrawLayer("OVERLAY", 6)
-			-- frame.texture:SetTexture("Interface\\LootFrame\\LegendaryToast") -- Legendary
-			frame.texture:SetTexture("Interface\\LootFrame\\LootToastAtlas") -- Horde
-			frame.texture:SetTexCoord(0, 0.28, 0.45, 0.8)
-			frame.texture:SetVertexColor(1000, 10, 1, 1)
-			frame.texture:SetAlpha(1)
-			frame.texture:Show()
-
-			frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-			frame.title:SetPoint("TOPLEFT", 100 * SCALE, -35 * SCALE)
-			frame.title:SetTextColor(128 / 255, 128 / 255, 128 / 255, 1) -- Unclaimed color
-			-- frame.title:SetTextColor(255 / 255, 128 / 255, 0, 1)
-			frame.title:SetJustifyH("LEFT")
-			frame.title:SetFont("Fonts\\blei00d.TTF", 28 * SCALE, "OUTLINE")
-			frame.title:SetText("Unclaimed")
-
-			frame.desc = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-			frame.desc:SetPoint("TOP", 10 * SCALE, -20 * SCALE)
-			frame.desc:SetTextColor(1, 0.8, 0, 1)
-			frame.desc:SetJustifyH("LEFT")
-			frame.desc:SetFont("Fonts\\blei00d.TTF", 14, "")
-			frame.desc:SetText(v.name)
-
-			frame.icon = frame:CreateTexture(nil, "OVERLAY")
-			frame.icon:SetPoint("LEFT", 35 * SCALE, -5 * SCALE)
-			frame.icon:SetHeight(frame:GetHeight() * 0.55)
-			frame.icon:SetWidth(frame:GetHeight() * 0.55)
-			frame.icon:SetDrawLayer("OVERLAY", 7)
-			frame.icon:SetTexture(v.icon_path)
-			frame.icon:Show()
-
-			frame:HookScript("OnEnter", function()
-				GameTooltip_SetDefaultAnchor(GameTooltip, WorldFrame)
-				GameTooltip:AddDoubleLine(v.description, "", 1, 1, 1, 0.5, 0.5, 0.5)
-				GameTooltip:Show()
-			end)
-			frame:HookScript("OnLeave", function()
-				GameTooltip:Hide()
-			end)
-		end
-	end
-	return _frames
-end
-local event_type_frames = {
-	["Failure"] = makeEventTypeFrames("Failure"),
-	["Achievement"] = makeEventTypeFrames("Achievement"),
-	["Milestone"] = makeEventTypeFrames("Milestone"),
-}
 
 local function drawLogTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
@@ -662,7 +631,7 @@ local function drawLogTab(container)
 		end
 		clearDeathlogMenuLogData()
 		font_container.page_str:SetText("Page " .. page_number)
-		setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
+		setLogData()
 	end)
 
 	if font_container.next_button == nil then
@@ -679,12 +648,155 @@ local function drawLogTab(container)
 		page_number = page_number + 1
 		clearDeathlogMenuLogData()
 		font_container.page_str:SetText("Page " .. page_number)
-		setDeathlogMenuLogData(deathlogFilter(_deathlog_data, filter))
+		setLogData()
 	end)
 
 	deathlog_group.frame:HookScript("OnHide", function()
 		font_container:Hide()
 	end)
+end
+
+local function makeAchievementLabel(_v)
+	local __f = AceGUI:Create("InlineGroup")
+	__f:SetLayout("Flow")
+	__f:SetHeight(200)
+	__f:SetWidth(800)
+	local _title = AceGUI:Create("Label")
+	_title:SetText(_v.title)
+	_title:SetHeight(100)
+	_title:SetWidth(690)
+	_title:SetJustifyH("LEFT")
+	_title:SetFont(main_font, 16, "")
+	__f:AddChild(_title)
+
+	local _pts = AceGUI:Create("Label")
+	_pts:SetText(_v.pts .. " pts.")
+	_pts:SetColor(0, 255, 0, 1)
+	_pts:SetHeight(50)
+	_pts:SetWidth(75)
+	_pts:SetJustifyH("RIGHT")
+	_pts:SetFont(main_font, 12, "")
+	__f:AddChild(_pts)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(100)
+	_gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+
+	local _desc = AceGUI:Create("Label")
+	_desc:SetText(_v.description)
+	_desc:SetHeight(140)
+	_desc:SetWidth(800)
+	_desc:SetJustifyH("LEFT")
+	__f:AddChild(_desc)
+	return __f
+end
+
+local function makeMilestoneLabel(_v)
+	local __f = AceGUI:Create("InlineGroup")
+	__f:SetLayout("Flow")
+	__f:SetHeight(200)
+	__f:SetWidth(800)
+	local _title = AceGUI:Create("Label")
+	_title:SetText(_v.title)
+	_title:SetHeight(100)
+	_title:SetWidth(690)
+	_title:SetJustifyH("LEFT")
+	_title:SetFont(main_font, 16, "")
+	__f:AddChild(_title)
+
+	local _pts = AceGUI:Create("Label")
+	_pts:SetText(_v.pts .. " pts.")
+	_pts:SetColor(0, 255 / 255, 0, 1)
+	_pts:SetHeight(50)
+	_pts:SetWidth(75)
+	_pts:SetJustifyH("RIGHT")
+	_pts:SetFont(main_font, 12, "")
+	__f:AddChild(_pts)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(100)
+	_gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+
+	local _desc = AceGUI:Create("Label")
+	_desc:SetText(_v.description)
+	_desc:SetHeight(140)
+	_desc:SetWidth(800)
+	_desc:SetJustifyH("LEFT")
+	__f:AddChild(_desc)
+
+	local _claimed_by = AceGUI:Create("Label")
+	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
+	_claimed_by:SetText("Unclaimed")
+	_claimed_by:SetHeight(140)
+	_claimed_by:SetWidth(800)
+	_claimed_by:SetJustifyH("LEFT")
+	__f:AddChild(_claimed_by)
+	return __f
+end
+
+local function makeFailureLabel(_v)
+	local __f = AceGUI:Create("InlineGroup")
+	__f:SetLayout("Flow")
+	__f:SetHeight(200)
+	__f:SetWidth(800)
+	local _title = AceGUI:Create("Label")
+	_title:SetText(_v.title)
+	_title:SetHeight(100)
+	_title:SetWidth(690)
+	_title:SetJustifyH("LEFT")
+	_title:SetFont(main_font, 16, "")
+	__f:AddChild(_title)
+
+	local _pts = AceGUI:Create("Label")
+	_pts:SetText(_v.pts .. " pts.")
+	_pts:SetColor(255 / 255, 0, 0, 1)
+	_pts:SetHeight(50)
+	_pts:SetWidth(75)
+	_pts:SetJustifyH("RIGHT")
+	_pts:SetFont(main_font, 12, "")
+	__f:AddChild(_pts)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(100)
+	_gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+
+	local _desc = AceGUI:Create("Label")
+	_desc:SetText(_v.description)
+	_desc:SetHeight(140)
+	_desc:SetWidth(800)
+	_desc:SetJustifyH("LEFT")
+	__f:AddChild(_desc)
+	return __f
+end
+
+local function makeOfficerCommandLabel(_v)
+	local __f = AceGUI:Create("InlineGroup")
+	__f:SetLayout("Flow")
+	__f:SetHeight(200)
+	__f:SetWidth(800)
+	local _title = AceGUI:Create("Label")
+	_title:SetText(_v.title)
+	_title:SetHeight(100)
+	_title:SetWidth(690)
+	_title:SetJustifyH("LEFT")
+	_title:SetFont(main_font, 16, "")
+	__f:AddChild(_title)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(100)
+	_gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+
+	local _desc = AceGUI:Create("Label")
+	_desc:SetText(_v.description)
+	_desc:SetHeight(140)
+	_desc:SetWidth(800)
+	_desc:SetJustifyH("LEFT")
+	__f:AddChild(_desc)
+	return __f
 end
 
 local function drawEventTypeTab(container, _title, _frames)
@@ -700,25 +812,95 @@ local function drawEventTypeTab(container, _title, _frames)
 	header_frame:SetHeight(100)
 	scroll_container:AddChild(header_frame)
 
-	local title = AceGUI:Create("Label")
-	title:SetFullWidth(true)
-	title:SetHeight(60)
-	title:SetText(_title)
-	title:SetFont(main_font, 24, "")
-	title:SetJustifyH("CENTER")
-	header_frame:AddChild(title)
+	local recently_selected_group = "Milestones"
+	local tree = {
+		{
+			value = "Milestone",
+			text = "Milestones",
+		},
+		{
+			value = "Achievement",
+			text = "Achievements",
+		},
+		{
+			value = "Failure",
+			text = "Failures",
+		},
+		{
+			value = "OfficerCommands",
+			text = "Officer Commands",
+		},
+	}
+
+	local tree_container = AceGUI:Create("TreeGroup")
+
+	tree_container:SetTree(tree)
+	tree_container:EnableButtonTooltips(true)
+	tree_container:SetFullWidth(true)
+	tree_container:SetHeight(450)
+	tree_container:SetLayout("Fill")
+	scroll_container:AddChild(tree_container)
 
 	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("Flow")
-	scroll_container:AddChild(scroll_frame)
+	scroll_frame:SetLayout("List")
+	tree_container:AddChild(scroll_frame)
 
-	local c = 0
-	for k, v in pairs(_frames) do
-		v:Show()
-		v:SetParent(container.frame)
-		local SCALE = 1
-		v:SetPoint("TOPLEFT", c * 300, -100)
-		c = c + 1
+	tree_container:SetCallback("OnGroupSelected", function(_container, events, group)
+		recently_selected_group = group
+		scroll_frame:ReleaseChildren()
+		for k, v in pairs(ns.event) do
+			if v.type == group then
+				if group == "Achievement" then
+					scroll_frame:AddChild(makeAchievementLabel(v))
+				elseif group == "Milestone" then
+					scroll_frame:AddChild(makeMilestoneLabel(v))
+				elseif group == "Failure" then
+					scroll_frame:AddChild(makeFailureLabel(v))
+				elseif group == "OfficerCommand" then
+					scroll_frame:AddChild(makeOfficerCommandLabel(v))
+				end
+			end
+		end
+	end)
+
+	tree_container:SelectByValue("Milestone")
+end
+
+local function drawLeaderboardTab(container)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Fill")
+	deathlog_tabcontainer:AddChild(scroll_container)
+
+	local main_frame = AceGUI:Create("SimpleGroup")
+	main_frame:SetLayout("Flow")
+	main_frame:SetFullWidth(true)
+	main_frame:SetFullHeight(true)
+	scroll_container:AddChild(main_frame)
+
+	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
+		local __f = AceGUI:Create("InlineGroup")
+		__f:SetLayout("Flow")
+		__f:SetHeight(700)
+		__f:SetWidth(340)
+		main_frame:AddChild(__f)
+
+		local _header = AceGUI:Create("Heading")
+		_header:SetFullWidth(true)
+		_header:SetText(_type .. " Leaderboard")
+		__f:AddChild(_header)
+
+		for j = 1, 30 do
+			local _line = AceGUI:Create("Label")
+			_line:SetWidth(260)
+			_line:SetText("1. Yazpad")
+			__f:AddChild(_line)
+			local _pts = AceGUI:Create("Label")
+			_pts:SetWidth(40)
+			_pts:SetText("5 pts")
+			__f:AddChild(_pts)
+		end
 	end
 end
 
@@ -767,25 +949,12 @@ local function createDeathlogMenu()
 
 	local function SelectGroup(container, event, group)
 		container:ReleaseChildren()
-		for _, v in pairs(event_type_frames) do
-			for _, v2 in pairs(v) do
-				v2:Hide()
-			end
-		end
-		if group == "FailureTab" then
-			drawEventTypeTab(container, "Failures", event_type_frames["Failure"])
-		elseif group == "StatisticsTab" then
-			drawEventTypeTab(container, "Milestones", event_type_frames["Milestone"])
-		elseif group == "AchievementsTab" then
-			drawEventTypeTab(container, "Achievements", event_type_frames["Achievement"])
-		elseif group == "ClassStatisticsTab" then
-			drawClassStatisticsTab(container)
-		elseif group == "CreatureStatisticsTab" then
-			drawCreatureStatisticsTab(container)
+		if group == "PointsTab" then
+			drawEventTypeTab(container)
 		elseif group == "LogTab" then
 			drawLogTab(container)
-		elseif group == "OverviewTab" then
-			drawOverviewTab(container)
+		elseif group == "LeaderboardTab" then
+			drawLeaderboardTab(container)
 		end
 	end
 
@@ -803,7 +972,7 @@ function deathlogShowMenu(deathlog_data, stats, log_normal_params)
 	_deathlog_data = deathlog_data
 	_stats = stats
 	_log_normal_params = log_normal_params
-	setDeathlogMenuLogData(_deathlog_data)
+	setLogData()
 end
 
 function deathlogHideMenu()
