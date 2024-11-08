@@ -593,7 +593,6 @@ local function drawLogTab(container)
 			if font_strings[i] and font_strings[i]["Last Words"] then
 				_last_words = font_strings[i]["Last Words"]:GetText() or ""
 			end
-			deathlog_setTooltip(_name, _level, _guild, _race, _class, _source, _zone, _date, _last_words)
 			GameTooltip:Show()
 		end)
 
@@ -904,7 +903,7 @@ local function drawLeaderboardTab(container)
 	end
 end
 
-local function createDeathlogMenu()
+local function createMenu()
 	local ace_deathlog_menu = AceGUI:Create("DeathlogMenu")
 	_G["AceDeathlogMenu"] = ace_deathlog_menu.frame -- Close on <ESC>
 	tinsert(UISpecialFrames, "AceDeathlogMenu")
@@ -964,17 +963,10 @@ local function createDeathlogMenu()
 	return ace_deathlog_menu
 end
 
-deathlog_menu = createDeathlogMenu()
+deathlog_menu = createMenu()
 
-function deathlogShowMenu(deathlog_data, stats, log_normal_params)
+ns.showMenu = function()
 	deathlog_menu:Show()
 	deathlog_tabcontainer:SelectTab("LogTab")
-	_deathlog_data = deathlog_data
-	_stats = stats
-	_log_normal_params = log_normal_params
 	setLogData()
-end
-
-function deathlogHideMenu()
-	deathlog_menu:Hide()
 end
