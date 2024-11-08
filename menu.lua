@@ -39,7 +39,7 @@ local main_font = Deathlog_L.main_font
 
 local deathlog_tabcontainer = nil
 
-local class_tbl = deathlog_class_tbl
+local class_tbl = ns.class_tbl
 local race_tbl = ns.race_id
 local zone_tbl = deathlog_zone_tbl
 local instance_tbl = Deathlog_L.instance_map
@@ -307,35 +307,6 @@ local function setLogData()
 	end
 end
 
-local function setDeathlogMenuLogData(data)
-	local ordered = deathlogOrderBy(data, function(t, a, b)
-		return tonumber(t[b]["date"]) < tonumber(t[a]["date"])
-	end)
-	for i = 1, max_rows do
-		local idx = (i + (page_number - 1) * max_rows)
-		if idx > #ordered then
-			break
-		end
-		for _, col in ipairs(subtitle_data) do
-			font_strings[i][col[1]]:SetText(col[3](ordered[idx], ""))
-		end
-		if ordered[idx] and ordered[idx].map_id then
-			font_strings[i].map_id = ordered[idx].map_id
-		end
-		if ordered[idx] and ordered[idx].map_pos then
-			local x, y = strsplit(",", ordered[idx].map_pos, 2)
-			font_strings[i].map_id_coords_x = x
-			font_strings[i].map_id_coords_y = y
-		end
-	end
-	if #ordered == 1 then
-		deathlog_menu:SetStatusText("")
-	else
-		deathlog_menu:SetStatusText("")
-	end
-end
-
-local _deathlog_data = {}
 local _stats = {}
 local _log_normal_params = {}
 local initialized = false
@@ -727,7 +698,11 @@ local function makeMilestoneLabel(_v)
 
 	local _claimed_by = AceGUI:Create("Label")
 	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
-	_claimed_by:SetText("Unclaimed")
+	if ns.claimed_milestones[_v.name] == nil then
+		_claimed_by:SetText("Unclaimed")
+	else
+		_claimed_by:SetText("Claimed by: " .. ns.claimed_milestones[_v.name])
+	end
 	_claimed_by:SetHeight(140)
 	_claimed_by:SetWidth(800)
 	_claimed_by:SetJustifyH("LEFT")
@@ -847,6 +822,38 @@ local function drawEventTypeTab(container, _title, _frames)
 	tree_container:SetCallback("OnGroupSelected", function(_container, events, group)
 		recently_selected_group = group
 		scroll_frame:ReleaseChildren()
+
+		if group == "Achievement" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText(
+				"Awarded when completing the quest by the specified level.  Limited to once per character."
+			)
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "Milestone" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Awarded to the first character that meets the requirements.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "Failure" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Points are taken away for these events.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "OfficerCommand" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Special commands that only officers can use.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		end
 		for k, v in pairs(ns.event) do
 			if v.type == group then
 				if group == "Achievement" then

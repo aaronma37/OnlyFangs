@@ -6,7 +6,7 @@ ns.event.FirstToSixty = _event
 -- General info
 _event.name = "FirstToSixty"
 _event.type = "Milestone"
-_event.title = "First to Sixty"
+_event.title = "1st to Sixty"
 _event.icon_path = "Interface\\ICONS\\INV_BannerPVP_01"
 _event.pts = 10
 _event.description = "First to reach level 60 gets this milestone!"

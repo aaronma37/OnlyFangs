@@ -8,7 +8,7 @@ local COMM_COMMAND_DELIM = "|"
 local COMM_FIELD_DELIM = "~"
 local COMM_CHANNEL = "GUILD"
 local HB_DUR = 2
-local ERASE_CACHE = true
+local ERASE_CACHE = false
 -- Node
 local VALUE_IDX = 1
 local KEY_IDX = 4
@@ -47,6 +47,26 @@ end
 --- [guild][data][key] -> {value: {}, prev: string or nil, next: string or nil}
 
 local distributed_log = nil
+ns.claimed_milestones = {}
+
+local function refreshClaimedMilestones()
+	local guild_name = guildName()
+	for k, v in pairs(distributed_log[guild_name]["data"]) do
+		local event_name = ns.id_event[v["value"][EVENT_IDX]]
+		local type = ns.event[event_name].type
+		if type == "Milestone" then
+			if ns.claimed_milestones[event_name] == nil then
+				ns.claimed_milestones[event_name] = k
+			elseif
+				v["value"][DATE_IDX]
+				< distributed_log[guild_name]["data"][ns.claimed_milestones[event_name]]["value"][DATE_IDX]
+			then
+				ns.claimed_milestones[event_name] = k
+			end
+		end
+	end
+end
+
 ns.loadDistributedLog = function()
 	distributed_log = ns.distributed_log
 	local guild_name = guildName()
@@ -57,6 +77,7 @@ ns.loadDistributedLog = function()
 	if distributed_log[guild_name] == nil then
 		distributed_log[guild_name] = { ["meta"] = { ["newest"] = nil, ["oldest"] = nil, ["size"] = 0 }, ["data"] = {} }
 	end
+	refreshClaimedMilestones()
 end
 
 -- got a node that points to itself
@@ -129,8 +150,6 @@ local function lruGet(key_id)
 	return v["value"]
 end
 
-ns.claimed_milestones = {}
-
 ns.eventName = function(event_id)
 	return ns.id_event[event_id]
 end
@@ -165,8 +184,13 @@ ns.aggregateLog = function()
 	for k, v in pairs(distributed_log[guild_name]["data"]) do
 		local event_log = v["value"]
 		local event_name = ns.id_event[event_log[EVENT_IDX]]
-
-		ns.event[event_name].aggregrate(distributed_log, event_log)
+		if ns.event[event_name].type == "Milestone" then
+			if ns.claimed_milestones[event_name] == k then
+				ns.event[event_name].aggregrate(distributed_log, event_log)
+			end
+		else
+			ns.event[event_name].aggregrate(distributed_log, event_log)
+		end
 	end
 end
 
@@ -316,4 +340,3 @@ ns.fakeEntries = function()
 
 	ns.aggregateLog()
 end
--- ns.showToast("Yazpad", "warlock")
