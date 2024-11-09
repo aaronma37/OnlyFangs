@@ -659,6 +659,19 @@ local function makeAchievementLabel(_v)
 	_desc:SetWidth(800)
 	_desc:SetJustifyH("LEFT")
 	__f:AddChild(_desc)
+
+	local _gap2 = AceGUI:Create("Label")
+	_gap2:SetHeight(100)
+	_gap2:SetFullWidth(true)
+	__f:AddChild(_gap2)
+
+	local _zone = AceGUI:Create("Label")
+	_zone:SetText(_v.zone)
+	_zone:SetHeight(140)
+	_zone:SetWidth(800)
+	_zone:SetJustifyH("LEFT")
+	_zone:SetColor(100 / 255, 100 / 255, 100 / 255, 1)
+	__f:AddChild(_zone)
 	return __f
 end
 
