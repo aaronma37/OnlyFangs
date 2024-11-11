@@ -723,6 +723,102 @@ local function makeMilestoneLabel(_v)
 	return __f
 end
 
+local function makeFirstToFindLabel(_v)
+	local __f = AceGUI:Create("InlineGroup")
+	__f:SetLayout("Flow")
+	__f:SetHeight(200)
+	__f:SetWidth(800)
+	local _title = AceGUI:Create("Label")
+	_title:SetText(_v.title)
+	_title:SetHeight(100)
+	_title:SetWidth(690)
+	_title:SetJustifyH("LEFT")
+	_title:SetFont(main_font, 16, "")
+	__f:AddChild(_title)
+
+	local _pts = AceGUI:Create("Label")
+	_pts:SetText(_v.pts .. " pts.")
+	_pts:SetColor(0, 255 / 255, 0, 1)
+	_pts:SetHeight(50)
+	_pts:SetWidth(75)
+	_pts:SetJustifyH("RIGHT")
+	_pts:SetFont(main_font, 12, "")
+	__f:AddChild(_pts)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(100)
+	_gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+
+	local _desc = AceGUI:Create("Label")
+	_desc:SetText(_v.description)
+	_desc:SetHeight(140)
+	_desc:SetWidth(800)
+	_desc:SetJustifyH("LEFT")
+	__f:AddChild(_desc)
+
+	local _claimed_by = AceGUI:Create("Label")
+	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
+	if ns.claimed_milestones[_v.name] == nil then
+		_claimed_by:SetText("Unclaimed")
+	else
+		_claimed_by:SetText("Claimed by: " .. ns.claimed_milestones[_v.name])
+	end
+	_claimed_by:SetHeight(140)
+	_claimed_by:SetWidth(800)
+	_claimed_by:SetJustifyH("LEFT")
+	__f:AddChild(_claimed_by)
+	return __f
+end
+
+local function makeFirstToCompleteLabel(_v)
+	local __f = AceGUI:Create("InlineGroup")
+	__f:SetLayout("Flow")
+	__f:SetHeight(200)
+	__f:SetWidth(800)
+	local _title = AceGUI:Create("Label")
+	_title:SetText(_v.title)
+	_title:SetHeight(100)
+	_title:SetWidth(690)
+	_title:SetJustifyH("LEFT")
+	_title:SetFont(main_font, 16, "")
+	__f:AddChild(_title)
+
+	local _pts = AceGUI:Create("Label")
+	_pts:SetText(_v.pts .. " pts.")
+	_pts:SetColor(0, 255 / 255, 0, 1)
+	_pts:SetHeight(50)
+	_pts:SetWidth(75)
+	_pts:SetJustifyH("RIGHT")
+	_pts:SetFont(main_font, 12, "")
+	__f:AddChild(_pts)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(100)
+	_gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+
+	local _desc = AceGUI:Create("Label")
+	_desc:SetText(_v.description)
+	_desc:SetHeight(140)
+	_desc:SetWidth(800)
+	_desc:SetJustifyH("LEFT")
+	__f:AddChild(_desc)
+
+	local _claimed_by = AceGUI:Create("Label")
+	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
+	if ns.claimed_milestones[_v.name] == nil then
+		_claimed_by:SetText("Unclaimed")
+	else
+		_claimed_by:SetText("Claimed by: " .. ns.claimed_milestones[_v.name])
+	end
+	_claimed_by:SetHeight(140)
+	_claimed_by:SetWidth(800)
+	_claimed_by:SetJustifyH("LEFT")
+	__f:AddChild(_claimed_by)
+	return __f
+end
+
 local function makeFailureLabel(_v)
 	local __f = AceGUI:Create("InlineGroup")
 	__f:SetLayout("Flow")
@@ -804,6 +900,24 @@ local function drawEventTypeTab(container, _title, _frames)
 		{
 			value = "Milestone",
 			text = "Milestones",
+			children = {
+				{
+					value = "General",
+					text = "General",
+				},
+				{
+					value = "First to Complete",
+					text = "First to Complete",
+				},
+				{
+					value = "First to Find",
+					text = "First to Find",
+				},
+				{
+					value = "First to Max Profession",
+					text = "First to Max Profession",
+				},
+			},
 		},
 		{
 			value = "Achievement",
@@ -832,8 +946,13 @@ local function drawEventTypeTab(container, _title, _frames)
 	scroll_frame:SetLayout("List")
 	tree_container:AddChild(scroll_frame)
 
-	tree_container:SetCallback("OnGroupSelected", function(_container, events, group)
+	tree_container:SetCallback("OnGroupSelected", function(_container, events, group, other)
+		local _, _subgroup = string.split(string.char(1), group)
+		if _subgroup ~= nil then
+			group = _subgroup
+		end
 		recently_selected_group = group
+
 		scroll_frame:ReleaseChildren()
 
 		if group == "Achievement" then
@@ -848,6 +967,34 @@ local function drawEventTypeTab(container, _title, _frames)
 		elseif group == "Milestone" then
 			local _group_description = AceGUI:Create("Label")
 			_group_description:SetText("Awarded to the first character that meets the requirements.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "General" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Be the first to complete the specified achievement.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "First to Complete" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Be the first to complete the specified quest.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "First to Find" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Be the first to obtain the specified item.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "First to Max Profession" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Be the first to reach 300 the specified profession.")
 			_group_description:SetHeight(140)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")
@@ -868,11 +1015,17 @@ local function drawEventTypeTab(container, _title, _frames)
 			scroll_frame:AddChild(_group_description)
 		end
 		for k, v in pairs(ns.event) do
-			if v.type == group then
+			if v.type == group or v.subtype == group then
 				if group == "Achievement" then
 					scroll_frame:AddChild(makeAchievementLabel(v))
-				elseif group == "Milestone" then
-					scroll_frame:AddChild(makeMilestoneLabel(v))
+				elseif group == "General" then
+					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
+				elseif group == "First to Complete" then
+					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
+				elseif group == "First to Find" then
+					scroll_frame:AddChild(makeFirstToFindLabel(v))
+				elseif group == "First to Max Profession" then
+					scroll_frame:AddChild(makeFirstToFindLabel(v))
 				elseif group == "Failure" then
 					scroll_frame:AddChild(makeFailureLabel(v))
 				elseif group == "OfficerCommand" then
@@ -898,11 +1051,12 @@ local function drawLeaderboardTab(container)
 	main_frame:SetFullHeight(true)
 	scroll_container:AddChild(main_frame)
 
+	local _frames = {}
 	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
 		local __f = AceGUI:Create("InlineGroup")
 		__f:SetLayout("Flow")
 		__f:SetHeight(700)
-		__f:SetWidth(340)
+		__f:SetWidth(330)
 		main_frame:AddChild(__f)
 
 		local _header = AceGUI:Create("Heading")
@@ -912,14 +1066,22 @@ local function drawLeaderboardTab(container)
 
 		for j = 1, 30 do
 			local _line = AceGUI:Create("Label")
-			_line:SetWidth(260)
+			_line:SetWidth(250)
 			_line:SetText("1. Yazpad")
 			__f:AddChild(_line)
 			local _pts = AceGUI:Create("Label")
 			_pts:SetWidth(40)
 			_pts:SetText("5 pts")
 			__f:AddChild(_pts)
+			_frames[#_frames + 1] = __f.frame
 		end
+	end
+
+	local count = 0
+	for _, v in ipairs(_frames) do
+		v:SetPoint("TOPLEFT", scroll_container.frame, count * 11 - 300, -8)
+		count = count + 1
+		v:Show()
 	end
 end
 

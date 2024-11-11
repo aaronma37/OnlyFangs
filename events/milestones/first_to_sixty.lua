@@ -6,10 +6,11 @@ ns.event.FirstToSixty = _event
 -- General info
 _event.name = "FirstToSixty"
 _event.type = "Milestone"
-_event.title = "1st to Sixty"
+_event.title = "1st to 60"
 _event.icon_path = "Interface\\ICONS\\INV_BannerPVP_01"
-_event.pts = 10
+_event.pts = 125
 _event.description = "First to reach level 60 gets this milestone!"
+_event.subtype = "General"
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)

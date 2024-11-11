@@ -283,6 +283,9 @@ local function loadQuestEvent(_metadata)
 	-- Register Definitions
 	local sent = false
 	_event:SetScript("OnEvent", function(self, e, _args)
+		if sent == true then
+			return
+		end
 		if e == "QUEST_TURNED_IN" then
 			if
 				_args[1] ~= nil
@@ -293,6 +296,7 @@ local function loadQuestEvent(_metadata)
 				)
 			then
 				ns.triggerEvent(_event.name)
+				sent = true
 			end
 		end
 	end)

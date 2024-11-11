@@ -20,6 +20,7 @@ local addonName, ns = ...
 
 -- Entry: (event_id, player, time, faction)
 ns.recent_level_up = nil -- KEEP GLOBAL
+ns.current_profession_levels = {}
 local last_attack_source = nil
 local recent_msg = nil
 
@@ -61,12 +62,29 @@ local function handleEvent(self, event, ...)
 		C_Timer.After(3, function()
 			ns.recent_level_up = nil
 		end)
+
+		for i = 1, GetNumSkillLines() do
+			local arg, _, _, lvl = GetSkillLineInfo(i)
+			ns.current_profession_levels[arg] = lvl
+		end
 	elseif event == "ADDON_LOADED" then
 		print(OnlyFangsDistributedLog)
 		OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
 		ns.distributed_log = OnlyFangsDistributedLog
 		ns.loadDistributedLog()
 		ns.fakeEntries()
+	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
+		for bag = 0, 5 do
+			for slot = 0, 16 do
+				local item_id = C_Container.GetContainerItemID(bag, slot)
+				if ns.item_id_obs[item_id] ~= nil then
+					ns.item_id_obs[item_id]()
+				end
+				if item_id ~= nil then
+					local item_name, _, _rarity, _, _, _, _, _, _, _, _ = GetItemInfo(item_id)
+				end
+			end
+		end
 	end
 end
 
@@ -74,6 +92,7 @@ local deathlog_event_handler = CreateFrame("Frame", "OnlyFangs", nil, "BackdropT
 deathlog_event_handler:RegisterEvent("PLAYER_ENTERING_WORLD")
 deathlog_event_handler:RegisterEvent("PLAYER_LEVEL_UP")
 deathlog_event_handler:RegisterEvent("ADDON_LOADED")
+deathlog_event_handler:RegisterEvent("UNIT_INVENTORY_CHANGED")
 
 deathlog_event_handler:SetScript("OnEvent", handleEvent)
 
