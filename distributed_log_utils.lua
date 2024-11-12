@@ -35,6 +35,7 @@ local estimated_score = {
 	["Tauren"] = 0,
 	["Troll"] = 0,
 }
+ns.guild_member_addon_info = {}
 
 local function guildName()
 	local guild_name, _, _ = GetGuildInfo("Player")
@@ -213,8 +214,9 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 	if prefix == COMM_NAME and scope == "GUILD" then
 		local command, data = string.split(COMM_COMMAND_DELIM, datastr)
 		if command == COMM_COMMAND_HEARTBEAT then
-			local _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id =
+			local _addon_version, _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id =
 				string.split(COMM_FIELD_DELIM, data)
+			ns.guild_member_addon_info[sender] = { ["version"] = _addon_version, ["version_status"] = "updated" }
 			if _date ~= nil and lruGet(_fletcher) == nil then
 				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id) }
 				local _event_name = ns.id_event[tonumber(_event_id)]
@@ -265,6 +267,8 @@ C_Timer.NewTicker(HB_DUR, function(self)
 	end
 	local comm_message = COMM_COMMAND_HEARTBEAT
 		.. COMM_COMMAND_DELIM
+		.. GetAddOnMetadata("OnlyFangs", "Version")
+		.. COMM_FIELD_DELIM
 		.. distributed_log[guild_name]["meta"]["size"]
 		.. COMM_FIELD_DELIM
 		.. distributed_log.points["Orc"]

@@ -317,47 +317,6 @@ function OnlyFangsGeneratePassiveAchievementProfLevelDescription(profession_name
 		.. "."
 end
 
-passive_achievement_kill_handler = CreateFrame("Frame")
-passive_achievement_kill_handler:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
-
-local registered_kill_event_achievements = {}
-function passive_achievement_kill_handler:RegisterKillEvent(achievement_name)
-	if ns.passive_achievements[achievement_name] then
-		registered_kill_event_achievements[achievement_name] = ns.passive_achievements[achievement_name]
-	end
-end
-
-passive_achievement_kill_handler:SetScript("OnEvent", function(self, event, ...)
-	local arg = { ... }
-	if event == "CHAT_MSG_COMBAT_XP_GAIN" then
-		local combat_log_payload = { CombatLogGetCurrentEventInfo() }
-		local v = arg[1]:match("(.+) dies")
-		if kill_list_dict[v] then
-			if HardcoreUnlocked_Character then
-				if HardcoreUnlocked_Character.kill_list_dict == nil then
-					HardcoreUnlocked_Character.kill_list_dict = {}
-				end
-
-				if HardcoreUnlocked_Character.kill_list_dict[v] == nil then
-					if ns.passive_achievements[kill_list_dict[v]] then
-						Hardcore:Print(
-							"["
-								.. ns.passive_achievements[kill_list_dict[v]].title
-								.. "] You have slain "
-								.. v
-								.. "!  Remember to /reload when convenient to save your progress."
-						)
-					end
-					for _, registered_kill_event_achievement in pairs(registered_kill_event_achievements) do
-						registered_kill_event_achievement:HandleKillEvent(v, HardcoreUnlocked_Character)
-					end
-				end
-				HardcoreUnlocked_Character.kill_list_dict[v] = 1
-			end
-		end
-	end
-end)
-
 function OnlyFangsCommonPassiveAchievementAltBasicQuestCheck(_achievement, _event, _args)
 	if _event == "QUEST_TURNED_IN" then
 		if

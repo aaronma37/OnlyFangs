@@ -140,6 +140,24 @@ local function handleEvent(self, event, ...)
 				ns.kill_target_exec[creature_guid_map[target_guid]]()
 			end
 		end
+	elseif event == "GUILD_ROSTER_UPDATE" then
+		local arg = { ... }
+		-- Create a new dictionary of just online people every time roster is updated
+		ns.guild_online = {}
+		local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()
+		for i = 1, numOnline, 1 do
+			local name, rankName, rankIndex, level, classDisplayName, zone, publicNote, officerNote, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
+				GetGuildRosterInfo(i)
+
+			-- name is nil after a gquit, so nil check here
+			if name then
+				ns.guild_online[name] = {
+					name = name,
+					level = level,
+					classDisplayName = classDisplayName,
+				}
+			end
+		end
 	end
 end
 
@@ -151,6 +169,7 @@ deathlog_event_handler:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 deathlog_event_handler:RegisterEvent("UNIT_INVENTORY_CHANGED")
 deathlog_event_handler:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
 deathlog_event_handler:RegisterEvent("PLAYER_TARGET_CHANGED")
+deathlog_event_handler:RegisterEvent("GUILD_ROSTER_UPDATE")
 
 deathlog_event_handler:SetScript("OnEvent", handleEvent)
 
@@ -165,4 +184,5 @@ local options = {
 LibStub("AceConfig-3.0"):RegisterOptionsTable("OnlyFangs", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("OnlyFangs", "OnlyFangs", nil)
 
-ns.checkEvents()
+-- testing
+-- ns.checkEvents()

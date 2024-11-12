@@ -124,3 +124,23 @@ ns.fletcher16 = function(name, race_id, entry_id, date)
 	end
 	return name .. "-" .. bit.bor(bit.lshift(sum2, 8), sum1)
 end
+
+ns.getVersion = function()
+	local name = GetAddOnInfo("OnlyFangs")
+	local version
+
+	if version_string then
+		version = version_string
+	else
+		version = GetAddOnMetadata(name, "Version")
+	end
+
+	local major, minor, patch = string.match(version, "(%d+)%p(%d+)%p(%d+)")
+	local hash = "nil"
+
+	local buildType
+
+	print(major, minor, patch, hash)
+	return tonumber(major), tonumber(minor), tonumber(patch), tostring(hash), tostring(buildType)
+end
+ns.getVersion()

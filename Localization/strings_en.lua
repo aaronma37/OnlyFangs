@@ -43,6 +43,7 @@ deathlog_strings_en = {
 		Hunter = "hunter",
 	},
 	tab_table = {
+		{ value = "GuildMembersTab", text = "GuildMembers" },
 		{ value = "PointsTab", text = "Points" },
 		{ value = "LogTab", text = "Log" },
 		{ value = "LeaderboardTab", text = "Leaderboard" },

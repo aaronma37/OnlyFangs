@@ -20,6 +20,7 @@ along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 
 local addonName, ns = ...
 
+local ticker_handler = nil
 local _menu_width = 1100
 local _inner_menu_width = 800
 local _menu_height = 600
@@ -37,7 +38,7 @@ local environment_damage = {
 
 local main_font = Deathlog_L.main_font
 
-local deathlog_tabcontainer = nil
+local onlyfangs_tab_container = nil
 
 local class_tbl = ns.class_tbl
 local race_tbl = ns.race_id
@@ -297,13 +298,21 @@ local function setLogData()
 
 		local _event = list[idx]
 		local _event_name = ns.eventName(_event["Event"])
-		font_strings[i]["Name"]:SetText(_event["Name"])
-		font_strings[i]["Date"]:SetText(_event["Date"])
-		font_strings[i]["Race"]:SetText(_event["Race"])
-		font_strings[i]["Class"]:SetText(_event["Class"])
-		font_strings[i]["Event"]:SetText(_event_name)
+
+		local _char_name, _ = string.split("-", _event["Name"])
+		font_strings[i]["Name"]:SetText(_char_name)
+		font_strings[i]["Date"]:SetText(date("%m/%d/%y, %H:%M", _event["Date"] + 1730639674))
+		font_strings[i]["Race"]:SetText(ns.id_race[_event["Race"]])
+		font_strings[i]["Class"]:SetText(ns.id_class[_event["Class"]])
+		font_strings[i]["Event"]:SetText(ns.event[_event_name].title)
 		font_strings[i]["Type"]:SetText(ns.event[_event_name].type)
-		font_strings[i]["Points"]:SetText(ns.event[_event_name].pts)
+		local pt_str = ""
+		if ns.event[_event_name].pts > 0 then
+			pt_str = "|cff00FF00+" .. ns.event[_event_name].pts .. "|r"
+		elseif ns.event[_event_name].pts < 0 then
+			pt_str = "|cffFF0000-" .. ns.event[_event_name].pts .. "|r"
+		end
+		font_strings[i]["Points"]:SetText(pt_str)
 	end
 end
 
@@ -316,7 +325,7 @@ local function drawLogTab(container)
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
 	scroll_container:SetLayout("Fill")
-	deathlog_tabcontainer:AddChild(scroll_container)
+	onlyfangs_tab_container:AddChild(scroll_container)
 
 	local name_filter = nil
 	local guidl_filter = nil
@@ -635,14 +644,16 @@ local function makeAchievementLabel(_v)
 	return __f
 end
 
+local alt = 0
+local alt2 = 1
 local function makeMilestoneLabel(_v)
 	local __f = AceGUI:Create("InlineGroup")
 	__f:SetLayout("Flow")
-	__f:SetHeight(200)
+	__f:SetHeight(100)
 	__f:SetWidth(800)
 	local _title = AceGUI:Create("Label")
 	_title:SetText(_v.title)
-	_title:SetHeight(100)
+	_title:SetHeight(30)
 	_title:SetWidth(690)
 	_title:SetJustifyH("LEFT")
 	_title:SetFont(main_font, 16, "")
@@ -651,20 +662,20 @@ local function makeMilestoneLabel(_v)
 	local _pts = AceGUI:Create("Label")
 	_pts:SetText(_v.pts .. " pts.")
 	_pts:SetColor(0, 255 / 255, 0, 1)
-	_pts:SetHeight(50)
+	_pts:SetHeight(30)
 	_pts:SetWidth(75)
 	_pts:SetJustifyH("RIGHT")
 	_pts:SetFont(main_font, 12, "")
 	__f:AddChild(_pts)
 
 	local _gap = AceGUI:Create("Label")
-	_gap:SetHeight(100)
+	_gap:SetHeight(0)
 	_gap:SetFullWidth(true)
 	__f:AddChild(_gap)
 
 	local _desc = AceGUI:Create("Label")
 	_desc:SetText(_v.description)
-	_desc:SetHeight(140)
+	_desc:SetHeight(30)
 	_desc:SetWidth(800)
 	_desc:SetJustifyH("LEFT")
 	__f:AddChild(_desc)
@@ -683,37 +694,127 @@ local function makeMilestoneLabel(_v)
 	return __f
 end
 
-local function makeFirstToFindLabel(_v)
-	local __f = AceGUI:Create("InlineGroup")
+local function makeAchievementLabel2(_v)
+	local __f = AceGUI:Create("SimpleGroupOF")
 	__f:SetLayout("Flow")
-	__f:SetHeight(200)
-	__f:SetWidth(800)
+	__f:SetHeight(100)
+	__f:SetWidth(390)
+
+	-- __f.frame2 = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+	__f.frame:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		edgeSize = 1,
+		insets = { left = 1, right = 1, top = 1, bottom = 1 },
+	})
+	__f.frame:SetBackdropColor(1, 1, 1, alt)
+	__f.frame:SetBackdropBorderColor(1, 1, 1, 0)
+	if alt2 == 1 then
+		if alt == 0 then
+			alt = 0.1
+			alt2 = 0
+		else
+			alt = 0
+			alt2 = 0
+		end
+	else
+		alt2 = 1
+	end
+
 	local _title = AceGUI:Create("Label")
 	_title:SetText(_v.title)
-	_title:SetHeight(100)
-	_title:SetWidth(690)
+	_title:SetHeight(30)
+	_title:SetWidth(280)
 	_title:SetJustifyH("LEFT")
-	_title:SetFont(main_font, 16, "")
+	_title:SetFont(main_font, 12, "")
 	__f:AddChild(_title)
 
 	local _pts = AceGUI:Create("Label")
 	_pts:SetText(_v.pts .. " pts.")
 	_pts:SetColor(0, 255 / 255, 0, 1)
-	_pts:SetHeight(50)
+	_pts:SetHeight(30)
 	_pts:SetWidth(75)
 	_pts:SetJustifyH("RIGHT")
 	_pts:SetFont(main_font, 12, "")
 	__f:AddChild(_pts)
 
+	local _desc = AceGUI:Create("Label")
+	_desc:SetText(_v.description)
+	_desc:SetHeight(30)
+	_desc:SetWidth(400)
+	_desc:SetJustifyH("LEFT")
+	__f:AddChild(_desc)
+
+	local _claimed_by = AceGUI:Create("Label")
+	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
+	_claimed_by:SetText(_v.zone)
+	_claimed_by:SetHeight(140)
+	_claimed_by:SetWidth(400)
+	_claimed_by:SetJustifyH("LEFT")
+	__f:AddChild(_claimed_by)
+
 	local _gap = AceGUI:Create("Label")
-	_gap:SetHeight(100)
-	_gap:SetFullWidth(true)
+	_gap:SetHeight(30)
+	_gap:SetText("")
+	-- _gap:SetFullWidth(true)
 	__f:AddChild(_gap)
+	local _gap2 = AceGUI:Create("Label")
+	_gap2:SetHeight(30)
+	_gap2:SetText("")
+	-- _gap2:SetFullWidth(true)
+	__f:AddChild(_gap2)
+
+	return __f
+end
+
+local function makeFirstToFindLabel(_v)
+	local __f = AceGUI:Create("SimpleGroupOF")
+	__f:SetLayout("Flow")
+	__f:SetHeight(100)
+	__f:SetWidth(390)
+
+	-- __f.frame2 = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+	__f.frame:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		edgeSize = 1,
+		insets = { left = 1, right = 1, top = 1, bottom = 1 },
+	})
+	__f.frame:SetBackdropColor(1, 1, 1, alt)
+	__f.frame:SetBackdropBorderColor(1, 1, 1, 0)
+	if alt2 == 1 then
+		if alt == 0 then
+			alt = 0.1
+			alt2 = 0
+		else
+			alt = 0
+			alt2 = 0
+		end
+	else
+		alt2 = 1
+	end
+
+	local _title = AceGUI:Create("Label")
+	_title:SetText(_v.title)
+	_title:SetHeight(30)
+	_title:SetWidth(280)
+	_title:SetJustifyH("LEFT")
+	_title:SetFont(main_font, 12, "")
+	__f:AddChild(_title)
+
+	local _pts = AceGUI:Create("Label")
+	_pts:SetText(_v.pts .. " pts.")
+	_pts:SetColor(0, 255 / 255, 0, 1)
+	_pts:SetHeight(30)
+	_pts:SetWidth(75)
+	_pts:SetJustifyH("RIGHT")
+	_pts:SetFont(main_font, 12, "")
+	__f:AddChild(_pts)
 
 	local _desc = AceGUI:Create("Label")
 	_desc:SetText(_v.description)
-	_desc:SetHeight(140)
-	_desc:SetWidth(800)
+	_desc:SetHeight(30)
+	_desc:SetWidth(400)
 	_desc:SetJustifyH("LEFT")
 	__f:AddChild(_desc)
 
@@ -725,9 +826,21 @@ local function makeFirstToFindLabel(_v)
 		_claimed_by:SetText("Claimed by: " .. ns.claimed_milestones[_v.name])
 	end
 	_claimed_by:SetHeight(140)
-	_claimed_by:SetWidth(800)
+	_claimed_by:SetWidth(400)
 	_claimed_by:SetJustifyH("LEFT")
 	__f:AddChild(_claimed_by)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(30)
+	_gap:SetText("")
+	-- _gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+	local _gap2 = AceGUI:Create("Label")
+	_gap2:SetHeight(30)
+	_gap2:SetText("")
+	-- _gap2:SetFullWidth(true)
+	__f:AddChild(_gap2)
+
 	return __f
 end
 
@@ -847,7 +960,7 @@ local function drawEventTypeTab(container, _title, _frames)
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
 	scroll_container:SetLayout("Flow")
-	deathlog_tabcontainer:AddChild(scroll_container)
+	onlyfangs_tab_container:AddChild(scroll_container)
 
 	local header_frame = AceGUI:Create("SimpleGroup")
 	header_frame:SetLayout("Flow")
@@ -921,7 +1034,7 @@ local function drawEventTypeTab(container, _title, _frames)
 	scroll_container:AddChild(tree_container)
 
 	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("List")
+	scroll_frame:SetLayout("Flow")
 	tree_container:AddChild(scroll_frame)
 
 	tree_container:SetCallback("OnGroupSelected", function(_container, events, group, other)
@@ -1023,19 +1136,19 @@ local function drawEventTypeTab(container, _title, _frames)
 		for k, v in pairs(ns.event) do
 			if v.type == group or v.subtype == group then
 				if group == "General" then
-					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
+					scroll_frame:AddChild(makeFirstToFindLabel(v))
 				elseif group == "First to Kill" then
-					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
+					scroll_frame:AddChild(makeFirstToFindLabel(v))
 				elseif group == "First to Complete" then
-					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
+					scroll_frame:AddChild(makeFirstToFindLabel(v))
 				elseif group == "First to Find" then
 					scroll_frame:AddChild(makeFirstToFindLabel(v))
 				elseif group == "Profession" then
-					scroll_frame:AddChild(makeAchievementLabel(v))
+					scroll_frame:AddChild(makeAchievementLabel2(v))
 				elseif group == "Quest" then
-					scroll_frame:AddChild(makeAchievementLabel(v))
+					scroll_frame:AddChild(makeAchievementLabel2(v))
 				elseif group == "Leveling" then
-					scroll_frame:AddChild(makeAchievementLabel(v))
+					scroll_frame:AddChild(makeAchievementLabel2(v))
 				elseif group == "First to Max Profession" then
 					scroll_frame:AddChild(makeFirstToFindLabel(v))
 				elseif group == "Failure" then
@@ -1050,12 +1163,349 @@ local function drawEventTypeTab(container, _title, _frames)
 	tree_container:SelectByValue("Milestone")
 end
 
+local guild_member_subtitle_data = {
+	{
+		"Name",
+		100,
+		function(_player_name_short, _player_name_long)
+			return _player_name_short or ""
+		end,
+	},
+	{
+		"Lvl",
+		30,
+		function(_player_name_short, _player_name_long)
+			if ns.guild_online[_player_name_long] == nil then
+				return ""
+			end
+			return ns.guild_online[_player_name_long].level or ""
+		end,
+	},
+	{
+		"Version",
+		90,
+		function(_player_name_short, _player_name_long)
+			local version_text
+			if
+				(ns.guild_member_addon_info[_player_name_long] and ns.guild_online[_player_name_long])
+				or _player_name_short == UnitName("player")
+			then
+				if _player_name_short == UnitName("player") then
+					version_text = GetAddOnMetadata("OnlyFangs", "Version")
+				else
+					version_text = ns.guild_member_addon_info[_player_name_long]["version"]
+				end
+
+				if
+					ns.guild_member_addon_info[_player_name_long]
+					and ns.guild_member_addon_info[_player_name_long]["version_status"] ~= nil
+					and ns.guild_member_addon_info[_player_name_long]["version_status"] == "updated"
+				then
+					version_text = "|c0000ff00" .. version_text .. "|r"
+				else
+					version_text = "|c00ffff00" .. version_text .. "|r"
+				end
+			else
+				version_text = "|c00ff0000Not detected|r"
+			end
+			return version_text or ""
+		end,
+	},
+	{
+		"Points",
+		120,
+		function(_player_name_short, _player_name_long)
+			if other_hardcore_character_cache[_player_name_short] == nil then
+				return ""
+			end
+			if
+				other_hardcore_character_cache[_player_name_short].achievements == nil
+				or #other_hardcore_character_cache[_player_name_short].achievements > 0
+				or #other_hardcore_character_cache[_player_name_short].passive_achievements > 0
+			then
+				local inline_text = ""
+				for i, achievement_name in ipairs(other_hardcore_character_cache[_player_name_short].achievements) do
+					if _G.achievements[achievement_name] then
+						inline_text = inline_text
+							.. "|T"
+							.. _G.achievements[achievement_name].icon_path
+							.. ":16:16:0:0:64:64:4:60:4:60|t"
+					end
+				end
+				for i, achievement_name in
+					ipairs(other_hardcore_character_cache[_player_name_short].passive_achievements)
+				do
+					if _G.passive_achievements[achievement_name] then
+						inline_text = inline_text
+							.. "|T"
+							.. _G.passive_achievements[achievement_name].icon_path
+							.. ":16:16:0:0:64:64:4:60:4:60|t"
+					end
+				end
+				return inline_text
+			else
+				return ""
+			end
+		end,
+	},
+}
+local guild_member_font_container = CreateFrame("Frame")
+guild_member_font_container:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+guild_member_font_container:Show()
+local guild_member_entry_tbl = {}
+local guild_member_font_strings = {} -- idx/columns
+local guild_member_header_strings = {} -- columns
+local guild_member_row_backgrounds = {} --idx
+local guild_member_max_rows = 48 --idx
+local guild_member_row_height = 10
+local guild_member_Width = 850
+for idx, v in ipairs(guild_member_subtitle_data) do
+	guild_member_header_strings[v[1]] = guild_member_font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	if idx == 1 then
+		guild_member_header_strings[v[1]]:SetPoint("TOPLEFT", guild_member_font_container, "TOPLEFT", 0, 2)
+	else
+		guild_member_header_strings[v[1]]:SetPoint("LEFT", last_font_string, "RIGHT", 0, 0)
+	end
+	last_font_string = guild_member_header_strings[v[1]]
+	guild_member_header_strings[v[1]]:SetJustifyH("LEFT")
+	guild_member_header_strings[v[1]]:SetWordWrap(false)
+
+	if idx + 1 <= #guild_member_subtitle_data then
+		guild_member_header_strings[v[1]]:SetWidth(v[2])
+	end
+	guild_member_header_strings[v[1]]:SetTextColor(0.7, 0.7, 0.7)
+	guild_member_header_strings[v[1]]:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+	guild_member_header_strings[v[1]]:SetText(v[1])
+end
+for i = 1, guild_member_max_rows do
+	guild_member_font_strings[i] = {}
+	local last_font_string = nil
+	for idx, v in ipairs(guild_member_subtitle_data) do
+		guild_member_font_strings[i][v[1]] =
+			guild_member_font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		if idx == 1 then
+			guild_member_font_strings[i][v[1]]:SetPoint(
+				"TOPLEFT",
+				guild_member_font_container,
+				"TOPLEFT",
+				0,
+				-i * guild_member_row_height
+			)
+		else
+			guild_member_font_strings[i][v[1]]:SetPoint("LEFT", last_font_string, "RIGHT", 0, 0)
+		end
+		last_font_string = guild_member_font_strings[i][v[1]]
+		guild_member_font_strings[i][v[1]]:SetJustifyH("LEFT")
+		guild_member_font_strings[i][v[1]]:SetWordWrap(false)
+
+		if idx + 1 <= #guild_member_subtitle_data then
+			guild_member_font_strings[i][v[1]]:SetWidth(v[2])
+		end
+		guild_member_font_strings[i][v[1]]:SetTextColor(1, 1, 1)
+		guild_member_font_strings[i][v[1]]:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+	end
+
+	guild_member_row_backgrounds[i] = guild_member_font_container:CreateTexture(nil, "OVERLAY")
+	guild_member_row_backgrounds[i]:SetDrawLayer("OVERLAY", 2)
+	guild_member_row_backgrounds[i]:SetVertexColor(0.5, 0.5, 0.5, (i % 2) / 10)
+	guild_member_row_backgrounds[i]:SetHeight(guild_member_row_height)
+	guild_member_row_backgrounds[i]:SetWidth(guild_member_Width)
+	guild_member_row_backgrounds[i]:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+	guild_member_row_backgrounds[i]:SetPoint(
+		"TOPLEFT",
+		guild_member_font_container,
+		"TOPLEFT",
+		0,
+		-i * guild_member_row_height
+	)
+end
+
+local function setGuildMemberData()
+	local rows_used = 1
+	for i = 1, GetNumGuildMembers() do
+		if rows_used > guild_member_max_rows then
+			break
+		end
+		local player_name_long, _, _, _, _, _, _, _, online, _, _ = GetGuildRosterInfo(i)
+		if online then
+			local player_name_short = string.split("-", player_name_long)
+			for _, col in ipairs(guild_member_subtitle_data) do
+				guild_member_font_strings[rows_used][col[1]]:SetText(col[3](player_name_short, player_name_long))
+			end
+			rows_used = rows_used + 1
+		end
+	end
+end
+
+local function DrawAccountabilityTab(container)
+	local function updateLabelData(_label_tbls, player_name_short)
+		if ns.guild_member_addon_info[player_name_short] ~= nil then
+			_label_tbls["party_mode_label"]:SetText(ns.guild_member_addon_info[player_name_short].party_mode)
+			_label_tbls["first_recorded_label"]:SetText(
+				date("%m/%d/%y", ns.guild_member_addon_info[player_name_short].first_recorded or 0)
+			)
+
+			if
+				ns.guild_member_addon_info[player_name_short].achievements == nil
+				or #ns.guild_member_addon_info[player_name_short].achievements > 0
+				or #ns.guild_member_addon_info[player_name_short].passive_achievements > 0
+			then
+				local inline_text = ""
+				for i, achievement_name in ipairs(ns.guild_member_addon_info[player_name_short].achievements) do
+					if _G.achievements[achievement_name] then
+						inline_text = inline_text
+							.. "|T"
+							.. _G.achievements[achievement_name].icon_path
+							.. ":16:16:0:0:64:64:4:60:4:60|t"
+					end
+				end
+				for i, achievement_name in ipairs(ns.guild_member_addon_info[player_name_short].passive_achievements) do
+					if _G.passive_achievements[achievement_name] then
+						inline_text = inline_text
+							.. "|T"
+							.. _G.passive_achievements[achievement_name].icon_path
+							.. ":16:16:0:0:64:64:4:60:4:60|t"
+					end
+				end
+				_label_tbls["achievement_label"]:SetText(inline_text)
+				_label_tbls["achievement_label"]:SetCallback("OnEnter", function(widget)
+					GameTooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
+					GameTooltip:AddLine("achievements")
+					for i, achievement_name in ipairs(ns.guild_member_addon_info[player_name_short].achievements) do
+						if _G.achievements[achievement_name] then
+							GameTooltip:AddLine(_G.achievements[achievement_name].title)
+						end
+					end
+					for i, achievement_name in
+						ipairs(ns.guild_member_addon_info[player_name_short].passive_achievements)
+					do
+						if _G.passive_achievements[achievement_name] then
+							GameTooltip:AddLine(_G.passive_achievements[achievement_name].title)
+						end
+					end
+					GameTooltip:Show()
+				end)
+				_label_tbls["achievement_label"]:SetCallback("OnLeave", function(widget)
+					GameTooltip:Hide()
+				end)
+			else
+				_label_tbls["achievement_label"]:SetText("")
+			end
+			_label_tbls["hc_tag_label"]:SetText(
+				ns.guild_member_addon_info[player_name_short].hardcore_player_name or ""
+			)
+		end
+
+		local player_name_long = player_name_short .. "-" .. GetSpacelessRealmName()
+		if ns.guild_online[player_name_long] ~= nil then
+			local version_text
+			if
+				(ns.guild_member_addon_info[player_name_long] and ns.guild_online[player_name_long])
+				or player_name_short == UnitName("player")
+			then
+				if player_name_short == UnitName("player") then
+					version_text = GetAddOnMetadata("OnlyFangs", "Version")
+				else
+					version_text = ns.guild_member_addon_info[player_name_long]
+				end
+
+				if ns.guild_member_addon_info[player_name_long]["version_status"] == "updated" then
+					version_text = "|c0000ff00" .. version_text .. "|r"
+				else
+					version_text = "|c00ffff00" .. version_text .. "|r"
+				end
+			else
+				version_text = "|c00ff0000Not detected|r"
+			end
+			_label_tbls["version_label"]:SetText(version_text)
+
+			_label_tbls["level_label"]:SetText(ns.guild_online[player_name_long].level)
+		end
+	end
+	local function addEntry(_scroll_frame, player_name_short, _self_name)
+		--local _player_name = player_name_short .. "-" .. GetSpacelessRealmName()
+		local entry = AceGUI:Create("SimpleGroup")
+		entry:SetLayout("Flow")
+		entry:SetFullWidth(true)
+		_scroll_frame:AddChild(entry)
+
+		local name_label = AceGUI:Create("Label")
+		name_label:SetWidth(110)
+		name_label:SetText(player_name_short)
+		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		entry:AddChild(name_label)
+		guild_member_entry_tbl[player_name_short] = {}
+
+		local level_label = AceGUI:Create("Label")
+		level_label:SetWidth(50)
+		level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		entry:AddChild(level_label)
+		guild_member_entry_tbl[player_name_short]["level_label"] = level_label
+
+		local version_label = AceGUI:Create("Label")
+		version_label:SetWidth(80)
+		version_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		entry:AddChild(version_label)
+		guild_member_entry_tbl[player_name_short]["version_label"] = version_label
+
+		local party_mode_label = AceGUI:Create("Label")
+		party_mode_label:SetWidth(75)
+		party_mode_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		entry:AddChild(party_mode_label)
+		guild_member_entry_tbl[player_name_short]["party_mode_label"] = party_mode_label
+
+		local first_recorded_label = AceGUI:Create("Label")
+		first_recorded_label:SetWidth(85)
+		first_recorded_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		entry:AddChild(first_recorded_label)
+		guild_member_entry_tbl[player_name_short]["first_recorded_label"] = first_recorded_label
+
+		local achievement_label = AceGUI:Create("InteractiveLabel")
+		achievement_label:SetWidth(320)
+		achievement_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		entry:AddChild(achievement_label)
+		guild_member_entry_tbl[player_name_short]["achievement_label"] = achievement_label
+
+		local hc_tag_label = AceGUI:Create("Label")
+		hc_tag_label:SetWidth(75)
+		hc_tag_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+		entry:AddChild(hc_tag_label)
+		guild_member_entry_tbl[player_name_short]["hc_tag_label"] = hc_tag_label
+
+		updateLabelData(guild_member_entry_tbl[player_name_short], player_name_short) -- , _player_name)
+	end
+
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("List")
+	onlyfangs_tab_container:AddChild(scroll_container)
+
+	local scroll_frame = AceGUI:Create("ScrollFrame")
+	scroll_frame:SetLayout("List")
+	scroll_container:AddChild(scroll_frame)
+	guild_member_font_container:SetParent(scroll_container.frame)
+	guild_member_font_container:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT")
+	guild_member_font_container:SetHeight(400)
+	guild_member_font_container:SetWidth(200)
+	setGuildMemberData()
+
+	ticker_handler = C_Timer.NewTicker(1, function()
+		setGuildMemberData()
+	end)
+
+	guild_member_font_container:Show()
+	scroll_container.frame:HookScript("OnHide", function()
+		guild_member_font_container:Hide()
+	end)
+end
+
 local function drawLeaderboardTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
 	scroll_container:SetLayout("Fill")
-	deathlog_tabcontainer:AddChild(scroll_container)
+	onlyfangs_tab_container:AddChild(scroll_container)
 
 	local main_frame = AceGUI:Create("SimpleGroup")
 	main_frame:SetLayout("Flow")
@@ -1099,8 +1549,24 @@ end
 
 local function createMenu()
 	local ace_deathlog_menu = AceGUI:Create("DeathlogMenu")
-	_G["AceDeathlogMenu"] = ace_deathlog_menu.frame -- Close on <ESC>
-	tinsert(UISpecialFrames, "AceDeathlogMenu")
+	_G["AceOnlyFangsMenu"] = ace_deathlog_menu.frame -- Close on <ESC>
+	ace_deathlog_menu:SetCallback("OnClose", function(widget)
+		if ticker_handler ~= nil then
+			ticker_handler:Cancel()
+			ticker_handler = nil
+		end
+		-- hardcore_modern_menu_state.entry_tbl = {}
+		-- AceGUI:Release(widget)
+	end)
+	ace_deathlog_menu:SetCallback("OnHide", function(widget)
+		if ticker_handler ~= nil then
+			ticker_handler:Cancel()
+			ticker_handler = nil
+		end
+		-- hardcore_modern_menu_state.entry_tbl = {}
+		-- AceGUI:Release(widget)
+	end)
+	tinsert(UISpecialFrames, "AceOnlyFangsMenu")
 
 	ace_deathlog_menu:SetTitle("OnlyFangs")
 	ace_deathlog_menu:SetVersion(GetAddOnMetadata("OnlyFangs", "Version"))
@@ -1133,12 +1599,12 @@ local function createMenu()
 		ace_deathlog_menu.exit_button_x:SetVertexColor(1, 1, 1, 0.8)
 	end
 
-	deathlog_tabcontainer = AceGUI:Create("DeathlogTabGroup") -- "InlineGroup" is also good
+	onlyfangs_tab_container = AceGUI:Create("DeathlogTabGroup") -- "InlineGroup" is also good
 	local tab_table = Deathlog_L.tab_table
-	deathlog_tabcontainer:SetTabs(tab_table)
-	deathlog_tabcontainer:SetFullWidth(true)
-	deathlog_tabcontainer:SetFullHeight(true)
-	deathlog_tabcontainer:SetLayout("Flow")
+	onlyfangs_tab_container:SetTabs(tab_table)
+	onlyfangs_tab_container:SetFullWidth(true)
+	onlyfangs_tab_container:SetFullHeight(true)
+	onlyfangs_tab_container:SetLayout("Flow")
 
 	local function SelectGroup(container, event, group)
 		container:ReleaseChildren()
@@ -1148,12 +1614,14 @@ local function createMenu()
 			drawLogTab(container)
 		elseif group == "LeaderboardTab" then
 			drawLeaderboardTab(container)
+		elseif group == "GuildMembersTab" then
+			DrawAccountabilityTab(container)
 		end
 	end
 
-	deathlog_tabcontainer:SetCallback("OnGroupSelected", SelectGroup)
+	onlyfangs_tab_container:SetCallback("OnGroupSelected", SelectGroup)
 
-	ace_deathlog_menu:AddChild(deathlog_tabcontainer)
+	ace_deathlog_menu:AddChild(onlyfangs_tab_container)
 	return ace_deathlog_menu
 end
 
@@ -1161,6 +1629,6 @@ deathlog_menu = createMenu()
 
 ns.showMenu = function()
 	deathlog_menu:Show()
-	deathlog_tabcontainer:SelectTab("LogTab")
+	onlyfangs_tab_container:SelectTab("LogTab")
 	setLogData()
 end
