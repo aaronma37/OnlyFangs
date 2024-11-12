@@ -46,6 +46,7 @@ local function loadLevelEvent(_metadata)
 	-- General info
 	_event.name = _metadata.name
 	_event.type = "Achievement"
+	_event.subtype = "Leveling"
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
 	_event.pts = 10

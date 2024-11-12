@@ -23,8 +23,13 @@ ns.recent_level_up = nil -- KEEP GLOBAL
 ns.current_profession_levels = {}
 local last_attack_source = nil
 local recent_msg = nil
+local creature_guid_map = {}
+local player_guid = UnitGUID("player")
+local creature_last_attack_source = {}
 
 deathlog_data = deathlog_data or {}
+
+local player_name = UnitName("Player")
 
 local onlyfangs_minimap_button_stub = nil
 local onlyfangs_minimap_button_info = {}
@@ -44,6 +49,11 @@ local onlyfangs_minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject(addo
 		tooltip:AddLine(addonName)
 		tooltip:AddLine(Deathlog_L.minimap_btn_left_click)
 		tooltip:AddLine(Deathlog_L.minimap_btn_right_click .. GAMEOPTIONS_MENU)
+		tooltip:AddLine("Score:")
+		tooltip:AddDoubleLine("Orc:", ns.getScore("Orc"), 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Troll:", ns.getScore("Troll"), 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Tauren:", ns.getScore("Tauren"), 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Undead:", ns.getScore("Undead"), 1, 1, 1, 1, 1, 1)
 	end,
 })
 local function initMinimapButton()
@@ -68,11 +78,10 @@ local function handleEvent(self, event, ...)
 			ns.current_profession_levels[arg] = lvl
 		end
 	elseif event == "ADDON_LOADED" then
-		print(OnlyFangsDistributedLog)
 		OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
 		ns.distributed_log = OnlyFangsDistributedLog
 		ns.loadDistributedLog()
-		ns.fakeEntries()
+		-- ns.fakeEntries()
 	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
 		for bag = 0, 5 do
 			for slot = 0, 16 do
@@ -85,6 +94,52 @@ local function handleEvent(self, event, ...)
 				end
 			end
 		end
+	elseif event == "PLAYER_TARGET_CHANGED" then
+		local _t_name, _ = UnitName("target")
+		local _t_guid = UnitGUID("target")
+		if _t_name ~= nil then
+			creature_guid_map[_t_guid] = _t_name
+		end
+	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
+		local _, ev, _, _, source_name, _, _, target_guid, _, cc, _, environmental_type, _, _, _, _, _ =
+			CombatLogGetCurrentEventInfo()
+		-- print(ev, source_name, cc, target_guid)
+
+		if not (source_name == player_name) then
+			if not (source_name == nil) then
+				if string.find(ev, "DAMAGE") ~= nil then
+					ns.last_attack_source = source_name
+				end
+			end
+		else
+			creature_last_attack_source[target_guid] = source_name
+		end
+		if ev == "ENVIRONMENTAL_DAMAGE" then
+			if target_guid == UnitGUID("player") then
+				if environmental_type == "Drowning" then
+					ns.last_attack_source = -2
+				elseif environmental_type == "Falling" then
+					ns.last_attack_source = -3
+				elseif environmental_type == "Fatigue" then
+					ns.last_attack_source = -4
+				elseif environmental_type == "Fire" then
+					ns.last_attack_source = -5
+				elseif environmental_type == "Lava" then
+					ns.last_attack_source = -6
+				elseif environmental_type == "Slime" then
+					ns.last_attack_source = -7
+				end
+			end
+		elseif ev == "UNIT_DIED" then
+			if
+				creature_guid_map[target_guid]
+				and ns.kill_target_exec[creature_guid_map[target_guid]]
+				and creature_last_attack_source[target_guid] == player_name
+			then
+				ns.kill_target_exec[creature_guid_map[target_guid]]()
+			end
+		end
 	end
 end
 
@@ -92,7 +147,10 @@ local deathlog_event_handler = CreateFrame("Frame", "OnlyFangs", nil, "BackdropT
 deathlog_event_handler:RegisterEvent("PLAYER_ENTERING_WORLD")
 deathlog_event_handler:RegisterEvent("PLAYER_LEVEL_UP")
 deathlog_event_handler:RegisterEvent("ADDON_LOADED")
+deathlog_event_handler:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 deathlog_event_handler:RegisterEvent("UNIT_INVENTORY_CHANGED")
+deathlog_event_handler:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
+deathlog_event_handler:RegisterEvent("PLAYER_TARGET_CHANGED")
 
 deathlog_event_handler:SetScript("OnEvent", handleEvent)
 

@@ -8,7 +8,7 @@ _event.name = "AdjustPoints"
 _event.title = "Adjust Points"
 _event.icon_path = "Interface\\Addons\\HardcoreUnlocked\\Media\\icon_a_final_blow.blp"
 _event.pts = 0 -- Unused
-_event.description = "[Guild Master Only] Allows guild master to set points for a race."
+_event.description = "[Guild Master Only] Allows guild master to add or subtract points for a race."
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)

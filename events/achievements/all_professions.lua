@@ -29,6 +29,7 @@ local function loadProfessionEvent(lvl, name, title)
 	_event.profession_name = name
 	_event.pts = 3
 	_event.lvl = lvl
+	_event.subtype = "Profession"
 	_event.description = "|cffddddddReach " .. lvl .. " |r|cffFFA500[" .. _event.profession_name .. "]|r |cffdddddd.|r"
 
 	-- Aggregation
@@ -72,7 +73,6 @@ local function loadProfessionEvent(lvl, name, title)
 end
 
 for _, lvl in ipairs(lvls) do
-	print(lvl)
 	for name, title in pairs(profs) do
 		loadProfessionEvent(lvl, name, title)
 	end

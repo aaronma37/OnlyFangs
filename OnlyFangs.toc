@@ -21,6 +21,7 @@ events/achievements/all_professions.lua
 events/milestones/all_professions.lua
 events/milestones/first_to_find.lua
 events/milestones/first_to_complete.lua
+events/milestones/first_to_kill.lua
 
 events/failures/death.lua
 
@@ -43,6 +44,6 @@ utils.lua
 menu.lua
 
 additional_rules.lua
+distributed_log_utils.lua
 onlyfangs.lua
 
-distributed_log_utils.lua

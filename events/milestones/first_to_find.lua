@@ -37,7 +37,7 @@ local function loadEvent(item_metadata)
 	local _item_name = item_metadata.item_name
 	local _item_link = "|cff" .. rarity_colors[item_metadata.rarity] .. "[" .. _item_name .. "]|r"
 	local _event = CreateFrame("Frame")
-	local _name = "First To Find " .. _item_name
+	local _name = "First to Find " .. _item_name
 	ns.event[_name] = _event
 
 	-- General info

@@ -45,11 +45,18 @@ local quest_metadata = {
 		["quest_id"] = 2841,
 	},
 	{
-		["name"] = "Into The Bring the End",
-		["title"] = "First to Complete Into The Bring the End",
-		["quest_name"] = "Into The Bring the End",
+		["name"] = "Bring the End",
+		["title"] = "First to Complete Bring the End",
+		["quest_name"] = "Bring the End",
 		["zone"] = "Razorfen Downs",
 		["quest_id"] = 3341,
+	},
+	{
+		["name"] = "Into the Scarlet Monastery",
+		["title"] = "First to Complete Into the Scarlet Monastery",
+		["quest_name"] = "Into the Scarlet Monastery",
+		["zone"] = "Scarlet Monastery",
+		["quest_id"] = 1048,
 	},
 	{
 		["name"] = "Platinum Discs",

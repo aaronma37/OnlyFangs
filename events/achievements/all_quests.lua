@@ -258,6 +258,7 @@ local function loadQuestEvent(_metadata)
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
 	_event.pts = 10
+	_event.subtype = "Quest"
 	_event.max_lvl = _metadata.max_lvl
 	_event.description = "|cffddddddComplete |r|cffFFA500["
 		.. _event.quest_name

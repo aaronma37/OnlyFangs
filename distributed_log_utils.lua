@@ -17,6 +17,7 @@ local DATE_IDX = 1
 local RACE_IDX = 2
 local EVENT_IDX = 3
 local CLASS_IDX = 4
+local ADD_ARGS_IDX = 5
 
 local INIT_TIME = 1730639674
 
@@ -78,6 +79,14 @@ ns.loadDistributedLog = function()
 		distributed_log[guild_name] = { ["meta"] = { ["newest"] = nil, ["oldest"] = nil, ["size"] = 0 }, ["data"] = {} }
 	end
 	refreshClaimedMilestones()
+	ns.aggregateLog()
+	estimated_score_num_entries = distributed_log[guild_name]["meta"]["size"]
+	estimated_score = {
+		["Orc"] = distributed_log.points["Orc"],
+		["Undead"] = distributed_log.points["Undead"],
+		["Tauren"] = distributed_log.points["Tauren"],
+		["Troll"] = distributed_log.points["Troll"],
+	}
 end
 
 -- got a node that points to itself
@@ -147,7 +156,7 @@ local function lruGet(key_id)
 	end
 
 	distributed_log[guild_name]["meta"]["oldest"] = key_id
-	return v["value"]
+	return v
 end
 
 ns.eventName = function(event_id)
@@ -169,6 +178,8 @@ local function toMessage(key, log_event)
 		.. log_event[EVENT_IDX]
 		.. COMM_FIELD_DELIM
 		.. log_event[CLASS_IDX]
+		.. COMM_FIELD_DELIM
+		.. (log_event[ADD_ARGS_IDX] or "")
 	return comm_message
 end
 
@@ -199,7 +210,7 @@ event_handler:RegisterEvent("CHAT_MSG_ADDON")
 
 event_handler:SetScript("OnEvent", function(self, e, ...)
 	local prefix, datastr, scope, sender = ...
-	if prefix == COMM_NAME then
+	if prefix == COMM_NAME and scope == "GUILD" then
 		local command, data = string.split(COMM_COMMAND_DELIM, datastr)
 		if command == COMM_COMMAND_HEARTBEAT then
 			local _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id =
@@ -289,6 +300,8 @@ ns.sendEvent = function(event_name)
 		.. _event[EVENT_IDX]
 		.. COMM_FIELD_DELIM
 		.. _event[CLASS_IDX]
+		.. COMM_FIELD_DELIM
+		.. (_event[ADD_ARGS_IDX] or "")
 	if in_guild then
 		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
 	else
@@ -306,6 +319,7 @@ ns.logAsList = function()
 			["Race"] = v["value"][RACE_IDX],
 			["Event"] = v["value"][EVENT_IDX],
 			["Class"] = v["value"][CLASS_IDX],
+			["AdditionalArgs"] = (v["value"][ADD_ARGS_IDX] or ""),
 		}
 	end
 	return new_list

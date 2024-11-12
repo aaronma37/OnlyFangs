@@ -906,6 +906,10 @@ local function drawEventTypeTab(container, _title, _frames)
 					text = "General",
 				},
 				{
+					value = "First to Kill",
+					text = "First to Kill",
+				},
+				{
 					value = "First to Complete",
 					text = "First to Complete",
 				},
@@ -922,6 +926,20 @@ local function drawEventTypeTab(container, _title, _frames)
 		{
 			value = "Achievement",
 			text = "Achievements",
+			children = {
+				{
+					value = "Profession",
+					text = "Profession",
+				},
+				{
+					value = "Quest",
+					text = "Quest",
+				},
+				{
+					value = "Leveling",
+					text = "Leveling",
+				},
+			},
 		},
 		{
 			value = "Failure",
@@ -978,6 +996,13 @@ local function drawEventTypeTab(container, _title, _frames)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")
 			scroll_frame:AddChild(_group_description)
+		elseif group == "First to Kill" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Be the first to kill the specified target.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
 		elseif group == "First to Complete" then
 			local _group_description = AceGUI:Create("Label")
 			_group_description:SetText("Be the first to complete the specified quest.")
@@ -1013,17 +1038,44 @@ local function drawEventTypeTab(container, _title, _frames)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")
 			scroll_frame:AddChild(_group_description)
+		elseif group == "Profession" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Reach specified profession level.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "Quest" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Complete the quest by the specified level.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "Leveling" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Reach the specified level.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
 		end
 		for k, v in pairs(ns.event) do
 			if v.type == group or v.subtype == group then
-				if group == "Achievement" then
-					scroll_frame:AddChild(makeAchievementLabel(v))
-				elseif group == "General" then
+				if group == "General" then
+					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
+				elseif group == "First to Kill" then
 					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
 				elseif group == "First to Complete" then
 					scroll_frame:AddChild(makeFirstToCompleteLabel(v))
 				elseif group == "First to Find" then
 					scroll_frame:AddChild(makeFirstToFindLabel(v))
+				elseif group == "Profession" then
+					scroll_frame:AddChild(makeAchievementLabel(v))
+				elseif group == "Quest" then
+					scroll_frame:AddChild(makeAchievementLabel(v))
+				elseif group == "Leveling" then
+					scroll_frame:AddChild(makeAchievementLabel(v))
 				elseif group == "First to Max Profession" then
 					scroll_frame:AddChild(makeFirstToFindLabel(v))
 				elseif group == "Failure" then
