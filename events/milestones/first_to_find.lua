@@ -9,6 +9,13 @@ local rarity_colors = {
 }
 
 local item_metadata = {
+	{
+		["item_id"] = 7098,
+		["item_name"] = "Splintered Tusk",
+		["rarity"] = "common",
+		["pts"] = 5,
+		["test_only"] = 1,
+	},
 	{ ["item_id"] = 8350, ["item_name"] = "The 1 Ring", ["rarity"] = "uncommon", ["pts"] = 100 },
 	{ ["item_id"] = 14551, ["item_name"] = "Edgemaster's Handguards", ["rarity"] = "epic", ["pts"] = 25 },
 	{ ["item_id"] = 13468, ["item_name"] = "Black Lotus", ["rarity"] = "uncommon", ["pts"] = 20 },
@@ -57,6 +64,7 @@ local function loadEvent(item_metadata)
 	_event.item_id = _item_id
 	_event.subtype = "First to Find"
 	_event.pts = item_metadata.pts
+	_event.test_only = item_metadata.test_only
 	_event.description = "|cffddddddBe the first to find " .. _item_link .. " |cffdddddd.|r"
 
 	-- Aggregation

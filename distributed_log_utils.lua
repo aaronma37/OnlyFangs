@@ -222,7 +222,14 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id) }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				lruSet(_fletcher, _new_data)
-				ns.event[_event_name].aggregrate(distributed_log, _new_data)
+				if ns.event[_event_name].type == "Milestone" then
+					if ns.claimed_milestones[_event_name] == nil then
+						ns.event[_event_name].aggregrate(distributed_log, _new_data)
+						ns.claimed_milestones[_event_name] = _fletcher
+					end
+				else
+					ns.event[_event_name].aggregrate(distributed_log, _new_data)
+				end
 			end
 			if tonumber(_num_entries) > estimated_score_num_entries then
 				estimated_score_num_entries = tonumber(_num_entries)
@@ -247,7 +254,14 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					print("|cff33ff99OnlyFangs: " .. sender .. " " .. _event_name .. "|r")
 				end
 				lruSet(_fletcher, _new_data)
-				ns.event[_event_name].aggregrate(distributed_log, _new_data)
+				if ns.event[_event_name].type == "Milestone" then
+					if ns.claimed_milestones[_event_name] == nil then
+						ns.event[_event_name].aggregrate(distributed_log, _new_data)
+						ns.claimed_milestones[_event_name] = _fletcher
+					end
+				else
+					ns.event[_event_name].aggregrate(distributed_log, _new_data)
+				end
 			end
 		end
 	end

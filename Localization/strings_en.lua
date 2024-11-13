@@ -47,6 +47,7 @@ deathlog_strings_en = {
 		{ value = "PointsTab", text = "Points" },
 		{ value = "LogTab", text = "Log" },
 		{ value = "LeaderboardTab", text = "Leaderboard" },
+		{ value = "TestingPoints", text = "Testing Points" },
 	},
 	instance_tbl = {
 		{ 33, "SHADOWFANGKEEP", "Shadowfang Keep" },

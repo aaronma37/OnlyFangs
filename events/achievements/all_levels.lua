@@ -2,6 +2,13 @@ local addonName, ns = ...
 
 local level_metadata = {
 	{
+		["name"] = "ReachLvl3",
+		["title"] = "Reach Level 3",
+		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
+		["lvl"] = 10,
+		["test_only"] = 1,
+	},
+	{
 		["name"] = "ReachLvl10",
 		["title"] = "Reach Level 10",
 		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
@@ -50,6 +57,7 @@ local function loadLevelEvent(_metadata)
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
 	_event.pts = 10
+	_event.test_only = _metadata.test_only
 	_event.lvl = _metadata.lvl
 	_event.description = "|cffddddddReach level |r|cffFFA500[" .. _event.lvl .. "]|r |cffdddddd."
 

@@ -12,6 +12,7 @@ local target_metadata = {
 	{ ["target_name"] = "Grimungous", ["pts"] = 10 },
 	{ ["target_name"] = "Captain Flat Tusk", ["pts"] = 10 },
 	{ ["target_name"] = "Gamon", ["pts"] = 15 },
+	{ ["target_name"] = "Mottled Boar", ["pts"] = 15, ["test_only"] = 1 },
 }
 
 local function loadEvent(target_metadata)
@@ -25,6 +26,7 @@ local function loadEvent(target_metadata)
 	_event.title = _name
 	_event.subtype = "First to Kill"
 	_event.pts = target_metadata.pts
+	_event.test_only = target_metadata.test_only
 	_event.description = "|cffddddddBe the first to kill " .. target_metadata.target_name .. " |cffdddddd.|r"
 
 	-- Aggregation

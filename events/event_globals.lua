@@ -155,6 +155,10 @@ ns.event_id = {
 	["Attunement to the Core"] = 147,
 	["Master Angler"] = 148,
 	["PVPDeath"] = 149,
+	["First to Find Splintered Tusk"] = 150,
+	["First to Kill Mottled Boar"] = 151,
+	["ReachLvl3"] = 152,
+	["Your Place In The World"] = 153,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
@@ -376,7 +380,14 @@ function SetAchievementTooltip(achievement_icon, achievement, _player_name)
 	end)
 end
 
+ns.enable_testing = false
+if ns.enable_testing == true then
+	print("OnlyFangs Testing Version Enabled")
+end
+
 ns.triggerEvent = function(event_name)
-	ns.showToast(event_name, ns.event[event_name].icon_path, ns.event[event_name].type)
-	ns.sendEvent(event_name)
+	if ns.event[event_name].test_only == nil or ns.enable_testing then
+		ns.showToast(event_name, ns.event[event_name].icon_path, ns.event[event_name].type)
+		ns.sendEvent(event_name)
+	end
 end

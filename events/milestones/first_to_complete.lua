@@ -2,6 +2,16 @@ local addonName, ns = ...
 
 local quest_metadata = {
 	{
+		["name"] = "Your Place In The World",
+		["title"] = "First to Complete Your Place In The World",
+		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
+		["quest_name"] = "Your Place In The World",
+		["zone"] = "Durotar",
+		["quest_id"] = 4641,
+		["pts"] = 5,
+		["test_only"] = 1,
+	},
+	{
 		["name"] = "Hidden Enemies",
 		["title"] = "First to Complete Hidden Enemies",
 		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
@@ -178,6 +188,7 @@ local function loadQuestEvent(_metadata)
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
 	_event.pts = 10
+	_event.test_only = _metadata.test_only
 	_event.subtype = "First to Complete"
 	_event.description = "|cffddddddBe the first to complete |r|cffFFA500[" .. _event.quest_name .. "]|r |cffdddddd."
 

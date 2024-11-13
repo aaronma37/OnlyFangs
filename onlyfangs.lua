@@ -185,4 +185,7 @@ LibStub("AceConfig-3.0"):RegisterOptionsTable("OnlyFangs", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("OnlyFangs", "OnlyFangs", nil)
 
 -- testing
--- ns.checkEvents()
+
+if ns.enable_testing == true then
+	ns.checkEvents()
+end

@@ -108,11 +108,7 @@ local function WPDropDownDemo_Menu(frame, level, menuList)
 		deathlog_menu:Hide()
 	end
 
-	local function blockUser()
-		if death_tomb_frame.clicked_name then
-			local added = C_FriendList.AddIgnore(death_tomb_frame.clicked_name)
-		end
-	end
+	local function blockUser() end
 
 	if level == 1 then
 		info.text, info.hasArrow, info.func, info.disabled = "Show death location", false, openWorldMap, false
@@ -1163,27 +1159,29 @@ local function drawEventTypeTab(container, _title, _frames)
 			scroll_frame:AddChild(_group_description)
 		end
 		for k, v in pairs(ns.event) do
-			if v.type == group or v.subtype == group then
-				if group == "General" then
-					scroll_frame:AddChild(makeFirstToFindLabel(v))
-				elseif group == "First to Kill" then
-					scroll_frame:AddChild(makeFirstToFindLabel(v))
-				elseif group == "First to Complete" then
-					scroll_frame:AddChild(makeFirstToFindLabel(v))
-				elseif group == "First to Find" then
-					scroll_frame:AddChild(makeFirstToFindLabel(v))
-				elseif group == "Profession" then
-					scroll_frame:AddChild(makeAchievementLabel2(v))
-				elseif group == "Quest" then
-					scroll_frame:AddChild(makeAchievementLabel2(v))
-				elseif group == "Leveling" then
-					scroll_frame:AddChild(makeAchievementLabel2(v))
-				elseif group == "First to Max Profession" then
-					scroll_frame:AddChild(makeFirstToFindLabel(v))
-				elseif group == "Failure" then
-					scroll_frame:AddChild(makeFailureLabel(v))
-				elseif group == "OfficerCommand" then
-					scroll_frame:AddChild(makeOfficerCommandLabel(v))
+			if v.test_only == nil then
+				if v.type == group or v.subtype == group then
+					if group == "General" then
+						scroll_frame:AddChild(makeFirstToFindLabel(v))
+					elseif group == "First to Kill" then
+						scroll_frame:AddChild(makeFirstToFindLabel(v))
+					elseif group == "First to Complete" then
+						scroll_frame:AddChild(makeFirstToFindLabel(v))
+					elseif group == "First to Find" then
+						scroll_frame:AddChild(makeFirstToFindLabel(v))
+					elseif group == "Profession" then
+						scroll_frame:AddChild(makeAchievementLabel2(v))
+					elseif group == "Quest" then
+						scroll_frame:AddChild(makeAchievementLabel2(v))
+					elseif group == "Leveling" then
+						scroll_frame:AddChild(makeAchievementLabel2(v))
+					elseif group == "First to Max Profession" then
+						scroll_frame:AddChild(makeFirstToFindLabel(v))
+					elseif group == "Failure" then
+						scroll_frame:AddChild(makeFailureLabel(v))
+					elseif group == "OfficerCommand" then
+						scroll_frame:AddChild(makeOfficerCommandLabel(v))
+					end
 				end
 			end
 		end
@@ -1528,6 +1526,25 @@ local function DrawAccountabilityTab(container)
 		guild_member_font_container:Hide()
 	end)
 end
+local function drawTestTab(container)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Fill")
+	onlyfangs_tab_container:AddChild(scroll_container)
+
+	local main_frame = AceGUI:Create("SimpleGroup")
+	main_frame:SetLayout("Flow")
+	main_frame:SetFullWidth(true)
+	main_frame:SetFullHeight(true)
+	scroll_container:AddChild(main_frame)
+
+	for k, v in pairs(ns.event) do
+		if v.test_only == 1 then
+			main_frame:AddChild(makeFirstToFindLabel(v))
+		end
+	end
+end
 
 local function drawLeaderboardTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
@@ -1629,7 +1646,16 @@ local function createMenu()
 	end
 
 	onlyfangs_tab_container = AceGUI:Create("DeathlogTabGroup") -- "InlineGroup" is also good
-	local tab_table = Deathlog_L.tab_table
+	local tab_table = {}
+	for _, v in ipairs(Deathlog_L.tab_table) do
+		if v["value"] == "TestingPoints" then
+			if ns.enable_testing == true then
+				tab_table[#tab_table + 1] = v
+			end
+		else
+			tab_table[#tab_table + 1] = v
+		end
+	end
 	onlyfangs_tab_container:SetTabs(tab_table)
 	onlyfangs_tab_container:SetFullWidth(true)
 	onlyfangs_tab_container:SetFullHeight(true)
@@ -1645,6 +1671,8 @@ local function createMenu()
 			drawLeaderboardTab(container)
 		elseif group == "GuildMembersTab" then
 			DrawAccountabilityTab(container)
+		elseif group == "TestingPoints" then
+			drawTestTab(container)
 		end
 	end
 
