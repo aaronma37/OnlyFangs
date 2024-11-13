@@ -36,7 +36,7 @@ local onlyfangs_minimap_button_info = {}
 local onlyfangs_minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
 	type = "data source",
 	text = addonName,
-	icon = "Interface\\TARGETINGFRAME\\UI-TargetingFrame-Skull",
+	icon = "Interface\\FriendsFrame\\PlusManz-Horde.PNG",
 	OnClick = function(self, btn)
 		if btn == "LeftButton" then
 			ns.showMenu()

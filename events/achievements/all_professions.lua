@@ -39,13 +39,7 @@ local function loadProfessionEvent(lvl, name, title)
 	end
 
 	-- Registers
-	function _event:Register(succeed_function_executor)
-		_event:RegisterEvent("SKILL_LINES_CHANGED")
-	end
-
-	function _event:Unregister()
-		_event:UnregisterAllEvents()
-	end
+	_event:RegisterEvent("SKILL_LINES_CHANGED")
 
 	-- Register Definitions
 	local sent = false

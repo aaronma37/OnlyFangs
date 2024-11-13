@@ -74,7 +74,7 @@ local function loadProfessionEvent(_metadata)
 	_event.icon_path = _metadata.icon_path
 	_event.profession_name = _metadata.profession_name
 	_event.subtype = "First to Max Profession"
-	_event.pts = 10
+	_event.pts = 50
 	_event.description = "|cffddddddBe the first to reach 300 |r|cffFFA500["
 		.. _event.profession_name
 		.. "]|r |cffdddddd.|r"
@@ -86,13 +86,7 @@ local function loadProfessionEvent(_metadata)
 	end
 
 	-- Registers
-	function _event:Register(succeed_function_executor)
-		_event:RegisterEvent("SKILL_LINES_CHANGED")
-	end
-
-	function _event:Unregister()
-		_event:UnregisterAllEvents()
-	end
+	_event:RegisterEvent("SKILL_LINES_CHANGED")
 
 	-- Register Definitions
 	local sent = false

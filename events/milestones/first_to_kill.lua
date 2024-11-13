@@ -1,16 +1,17 @@
 local addonName, ns = ...
 
 local target_metadata = {
-	{ ["target_name"] = "Swiftmane" },
-	{ ["target_name"] = "Rocklance" },
-	{ ["target_name"] = "Gesharahan" },
-	{ ["target_name"] = "Taskmaster Whipfang" },
-	{ ["target_name"] = "Foreman Rigger" },
-	{ ["target_name"] = "Brother Ravenoak" },
-	{ ["target_name"] = "Narillasanz" },
-	{ ["target_name"] = "Warleader Krazzilak" },
-	{ ["target_name"] = "Grimungous" },
-	{ ["target_name"] = "Captain Flat Tusk" },
+	{ ["target_name"] = "Swiftmane", ["pts"] = 10 },
+	{ ["target_name"] = "Rocklance", ["pts"] = 10 },
+	{ ["target_name"] = "Gesharahan", ["pts"] = 10 },
+	{ ["target_name"] = "Taskmaster Whipfang", ["pts"] = 10 },
+	{ ["target_name"] = "Foreman Rigger", ["pts"] = 10 },
+	{ ["target_name"] = "Brother Ravenoak", ["pts"] = 10 },
+	{ ["target_name"] = "Narillasanz", ["pts"] = 10 },
+	{ ["target_name"] = "Warleader Krazzilak", ["pts"] = 10 },
+	{ ["target_name"] = "Grimungous", ["pts"] = 10 },
+	{ ["target_name"] = "Captain Flat Tusk", ["pts"] = 10 },
+	{ ["target_name"] = "Gamon", ["pts"] = 15 },
 }
 
 local function loadEvent(target_metadata)
@@ -23,7 +24,7 @@ local function loadEvent(target_metadata)
 	_event.type = "Milestone"
 	_event.title = _name
 	_event.subtype = "First to Kill"
-	_event.pts = 20
+	_event.pts = target_metadata.pts
 	_event.description = "|cffddddddBe the first to kill " .. target_metadata.target_name .. " |cffdddddd.|r"
 
 	-- Aggregation

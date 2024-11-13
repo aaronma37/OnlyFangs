@@ -60,13 +60,7 @@ local function loadLevelEvent(_metadata)
 	end
 
 	-- Registers
-	function _event:Register(succeed_function_executor)
-		_event:RegisterEvent("PLAYER_LEVEL_UP")
-	end
-
-	function _event:Unregister()
-		_event:UnregisterAllEvents()
-	end
+	_event:RegisterEvent("PLAYER_LEVEL_UP")
 
 	-- Register Definitions
 	local sent = false

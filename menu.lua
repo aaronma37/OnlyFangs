@@ -893,38 +893,67 @@ local function makeFirstToCompleteLabel(_v)
 end
 
 local function makeFailureLabel(_v)
-	local __f = AceGUI:Create("InlineGroup")
+	local __f = AceGUI:Create("SimpleGroupOF")
 	__f:SetLayout("Flow")
-	__f:SetHeight(200)
-	__f:SetWidth(800)
+	__f:SetHeight(100)
+	__f:SetWidth(390)
+
+	-- __f.frame2 = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+	__f.frame:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		edgeSize = 1,
+		insets = { left = 1, right = 1, top = 1, bottom = 1 },
+	})
+	__f.frame:SetBackdropColor(1, 1, 1, alt)
+	__f.frame:SetBackdropBorderColor(1, 1, 1, 0)
+	if alt2 == 1 then
+		if alt == 0 then
+			alt = 0.1
+			alt2 = 0
+		else
+			alt = 0
+			alt2 = 0
+		end
+	else
+		alt2 = 1
+	end
+
 	local _title = AceGUI:Create("Label")
 	_title:SetText(_v.title)
-	_title:SetHeight(100)
-	_title:SetWidth(690)
+	_title:SetHeight(30)
+	_title:SetWidth(280)
 	_title:SetJustifyH("LEFT")
-	_title:SetFont(main_font, 16, "")
+	_title:SetFont(main_font, 12, "")
 	__f:AddChild(_title)
 
 	local _pts = AceGUI:Create("Label")
 	_pts:SetText(_v.pts .. " pts.")
-	_pts:SetColor(255 / 255, 0, 0, 1)
-	_pts:SetHeight(50)
+	_pts:SetColor(1, 0, 0, 1)
+	_pts:SetHeight(30)
 	_pts:SetWidth(75)
 	_pts:SetJustifyH("RIGHT")
 	_pts:SetFont(main_font, 12, "")
 	__f:AddChild(_pts)
 
-	local _gap = AceGUI:Create("Label")
-	_gap:SetHeight(100)
-	_gap:SetFullWidth(true)
-	__f:AddChild(_gap)
-
 	local _desc = AceGUI:Create("Label")
 	_desc:SetText(_v.description)
-	_desc:SetHeight(140)
-	_desc:SetWidth(800)
+	_desc:SetHeight(30)
+	_desc:SetWidth(400)
 	_desc:SetJustifyH("LEFT")
 	__f:AddChild(_desc)
+
+	local _gap = AceGUI:Create("Label")
+	_gap:SetHeight(30)
+	_gap:SetText("")
+	-- _gap:SetFullWidth(true)
+	__f:AddChild(_gap)
+	local _gap2 = AceGUI:Create("Label")
+	_gap2:SetHeight(30)
+	_gap2:SetText("")
+	-- _gap2:SetFullWidth(true)
+	__f:AddChild(_gap2)
+
 	return __f
 end
 

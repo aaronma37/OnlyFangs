@@ -140,7 +140,6 @@ ns.getVersion = function()
 
 	local buildType
 
-	print(major, minor, patch, hash)
 	return tonumber(major), tonumber(minor), tonumber(patch), tostring(hash), tostring(buildType)
 end
 ns.getVersion()

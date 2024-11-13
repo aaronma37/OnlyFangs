@@ -257,7 +257,7 @@ local function loadQuestEvent(_metadata)
 	_event.type = "Achievement"
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
-	_event.pts = 10
+	_event.pts = 3
 	_event.subtype = "Quest"
 	_event.max_lvl = _metadata.max_lvl
 	_event.description = "|cffddddddComplete |r|cffFFA500["
@@ -273,13 +273,7 @@ local function loadQuestEvent(_metadata)
 	end
 
 	-- Registers
-	function _event:Register(succeed_function_executor)
-		_event:RegisterEvent("QUEST_TURNED_IN")
-	end
-
-	function _event:Unregister()
-		_event:UnregisterAllEvents()
-	end
+	_event:RegisterEvent("QUEST_TURNED_IN")
 
 	-- Register Definitions
 	local sent = false

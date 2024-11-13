@@ -136,6 +136,13 @@ ns.event_id = {
 	["Corruption of Earth and Seed"] = 128,
 	["Arcane Refreshment"] = 129,
 	["Dreadsteed of Xoroth"] = 130,
+	["First40Mount"] = 131,
+	["First60Mount"] = 132,
+	["FirstEpicBOE"] = 133,
+	["First16Slot"] = 134,
+	["First315Skinning"] = 135,
+	["FirstDevilsaurCrafted"] = 136,
+	["Coward"] = 137,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
@@ -315,127 +322,6 @@ function OnlyFangsGeneratePassiveAchievementProfLevelDescription(profession_name
 		.. " before reaching level "
 		.. level_cap + 1
 		.. "."
-end
-
-function OnlyFangsCommonPassiveAchievementAltBasicQuestCheck(_achievement, _event, _args)
-	if _event == "QUEST_TURNED_IN" then
-		if
-			_args[1] ~= nil
-			and (_args[1] == _achievement.quest_num or _args[1] == _achievement.quest_num_alt)
-			and (
-				UnitLevel("player") <= _achievement.level_cap
-				or (hc_recent_level_up and UnitLevel("player") <= _achievement.level_cap + 1)
-			)
-		then
-			_achievement.succeed_function_executor.Succeed(_achievement.name)
-		end
-	end
-end
-
-function OnlyFangsCommonPassiveAchievementBasicQuestCheck(_achievement, _event, _args)
-	if _event == "QUEST_TURNED_IN" then
-		if
-			_args[1] == _achievement.quest_num
-			and (
-				UnitLevel("player") <= _achievement.level_cap
-				or (hc_recent_level_up and UnitLevel("player") <= _achievement.level_cap + 1)
-			)
-		then
-			_achievement.succeed_function_executor.Succeed(_achievement.name)
-		end
-	end
-end
-
-function OnlyFangsCommonPassiveAchievementKillCheck(_achievement, _event, _args)
-	if _event == "QUEST_TURNED_IN" then
-		if
-			_args[1] == _achievement.quest_num
-			and (
-				UnitLevel("player") <= _achievement.level_cap
-				or (hc_recent_level_up and UnitLevel("player") <= _achievement.level_cap + 1)
-			)
-		then
-			if
-				HardcoreUnlocked_Character.kill_list_dict ~= nil
-				and HardcoreUnlocked_Character.kill_list_dict[_achievement.kill_target]
-			then
-				_achievement.succeed_function_executor.Succeed(_achievement.name)
-			else
-				Hardcore:Print(
-					"["
-						.. _achievement.title
-						.. "] You have completed the "
-						.. _achievement.quest_name
-						.. " quest, but "
-						.. _achievement.kill_target
-						.. " was not slain!"
-				)
-			end
-		end
-	end
-end
-
-function OnlyFangsCommonPassiveAchievementItemAcquiredCheck(_achievement, _event, _args)
-	if _achievement.item == nil then
-		Hardcore:Print("Achievement doesn't have a specified item")
-	end
-	if _event == "CHAT_MSG_LOOT" then
-		if string.match(_args[1], _achievement.item) and UnitLevel("player") <= _achievement.level_cap then
-			_achievement.succeed_function_executor.Succeed(_achievement.name)
-		end
-	end
-end
-
-function OnlyFangsCommonPassiveAchievementCraftedCheck(_achievement, _event, _args)
-	if _achievement.craft_set == nil then
-		Hardcore:Print("Achievement doesn't have a specified item")
-	end
-	if _event == "CHAT_MSG_LOOT" then
-		for k, _ in pairs(_achievement.craft_set) do
-			if
-				string.match(_args[1], k)
-				and string.match(_args[1], "You create")
-				and UnitLevel("player") <= _achievement.level_cap
-			then
-				if HardcoreUnlocked_Character then
-					if HardcoreUnlocked_Character.crafted_list_dict == nil then
-						HardcoreUnlocked_Character.crafted_list_dict = {}
-					end
-
-					HardcoreUnlocked_Character.crafted_list_dict[k] = 1
-					for craft_item, _ in pairs(_achievement.craft_set) do
-						if HardcoreUnlocked_Character.crafted_list_dict[craft_item] == nil then
-							Hardcore:Print(
-								"["
-									.. _achievement.title
-									.. "] You have crafted "
-									.. k
-									.. "!  Remember to /reload when convenient to save your progress."
-							)
-							return
-						end
-					end
-					_achievement.succeed_function_executor.Succeed(_achievement.name)
-				end
-			end
-		end
-	end
-end
-
-function OnlyFangsCommonPassiveAchievementProfLevelCheck(_achievement, _event, _args)
-	if _achievement.level_cap and UnitLevel("player") > _achievement.level_cap then
-		return
-	end
-	if _event == "SKILL_LINES_CHANGED" or _event == "PLAYER_ENTERING_WORLD" then
-		for i = 1, GetNumSkillLines() do
-			local arg, _, _, lvl = GetSkillLineInfo(i)
-			if arg == _achievement.profession_name then
-				if lvl >= _achievement.profession_threshold then
-					_achievement.succeed_function_executor.Succeed(_achievement.name)
-				end
-			end
-		end
-	end
 end
 
 function CalculateOnlyFangsAchievementPts(_hardcore_character)

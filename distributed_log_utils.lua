@@ -9,6 +9,7 @@ local COMM_FIELD_DELIM = "~"
 local COMM_CHANNEL = "GUILD"
 local HB_DUR = 2
 local ERASE_CACHE = false
+local DEBUG = false
 -- Node
 local VALUE_IDX = 1
 local KEY_IDX = 4
@@ -211,7 +212,7 @@ event_handler:RegisterEvent("CHAT_MSG_ADDON")
 
 event_handler:SetScript("OnEvent", function(self, e, ...)
 	local prefix, datastr, scope, sender = ...
-	if prefix == COMM_NAME and scope == "GUILD" then
+	if prefix == COMM_NAME and (DEBUG == true or scope == "GUILD") then
 		local command, data = string.split(COMM_COMMAND_DELIM, datastr)
 		if command == COMM_COMMAND_HEARTBEAT then
 			local _addon_version, _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id =
@@ -309,6 +310,7 @@ ns.sendEvent = function(event_name)
 	if in_guild then
 		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
 	else
+		local _n, _ = UnitName("player")
 		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, "SAY")
 	end
 end
@@ -332,15 +334,15 @@ end
 ns.fakeEntries = function()
 	local k, v = ns.stampEvent(adjustedTime(), ns.race_id["Orc"], ns.event_id["FirstToSixty"], ns.class_id["Warlock"])
 	-- ns.distributed_log:set(k, v)
-	lruSet(k, v)
+	-- lruSet(k, v)
 
 	k, v = ns.stampEvent(adjustedTime(), ns.race_id["Troll"], ns.event_id["FirstToSixty"], ns.class_id["Warrior"])
 	-- distributed_log:set(k, v)
-	lruSet(k, v)
+	-- lruSet(k, v)
 
 	k, v = ns.stampEvent(adjustedTime(), ns.race_id["Tauren"], ns.event_id["FirstToSixty"], ns.class_id["Mage"])
 	-- distributed_log:set(k, v)
-	lruSet(k, v)
+	-- lruSet(k, v)
 
 	distributed_log.points = {
 		["Human"] = 0,

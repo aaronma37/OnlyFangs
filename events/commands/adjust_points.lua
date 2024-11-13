@@ -16,11 +16,6 @@ _event.aggregrate = function(distributed_log, event_log)
 end
 
 -- Registers
-function _event:Register(succeed_function_executor) end
-
-function _event:Unregister()
-	_event:UnregisterAllEvents()
-end
 
 -- Register Definitions
 _event:SetScript("OnEvent", function(self, e, ...) end)
