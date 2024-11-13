@@ -94,7 +94,7 @@ local function loadProfessionEvent(_metadata)
 		if sent == true then
 			return
 		end
-		if ns.claimed_milestones[_event.name] == nil then
+		if ns.claimed_milestones[_event.name] ~= nil then
 			return
 		end
 

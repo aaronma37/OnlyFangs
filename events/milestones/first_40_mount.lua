@@ -24,7 +24,7 @@ end
 -- Register Definitions
 local sent = false
 _event:SetScript("OnEvent", function(self, e, ...)
-	if ns.claimed_milestones[_event.name] == nil then
+	if ns.claimed_milestones[_event.name] ~= nil then
 		return
 	end
 end)

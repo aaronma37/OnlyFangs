@@ -40,11 +40,9 @@ local function loadEvent(target_metadata)
 			return
 		end
 		if ns.claimed_milestones[_event.name] == nil then
-			return
+			ns.triggerEvent(_event.name)
+			sent = true
 		end
-
-		ns.triggerEvent(_event.name)
-		sent = true
 	end
 end
 

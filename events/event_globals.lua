@@ -143,6 +143,18 @@ ns.event_id = {
 	["First315Skinning"] = 135,
 	["FirstDevilsaurCrafted"] = 136,
 	["Coward"] = 137,
+	["First to Kill Gamon"] = 138,
+	["DrowningDeath"] = 139,
+	["Blood of the Black Dragon Champion"] = 140,
+	["LavaDeath"] = 141,
+	["The Binding"] = 142,
+	["The Green Hills of Stranglethorn"] = 143,
+	["Seal of Ascension"] = 144,
+	["Big Game Hunter"] = 145,
+	["FallDamageDeath"] = 146,
+	["Attunement to the Core"] = 147,
+	["Master Angler"] = 148,
+	["PVPDeath"] = 149,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
