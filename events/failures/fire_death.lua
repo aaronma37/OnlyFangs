@@ -1,15 +1,15 @@
 local addonName, ns = ...
 
 local _event = CreateFrame("Frame")
-ns.event.LavaDeath = _event
+ns.event.FireDeath = _event
 
 -- General info
-_event.name = "LavaDeath"
+_event.name = "FireDeath"
 _event.type = "Failure"
-_event.title = "Lava Death"
+_event.title = "Fire Death"
 _event.icon_path = "Interface\\ICONS\\INV_Misc_Bone_ElfSkull_01"
 _event.pts = -50
-_event.description = "Lose points if you die from lava."
+_event.description = "Lose points if you die from fire."
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)
@@ -24,7 +24,7 @@ _event:RegisterEvent("PLAYER_DEAD")
 local sent = false
 _event:SetScript("OnEvent", function(self, e, ...)
 	if sent == false then
-		if ns.last_attack_source == nil or tonumber(ns.last_attack_source) ~= -6 then
+		if ns.last_attack_source == nil or tonumber(ns.last_attack_source) ~= -5 then
 			return
 		end
 		ns.triggerEvent(_event.name)

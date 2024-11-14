@@ -11,7 +11,6 @@ _event.icon_path = "Interface\\ICONS\\INV_BannerPVP_01"
 _event.pts = 15
 _event.description = "First to a 16 Slot Bag gets this milestone!"
 _event.subtype = "General"
-_event.incomplete = 1
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)
@@ -19,12 +18,21 @@ _event.aggregrate = function(distributed_log, event_log)
 	distributed_log.points[race_name] = distributed_log.points[race_name] + _event.pts
 end
 
--- Registers
-
 -- Register Definitions
 local sent = false
-_event:SetScript("OnEvent", function(self, e, ...)
-	if ns.claimed_milestones[_event.name] ~= nil then
+
+local function triggerCondition()
+	if sent == true then
 		return
 	end
-end)
+	if ns.claimed_milestones[_event.name] == nil then
+		ns.triggerEvent(_event.name)
+		sent = true
+	end
+end
+
+for _, v in ipairs({ 14155, 4500, 10959, 11742 }) do
+	ns.item_id_obs[v] = function()
+		triggerCondition()
+	end
+end

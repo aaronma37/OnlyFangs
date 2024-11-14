@@ -11,7 +11,6 @@ _event.icon_path = "Interface\\ICONS\\INV_BannerPVP_01"
 _event.pts = 50
 _event.description = "First to obtain a level 60 mount gets this milestone!"
 _event.subtype = "General"
-_event.incomplete = 1
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)

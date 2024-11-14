@@ -27,10 +27,7 @@ local last_attack_source = nil
 local recent_msg = nil
 local creature_guid_map = {}
 local player_guid = UnitGUID("player")
-local creature_last_attack_source = {}
 local STREAMER_TAG_DELIM = "~"
-
-deathlog_data = deathlog_data or {}
 
 local player_name = UnitName("Player")
 
@@ -105,18 +102,34 @@ local function handleEvent(self, event, ...)
 		end
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-		local _, ev, _, _, source_name, _, _, target_guid, _, cc, _, environmental_type, _, _, _, _, _ =
+		local _, ev, ok, _, source_name, _, target_name, target_guid, _, cc, _, environmental_type, overkill_swing, _, _, overkill_range, _ =
 			CombatLogGetCurrentEventInfo()
 		-- print(ev, source_name, cc, target_guid)
 
-		if not (source_name == player_name) then
+		if source_name ~= player_name and target_guid == player_guid then
 			if not (source_name == nil) then
 				if string.find(ev, "DAMAGE") ~= nil then
 					ns.last_attack_source = source_name
 				end
 			end
-		else
-			creature_last_attack_source[target_guid] = source_name
+		elseif ev == "SWING_DAMAGE" then
+			if
+				overkill_swing > -1
+				and player_name == source_name
+				and creature_guid_map[target_guid]
+				and ns.kill_target_exec[creature_guid_map[target_guid]]
+			then
+				ns.kill_target_exec[creature_guid_map[target_guid]]()
+			end
+		elseif ev == "RANGE_DAMAGE" or ev == "SPELL_DAMAGE" or ev == "SPELL_PERIODIC_DAMAGE" then
+			if
+				overkill_range > -1
+				and player_name == source_name
+				and creature_guid_map[target_guid]
+				and ns.kill_target_exec[creature_guid_map[target_guid]]
+			then
+				ns.kill_target_exec[creature_guid_map[target_guid]]()
+			end
 		end
 		if ev == "ENVIRONMENTAL_DAMAGE" then
 			if target_guid == UnitGUID("player") then
@@ -133,14 +146,6 @@ local function handleEvent(self, event, ...)
 				elseif environmental_type == "Slime" then
 					ns.last_attack_source = -7
 				end
-			end
-		elseif ev == "UNIT_DIED" then
-			if
-				creature_guid_map[target_guid]
-				and ns.kill_target_exec[creature_guid_map[target_guid]]
-				and creature_last_attack_source[target_guid] == player_name
-			then
-				ns.kill_target_exec[creature_guid_map[target_guid]]()
 			end
 		end
 	elseif event == "GUILD_ROSTER_UPDATE" then

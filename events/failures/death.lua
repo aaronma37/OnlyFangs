@@ -24,6 +24,9 @@ _event:RegisterEvent("PLAYER_DEAD")
 local sent = false
 _event:SetScript("OnEvent", function(self, e, ...)
 	if sent == false then
+		if ns.last_attack_source and tonumber(ns.last_attack_source) ~= nil then
+			return
+		end
 		ns.triggerEvent(_event.name)
 		sent = true
 	end

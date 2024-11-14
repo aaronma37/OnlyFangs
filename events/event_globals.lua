@@ -170,6 +170,9 @@ ns.event_id = {
 	["1Skinning"] = 162,
 	["1Lockpicking"] = 163,
 	["1Blacksmithing"] = 164,
+	["YourPlaceInTheWorld"] = 165,
+	["FireDeath"] = 166,
+	["FatigueDeath"] = 167,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do

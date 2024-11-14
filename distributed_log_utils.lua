@@ -7,7 +7,7 @@ local COMM_COMMAND_DIRECT_EVENT = "DE"
 local COMM_COMMAND_DELIM = "|"
 local COMM_FIELD_DELIM = "~"
 local COMM_CHANNEL = "GUILD"
-local HB_DUR = 2
+local HB_DUR = 15
 local ERASE_CACHE = false
 local DEBUG = false
 -- Node
