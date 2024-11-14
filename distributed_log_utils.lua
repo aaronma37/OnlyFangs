@@ -22,11 +22,77 @@ local ADD_ARGS_IDX = 5
 
 local INIT_TIME = 1730639674
 
+local REALM_NAME = GetRealmName()
+REALM_NAME = REALM_NAME:gsub("%s+", "")
+
+local function spairs(t, order)
+	local keys = {}
+	for k in pairs(t) do
+		keys[#keys + 1] = k
+	end
+
+	if order then
+		table.sort(keys, function(a, b)
+			return order(t, a, b)
+		end)
+	else
+		table.sort(keys)
+	end
+
+	local i = 0
+	return function()
+		i = i + 1
+		if keys[i] then
+			return keys[i], t[keys[i]]
+		end
+	end
+end
+
 local function adjustedTime()
 	return GetServerTime() - INIT_TIME
 end
 local function fromAdjustedTime(t)
 	return t + INIT_TIME
+end
+
+local DAY_SECONDS = 86400
+local WEEK_SECONDS = 604800
+
+local top_players_daily = {}
+local top_players_weekly = {}
+local top_players_all_time = {}
+
+ns.getTopPlayers = function()
+	local top_daily_list = {}
+	local top_weekly_list = {}
+	local top_all_time_list = {}
+
+	-- Ordered
+	for k, v in
+		spairs(top_players_daily, function(t, a, b)
+			return t[a].pts > t[b].pts
+		end)
+	do
+		top_daily_list[#top_daily_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
+	end
+
+	for k, v in
+		spairs(top_players_weekly, function(t, a, b)
+			return t[a].pts > t[b].pts
+		end)
+	do
+		top_weekly_list[#top_weekly_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
+	end
+
+	for k, v in
+		spairs(top_players_all_time, function(t, a, b)
+			return t[a].pts > t[b].pts
+		end)
+	do
+		top_all_time_list[#top_all_time_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
+	end
+
+	return top_daily_list, top_weekly_list, top_all_time_list
 end
 
 local estimated_score_num_entries = 0
@@ -189,7 +255,36 @@ ns.getScore = function(team_name)
 	return estimated_score[team_name]
 end
 
+local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, current_adjusted_time, pts)
+	local _char_name, _ = string.split("-", _fletcher)
+	_char_name = _char_name .. "-" .. REALM_NAME
+	local streamer_name = ns.streamer_map[_char_name] or OnlyFangsStreamerMap[_char_name]
+	if streamer_name then
+		if top_players_all_time[streamer_name] == nil then
+			top_players_all_time[streamer_name] = { ["pts"] = 0 }
+		end
+		top_players_all_time[streamer_name].pts = top_players_all_time[streamer_name].pts + ns.event[_event_name].pts
+
+		if _event_log[DATE_IDX] + WEEK_SECONDS > current_adjusted_time then
+			if top_players_weekly[streamer_name] == nil then
+				top_players_weekly[streamer_name] = { ["pts"] = 0 }
+			end
+			top_players_weekly[streamer_name].pts = top_players_weekly[streamer_name].pts + ns.event[_event_name].pts
+		end
+		if _event_log[DATE_IDX] + DAY_SECONDS > current_adjusted_time then
+			if top_players_daily[streamer_name] == nil then
+				top_players_daily[streamer_name] = { ["pts"] = 0 }
+			end
+			top_players_daily[streamer_name].pts = top_players_daily[streamer_name].pts + ns.event[_event_name].pts
+		end
+	end
+end
+
 ns.aggregateLog = function()
+	top_players_daily = {}
+	top_players_weekly = {}
+	top_players_all_time = {}
+	local current_adjusted_time = adjustedTime()
 	local guild_name = guildName()
 	for k, _ in pairs(distributed_log.points) do
 		distributed_log.points[k] = 0
@@ -200,9 +295,11 @@ ns.aggregateLog = function()
 		if ns.event[event_name].type == "Milestone" then
 			if ns.claimed_milestones[event_name] == k then
 				ns.event[event_name].aggregrate(distributed_log, event_log)
+				addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
 			end
 		else
 			ns.event[event_name].aggregrate(distributed_log, event_log)
+			addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
 		end
 	end
 end
@@ -215,11 +312,12 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 	if prefix == COMM_NAME and (DEBUG == true or scope == "GUILD") then
 		local command, data = string.split(COMM_COMMAND_DELIM, datastr)
 		if command == COMM_COMMAND_HEARTBEAT then
-			local _addon_version, _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id =
+			local _addon_version, _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id, _add_args =
 				string.split(COMM_FIELD_DELIM, data)
 			ns.guild_member_addon_info[sender] = { ["version"] = _addon_version, ["version_status"] = "updated" }
 			if _date ~= nil and lruGet(_fletcher) == nil then
-				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id) }
+				local _new_data =
+					{ tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id), _add_args }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				lruSet(_fletcher, _new_data)
 				if ns.event[_event_name].type == "Milestone" then
@@ -241,9 +339,10 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				}
 			end
 		elseif command == COMM_COMMAND_DIRECT_EVENT then
-			local _fletcher, _date, _race_id, _event_id, _class_id = string.split(COMM_FIELD_DELIM, data)
+			local _fletcher, _date, _race_id, _event_id, _class_id, _add_args = string.split(COMM_FIELD_DELIM, data)
 			if lruGet(_fletcher) == nil then
-				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id) }
+				local _new_data =
+					{ tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id), _add_args }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				local _event_type = ns.event[_event_name].type
 				if _event_type == "Achievement" then
@@ -321,6 +420,31 @@ ns.sendEvent = function(event_name)
 		.. _event[CLASS_IDX]
 		.. COMM_FIELD_DELIM
 		.. (_event[ADD_ARGS_IDX] or "")
+	if in_guild then
+		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+	else
+		local _n, _ = UnitName("player")
+		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, "SAY")
+	end
+end
+
+ns.sendOffEvent = function(event_name, _race_id, _add)
+	local guild_name, in_guild = guildName()
+	local _, _, _class_id = UnitClass("Player")
+	local _fletcher, _event = ns.stampEvent(adjustedTime(), _race_id, ns.event_id[event_name], tonumber(_class_id))
+	local comm_message = COMM_COMMAND_DIRECT_EVENT
+		.. COMM_COMMAND_DELIM
+		.. _fletcher
+		.. COMM_FIELD_DELIM
+		.. _event[DATE_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[RACE_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[EVENT_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[CLASS_IDX]
+		.. COMM_FIELD_DELIM
+		.. tostring(_add)
 	if in_guild then
 		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
 	else

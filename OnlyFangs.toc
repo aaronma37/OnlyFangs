@@ -8,7 +8,7 @@
 
 
 ## DefaultState: enabled
-## SavedVariables: OnlyFangsDistributedLog, deathlog_data
+## SavedVariables: OnlyFangsDistributedLog, deathlog_data, OnlyFangsStreamerMap
 ## SavedVariablesPerCharacter: 
 
 events/event_globals.lua
@@ -35,6 +35,8 @@ events/failures/fall_damage_death.lua
 events/failures/pvp_death.lua
 events/failures/drowning_death.lua
 events/failures/lava_death.lua
+
+events/commands/adjust_points.lua
 
 Localization/strings_cn.lua
 Localization/strings_de.lua

@@ -20,6 +20,8 @@ along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 
 local addonName, ns = ...
 
+local off_race_sel = nil
+local off_pt_num = nil
 local ticker_handler = nil
 local _menu_width = 1100
 local _inner_menu_width = 800
@@ -1044,7 +1046,7 @@ local function drawEventTypeTab(container, _title, _frames)
 			text = "Failures",
 		},
 		{
-			value = "OfficerCommands",
+			value = "OfficerCommand",
 			text = "Officer Commands",
 		},
 	}
@@ -1136,6 +1138,63 @@ local function drawEventTypeTab(container, _title, _frames)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")
 			scroll_frame:AddChild(_group_description)
+			if CanEditOfficerNote() then
+				local __f = AceGUI:Create("InlineGroup")
+				__f:SetFullWidth(true)
+				__f:SetLayout("Flow")
+				__f:SetHeight(100)
+				scroll_frame:AddChild(__f)
+				local _desc = AceGUI:Create("Label")
+				_desc:SetText("Add/Subtract Points")
+				_desc:SetHeight(25)
+				_desc:SetWidth(150)
+				__f:AddChild(_desc)
+				local _addorsub = AceGUI:Create("Dropdown")
+				_addorsub:SetLabel("Race")
+				_addorsub:SetList({
+					["Orc"] = "Orc",
+					["Troll"] = "Troll",
+					["Undead"] = "Undead",
+					["Tauren"] = "Tauren",
+				})
+				_addorsub:SetHeight(25)
+				_addorsub:SetWidth(100)
+				_addorsub:SetCallback("OnValueChanged", function(self, val, race)
+					off_race_sel = race
+					print(off_race_sel)
+				end)
+				__f:AddChild(_addorsub)
+
+				local _num = AceGUI:Create("EditBox")
+				_num:SetLabel("Pts")
+				_num:SetHeight(45)
+				_num:SetWidth(100)
+				_num:SetCallback("OnEnterPressed", function(self, val, pts)
+					off_pt_num = tonumber(pts)
+				end)
+				__f:AddChild(_num)
+
+				local _button = AceGUI:Create("Button")
+				_button:SetText("Submit")
+				_button:SetHeight(25)
+				_button:SetWidth(120)
+				_button:SetCallback("OnClick", function(self)
+					if off_pt_num == nil then
+						print("Enter number of points to add or subtract")
+					end
+					if off_race_sel == nil or ns.race_id[off_race_sel] == nil then
+						print("Enter a valid race")
+					end
+
+					print("Adjusting points. " .. off_race_sel .. ": " .. off_pt_num)
+					ns.sendOffEvent(
+						"AdjustPoints",
+						ns.race_id[off_race_sel],
+						'{["pts"]=' .. tostring(off_pt_num) .. "}"
+					)
+				end)
+				__f:AddChild(_button)
+			end
 		elseif group == "Profession" then
 			local _group_description = AceGUI:Create("Label")
 			_group_description:SetText("Reach specified profession level.")
@@ -1560,6 +1619,8 @@ local function drawLeaderboardTab(container)
 	scroll_container:AddChild(main_frame)
 
 	local _frames = {}
+	local top_scores = {}
+	top_scores["Daily"], top_scores["Weekly"], top_scores["All Time"] = ns.getTopPlayers()
 	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
 		local __f = AceGUI:Create("InlineGroup")
 		__f:SetLayout("Flow")
@@ -1575,7 +1636,11 @@ local function drawLeaderboardTab(container)
 		for j = 1, 30 do
 			local _line = AceGUI:Create("Label")
 			_line:SetWidth(250)
-			_line:SetText(j .. ". ")
+			if top_scores[_type][j] ~= nil then
+				_line:SetText(j .. ". " .. top_scores[_type][j].streamer_name .. "(" .. top_scores[_type][j].pts .. ")")
+			else
+				_line:SetText(j .. ". ")
+			end
 			__f:AddChild(_line)
 			local _pts = AceGUI:Create("Label")
 			_pts:SetWidth(40)
