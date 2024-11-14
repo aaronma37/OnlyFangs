@@ -215,11 +215,12 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 	if prefix == COMM_NAME and (DEBUG == true or scope == "GUILD") then
 		local command, data = string.split(COMM_COMMAND_DELIM, datastr)
 		if command == COMM_COMMAND_HEARTBEAT then
-			local _addon_version, _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id =
+			local _addon_version, _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id, _add_args =
 				string.split(COMM_FIELD_DELIM, data)
 			ns.guild_member_addon_info[sender] = { ["version"] = _addon_version, ["version_status"] = "updated" }
 			if _date ~= nil and lruGet(_fletcher) == nil then
-				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id) }
+				local _new_data =
+					{ tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id), _add_args }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				lruSet(_fletcher, _new_data)
 				if ns.event[_event_name].type == "Milestone" then
@@ -241,9 +242,10 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				}
 			end
 		elseif command == COMM_COMMAND_DIRECT_EVENT then
-			local _fletcher, _date, _race_id, _event_id, _class_id = string.split(COMM_FIELD_DELIM, data)
+			local _fletcher, _date, _race_id, _event_id, _class_id, _add_args = string.split(COMM_FIELD_DELIM, data)
 			if lruGet(_fletcher) == nil then
-				local _new_data = { tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id) }
+				local _new_data =
+					{ tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id), _add_args }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				local _event_type = ns.event[_event_name].type
 				if _event_type == "Achievement" then
@@ -321,6 +323,31 @@ ns.sendEvent = function(event_name)
 		.. _event[CLASS_IDX]
 		.. COMM_FIELD_DELIM
 		.. (_event[ADD_ARGS_IDX] or "")
+	if in_guild then
+		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+	else
+		local _n, _ = UnitName("player")
+		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, "SAY")
+	end
+end
+
+ns.sendOffEvent = function(event_name, _race_id, _add)
+	local guild_name, in_guild = guildName()
+	local _, _, _class_id = UnitClass("Player")
+	local _fletcher, _event = ns.stampEvent(adjustedTime(), _race_id, ns.event_id[event_name], tonumber(_class_id))
+	local comm_message = COMM_COMMAND_DIRECT_EVENT
+		.. COMM_COMMAND_DELIM
+		.. _fletcher
+		.. COMM_FIELD_DELIM
+		.. _event[DATE_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[RACE_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[EVENT_IDX]
+		.. COMM_FIELD_DELIM
+		.. _event[CLASS_IDX]
+		.. COMM_FIELD_DELIM
+		.. tostring(_add)
 	if in_guild then
 		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
 	else

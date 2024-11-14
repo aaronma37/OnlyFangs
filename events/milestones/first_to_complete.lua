@@ -12,6 +12,16 @@ local quest_metadata = {
 		["test_only"] = 1,
 	},
 	{
+		["name"] = "Sting of the Scorpid",
+		["title"] = "First to Complete Sting of the Scorpid",
+		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
+		["quest_name"] = "Sting of the Scorpid",
+		["zone"] = "Durotar",
+		["quest_id"] = 789,
+		["pts"] = 5,
+		["test_only"] = 1,
+	},
+	{
 		["name"] = "Hidden Enemies",
 		["title"] = "First to Complete Hidden Enemies",
 		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",

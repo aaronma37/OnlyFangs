@@ -36,6 +36,8 @@ events/failures/pvp_death.lua
 events/failures/drowning_death.lua
 events/failures/lava_death.lua
 
+events/commands/adjust_points.lua
+
 Localization/strings_cn.lua
 Localization/strings_de.lua
 Localization/strings_en.lua
