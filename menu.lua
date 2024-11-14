@@ -1304,43 +1304,6 @@ local guild_member_subtitle_data = {
 			return version_text or ""
 		end,
 	},
-	{
-		"Points",
-		120,
-		function(_player_name_short, _player_name_long)
-			if other_hardcore_character_cache[_player_name_short] == nil then
-				return ""
-			end
-			if
-				other_hardcore_character_cache[_player_name_short].achievements == nil
-				or #other_hardcore_character_cache[_player_name_short].achievements > 0
-				or #other_hardcore_character_cache[_player_name_short].passive_achievements > 0
-			then
-				local inline_text = ""
-				for i, achievement_name in ipairs(other_hardcore_character_cache[_player_name_short].achievements) do
-					if _G.achievements[achievement_name] then
-						inline_text = inline_text
-							.. "|T"
-							.. _G.achievements[achievement_name].icon_path
-							.. ":16:16:0:0:64:64:4:60:4:60|t"
-					end
-				end
-				for i, achievement_name in
-					ipairs(other_hardcore_character_cache[_player_name_short].passive_achievements)
-				do
-					if _G.passive_achievements[achievement_name] then
-						inline_text = inline_text
-							.. "|T"
-							.. _G.passive_achievements[achievement_name].icon_path
-							.. ":16:16:0:0:64:64:4:60:4:60|t"
-					end
-				end
-				return inline_text
-			else
-				return ""
-			end
-		end,
-	},
 }
 local guild_member_font_container = CreateFrame("Frame")
 guild_member_font_container:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
