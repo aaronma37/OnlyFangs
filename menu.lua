@@ -1570,7 +1570,11 @@ local function drawTestTab(container)
 
 	for k, v in pairs(ns.event) do
 		if v.test_only == 1 then
-			main_frame:AddChild(makeFirstToFindLabel(v))
+			if v.type == "Milestone" then
+				main_frame:AddChild(makeFirstToFindLabel(v))
+			else
+				main_frame:AddChild(makeAchievementLabel2(v))
+			end
 		end
 	end
 end

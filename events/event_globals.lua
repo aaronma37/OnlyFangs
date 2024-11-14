@@ -160,6 +160,16 @@ ns.event_id = {
 	["ReachLvl3"] = 152,
 	["Your Place In The World"] = 153,
 	["Sting of the Scorpid"] = 154,
+	["1FirstAid"] = 155,
+	["1Cooking"] = 156,
+	["1Fishing"] = 157,
+	["1Herbalism"] = 158,
+	["1Mining"] = 159,
+	["1Tailoring"] = 160,
+	["1Enchanting"] = 161,
+	["1Skinning"] = 162,
+	["1Lockpicking"] = 163,
+	["1Blacksmithing"] = 164,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
@@ -381,7 +391,7 @@ function SetAchievementTooltip(achievement_icon, achievement, _player_name)
 	end)
 end
 
-ns.enable_testing = false
+ns.enable_testing = true
 if ns.enable_testing == true then
 	print("OnlyFangs Testing Version Enabled")
 end

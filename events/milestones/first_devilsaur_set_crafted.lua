@@ -23,8 +23,25 @@ end
 
 -- Register Definitions
 local sent = false
-_event:SetScript("OnEvent", function(self, e, ...)
-	if ns.claimed_milestones[_event.name] ~= nil then
+local has = { [15062] = false, [15063] = false }
+local function triggerCondition()
+	if sent == true then
 		return
 	end
-end)
+	if ns.claimed_milestones[_event.name] == nil then
+		ns.triggerEvent(_event.name)
+		sent = true
+	end
+end
+
+for _, v in ipairs({ 15062, 15063 }) do
+	ns.item_id_obs[v] = function()
+		has[v] = true
+		for k, v2 in pairs(has) do
+			if v2 == false then
+				return
+			end
+		end
+		triggerCondition()
+	end
+end

@@ -5,7 +5,7 @@ local level_metadata = {
 		["name"] = "ReachLvl3",
 		["title"] = "Reach Level 3",
 		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
-		["lvl"] = 10,
+		["lvl"] = 3,
 		["test_only"] = 1,
 	},
 	{
