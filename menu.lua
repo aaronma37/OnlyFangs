@@ -1258,6 +1258,13 @@ local guild_member_subtitle_data = {
 		end,
 	},
 	{
+		"Streamer Name",
+		120,
+		function(_player_name_short, _player_name_long)
+			return ns.streamer_map[_player_name_long] or OnlyFangsStreamerMap[_player_name_long] or ""
+		end,
+	},
+	{
 		"Lvl",
 		30,
 		function(_player_name_short, _player_name_long)
