@@ -152,6 +152,10 @@ local function handleEvent(self, event, ...)
 			local name, rankName, rankIndex, level, classDisplayName, zone, _public_note, _officer_note, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
 				GetGuildRosterInfo(i)
 
+			-- For testing
+			-- if name == "Yazpad-DefiasPillager" then
+			-- 	_officer_note = "~Yazpad~ Some other Stuff"
+			-- end
 			if OnlyFangsStreamerMap[name] == nil or ns.streamer_map[name] == nil then
 				-- local _, streamer_name = string.split(STREAMER_TAG_DELIM, "~Yazpad~ Some other Stuff")
 				local _, streamer_name = string.split(STREAMER_TAG_DELIM, _officer_note)
