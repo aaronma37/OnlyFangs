@@ -22,11 +22,77 @@ local ADD_ARGS_IDX = 5
 
 local INIT_TIME = 1730639674
 
+local REALM_NAME = GetRealmName()
+REALM_NAME = REALM_NAME:gsub("%s+", "")
+
+local function spairs(t, order)
+	local keys = {}
+	for k in pairs(t) do
+		keys[#keys + 1] = k
+	end
+
+	if order then
+		table.sort(keys, function(a, b)
+			return order(t, a, b)
+		end)
+	else
+		table.sort(keys)
+	end
+
+	local i = 0
+	return function()
+		i = i + 1
+		if keys[i] then
+			return keys[i], t[keys[i]]
+		end
+	end
+end
+
 local function adjustedTime()
 	return GetServerTime() - INIT_TIME
 end
 local function fromAdjustedTime(t)
 	return t + INIT_TIME
+end
+
+local DAY_SECONDS = 86400
+local WEEK_SECONDS = 604800
+
+local top_players_daily = {}
+local top_players_weekly = {}
+local top_players_all_time = {}
+
+ns.getTopPlayers = function()
+	local top_daily_list = {}
+	local top_weekly_list = {}
+	local top_all_time_list = {}
+
+	-- Ordered
+	for k, v in
+		spairs(top_players_daily, function(t, a, b)
+			return t[a].pts > t[b].pts
+		end)
+	do
+		top_daily_list[#top_daily_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
+	end
+
+	for k, v in
+		spairs(top_players_weekly, function(t, a, b)
+			return t[a].pts > t[b].pts
+		end)
+	do
+		top_weekly_list[#top_weekly_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
+	end
+
+	for k, v in
+		spairs(top_players_all_time, function(t, a, b)
+			return t[a].pts > t[b].pts
+		end)
+	do
+		top_all_time_list[#top_all_time_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
+	end
+
+	return top_daily_list, top_weekly_list, top_all_time_list
 end
 
 local estimated_score_num_entries = 0
@@ -189,7 +255,36 @@ ns.getScore = function(team_name)
 	return estimated_score[team_name]
 end
 
+local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, current_adjusted_time, pts)
+	local _char_name, _ = string.split("-", _fletcher)
+	_char_name = _char_name .. "-" .. REALM_NAME
+	local streamer_name = ns.streamer_map[_char_name] or OnlyFangsStreamerMap[_char_name]
+	if streamer_name then
+		if top_players_all_time[streamer_name] == nil then
+			top_players_all_time[streamer_name] = { ["pts"] = 0 }
+		end
+		top_players_all_time[streamer_name].pts = top_players_all_time[streamer_name].pts + ns.event[_event_name].pts
+
+		if _event_log[DATE_IDX] + WEEK_SECONDS > current_adjusted_time then
+			if top_players_weekly[streamer_name] == nil then
+				top_players_weekly[streamer_name] = { ["pts"] = 0 }
+			end
+			top_players_weekly[streamer_name].pts = top_players_weekly[streamer_name].pts + ns.event[_event_name].pts
+		end
+		if _event_log[DATE_IDX] + DAY_SECONDS > current_adjusted_time then
+			if top_players_daily[streamer_name] == nil then
+				top_players_daily[streamer_name] = { ["pts"] = 0 }
+			end
+			top_players_daily[streamer_name].pts = top_players_daily[streamer_name].pts + ns.event[_event_name].pts
+		end
+	end
+end
+
 ns.aggregateLog = function()
+	top_players_daily = {}
+	top_players_weekly = {}
+	top_players_all_time = {}
+	local current_adjusted_time = adjustedTime()
 	local guild_name = guildName()
 	for k, _ in pairs(distributed_log.points) do
 		distributed_log.points[k] = 0
@@ -200,9 +295,11 @@ ns.aggregateLog = function()
 		if ns.event[event_name].type == "Milestone" then
 			if ns.claimed_milestones[event_name] == k then
 				ns.event[event_name].aggregrate(distributed_log, event_log)
+				addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
 			end
 		else
 			ns.event[event_name].aggregrate(distributed_log, event_log)
+			addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
 		end
 	end
 end

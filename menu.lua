@@ -1138,9 +1138,7 @@ local function drawEventTypeTab(container, _title, _frames)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")
 			scroll_frame:AddChild(_group_description)
-
-			local _, _, _rank_index = GetGuildInfo("player")
-			if _rank_index == 0 then
+			if CanEditOfficerNote() then
 				local __f = AceGUI:Create("InlineGroup")
 				__f:SetFullWidth(true)
 				__f:SetLayout("Flow")
@@ -1621,6 +1619,8 @@ local function drawLeaderboardTab(container)
 	scroll_container:AddChild(main_frame)
 
 	local _frames = {}
+	local top_scores = {}
+	top_scores["Daily"], top_scores["Weekly"], top_scores["All Time"] = ns.getTopPlayers()
 	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
 		local __f = AceGUI:Create("InlineGroup")
 		__f:SetLayout("Flow")
@@ -1636,7 +1636,11 @@ local function drawLeaderboardTab(container)
 		for j = 1, 30 do
 			local _line = AceGUI:Create("Label")
 			_line:SetWidth(250)
-			_line:SetText(j .. ". ")
+			if top_scores[_type][j] ~= nil then
+				_line:SetText(j .. ". " .. top_scores[_type][j].streamer_name .. "(" .. top_scores[_type][j].pts .. ")")
+			else
+				_line:SetText(j .. ". ")
+			end
 			__f:AddChild(_line)
 			local _pts = AceGUI:Create("Label")
 			_pts:SetWidth(40)

@@ -21,11 +21,14 @@ local addonName, ns = ...
 -- Entry: (event_id, player, time, faction)
 ns.recent_level_up = nil -- KEEP GLOBAL
 ns.current_profession_levels = {}
+OnlyFangsStreamerMap = OnlyFangsStreamerMap or {}
+ns.streamer_map = {}
 local last_attack_source = nil
 local recent_msg = nil
 local creature_guid_map = {}
 local player_guid = UnitGUID("player")
 local creature_last_attack_source = {}
+local STREAMER_TAG_DELIM = "~"
 
 deathlog_data = deathlog_data or {}
 
@@ -145,12 +148,19 @@ local function handleEvent(self, event, ...)
 		-- Create a new dictionary of just online people every time roster is updated
 		ns.guild_online = {}
 		local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()
-		for i = 1, numOnline, 1 do
-			local name, rankName, rankIndex, level, classDisplayName, zone, publicNote, officerNote, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
+		for i = 1, numTotal, 1 do
+			local name, rankName, rankIndex, level, classDisplayName, zone, _public_note, _officer_note, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
 				GetGuildRosterInfo(i)
 
+			if OnlyFangsStreamerMap[name] == nil or ns.streamer_map[name] == nil then
+				-- local _, streamer_name = string.split(STREAMER_TAG_DELIM, "~Yazpad~ Some other Stuff")
+				local _, streamer_name = string.split(STREAMER_TAG_DELIM, _officer_note)
+				OnlyFangsStreamerMap[name] = streamer_name
+				ns.streamer_map[name] = streamer_name
+			end
+
 			-- name is nil after a gquit, so nil check here
-			if name then
+			if name and isOnline then
 				ns.guild_online[name] = {
 					name = name,
 					level = level,
