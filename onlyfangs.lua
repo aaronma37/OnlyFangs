@@ -28,6 +28,7 @@ local recent_msg = nil
 local creature_guid_map = {}
 local player_guid = UnitGUID("player")
 local STREAMER_TAG_DELIM = "~"
+local full_load = nil
 
 local player_name = UnitName("Player")
 
@@ -83,19 +84,21 @@ local function handleEvent(self, event, ...)
 		ns.loadDistributedLog()
 		-- ns.fakeEntries()
 	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
-		for bag = 0, 5 do
-			for slot = 0, 16 do
-				local item_id = C_Container.GetContainerItemID(bag, slot)
-				if ns.item_id_obs[item_id] ~= nil then
-					ns.item_id_obs[item_id]()
-				end
-				if ns.item_id_epic_obs[item_id] ~= nil then
-					ns.item_id_epic_obs[item_id]()
-				end
-				if item_id ~= nil then
-					-- 0: gray, 1: white, 2: green, 3: blue, 4: epic
-					-- local item_name, _, _rarity, _, _, _, _, _, _, _, _ = GetItemInfo(item_id)
-					-- print(item_name, _rarity)
+		if full_load then
+			for bag = 0, 5 do
+				for slot = 0, 16 do
+					local item_id = C_Container.GetContainerItemID(bag, slot)
+					if ns.item_id_obs[item_id] ~= nil then
+						ns.item_id_obs[item_id]()
+					end
+					if ns.item_id_epic_obs[item_id] ~= nil then
+						ns.item_id_epic_obs[item_id]()
+					end
+					if item_id ~= nil then
+						-- 0: gray, 1: white, 2: green, 3: blue, 4: epic
+						-- local item_name, _, _rarity, _, _, _, _, _, _, _, _ = GetItemInfo(item_id)
+						-- print(item_name, _rarity)
+					end
 				end
 			end
 		end
@@ -154,6 +157,12 @@ local function handleEvent(self, event, ...)
 			end
 		end
 	elseif event == "GUILD_ROSTER_UPDATE" then
+		if full_load == nil then
+			OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
+			ns.distributed_log = OnlyFangsDistributedLog
+			ns.loadDistributedLog()
+			full_load = true
+		end
 		local arg = { ... }
 		-- Create a new dictionary of just online people every time roster is updated
 		ns.guild_online = {}

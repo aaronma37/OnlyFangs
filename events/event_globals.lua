@@ -175,6 +175,10 @@ ns.event_id = {
 	["FireDeath"] = 166,
 	["FatigueDeath"] = 167,
 	["First to Kill Sarkoth"] = 168,
+	["ReachLvl2"] = 169,
+	["First to Kill Scorpid Worker"] = 170,
+	["First to Kill Adder"] = 171,
+	["First to Kill Hare"] = 172,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do

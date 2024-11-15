@@ -2,6 +2,13 @@ local addonName, ns = ...
 
 local level_metadata = {
 	{
+		["name"] = "ReachLvl2",
+		["title"] = "Reach Level 2",
+		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
+		["lvl"] = 2,
+		["test_only"] = 1,
+	},
+	{
 		["name"] = "ReachLvl3",
 		["title"] = "Reach Level 3",
 		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
