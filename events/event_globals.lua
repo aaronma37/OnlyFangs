@@ -1,5 +1,6 @@
 local addonName, ns = ...
 ns.item_id_obs = {}
+ns.item_id_epic_obs = {}
 ns.last_attack_source = nil
 ns.kill_target_exec = {}
 
@@ -173,6 +174,7 @@ ns.event_id = {
 	["YourPlaceInTheWorld"] = 165,
 	["FireDeath"] = 166,
 	["FatigueDeath"] = 167,
+	["First to Kill Sarkoth"] = 168,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do

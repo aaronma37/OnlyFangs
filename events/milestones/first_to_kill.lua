@@ -13,6 +13,7 @@ local target_metadata = {
 	{ ["target_name"] = "Captain Flat Tusk", ["pts"] = 10 },
 	{ ["target_name"] = "Gamon", ["pts"] = 15 },
 	{ ["target_name"] = "Mottled Boar", ["pts"] = 15, ["test_only"] = 1 },
+	{ ["target_name"] = "Sarkoth", ["pts"] = 15, ["test_only"] = 1 },
 }
 
 local function loadEvent(target_metadata)

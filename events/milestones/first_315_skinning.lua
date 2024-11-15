@@ -11,7 +11,6 @@ _event.icon_path = "Interface\\ICONS\\INV_BannerPVP_01"
 _event.pts = 100
 _event.description = "First to obtain reach 315 skinning gets this milestone!"
 _event.subtype = "General"
-_event.incomplete = 1
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)
@@ -19,12 +18,33 @@ _event.aggregrate = function(distributed_log, event_log)
 	distributed_log.points[race_name] = distributed_log.points[race_name] + _event.pts
 end
 
--- Registers
-
--- Register Definitions
 local sent = false
-_event:SetScript("OnEvent", function(self, e, ...)
-	if ns.claimed_milestones[_event.name] ~= nil then
-		return
+local function triggerCondition()
+	ns.item_id_obs[_event.item_id] = function()
+		if sent == true then
+			return
+		end
+		if ns.claimed_milestones[_event.name] == nil then
+			for bag = 0, 5 do
+				for slot = 0, 16 do
+					local item_id = C_Container.GetContainerItemID(bag, slot)
+					if item_id == 12709 then
+						local item_link = GetContainerItemLink(bag, slot)
+						local _, ench_id, gem1, gem2, gem3, gem4 =
+							item_link:match("item:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")
+						if ench_id == 865 then
+							ns.triggerEvent(_event.name)
+							sent = true
+						end
+					end
+				end
+			end
+		end
 	end
-end)
+end
+
+for _, v in ipairs({ 12709 }) do
+	ns.item_id_obs[v] = function()
+		triggerCondition()
+	end
+end

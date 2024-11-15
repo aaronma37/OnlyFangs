@@ -89,8 +89,13 @@ local function handleEvent(self, event, ...)
 				if ns.item_id_obs[item_id] ~= nil then
 					ns.item_id_obs[item_id]()
 				end
+				if ns.item_id_epic_obs[item_id] ~= nil then
+					ns.item_id_epic_obs[item_id]()
+				end
 				if item_id ~= nil then
-					local item_name, _, _rarity, _, _, _, _, _, _, _, _ = GetItemInfo(item_id)
+					-- 0: gray, 1: white, 2: green, 3: blue, 4: epic
+					-- local item_name, _, _rarity, _, _, _, _, _, _, _, _ = GetItemInfo(item_id)
+					-- print(item_name, _rarity)
 				end
 			end
 		end

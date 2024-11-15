@@ -296,21 +296,22 @@ local function setLogData()
 
 		local _event = list[idx]
 		local _event_name = ns.eventName(_event["Event"])
-
-		local _char_name, _ = string.split("-", _event["Name"])
-		font_strings[i]["Name"]:SetText(_char_name)
-		font_strings[i]["Date"]:SetText(date("%m/%d/%y, %H:%M", _event["Date"] + 1730639674))
-		font_strings[i]["Race"]:SetText(ns.id_race[_event["Race"]])
-		font_strings[i]["Class"]:SetText(ns.id_class[_event["Class"]])
-		font_strings[i]["Event"]:SetText(ns.event[_event_name].title)
-		font_strings[i]["Type"]:SetText(ns.event[_event_name].type)
-		local pt_str = ""
-		if ns.event[_event_name].pts > 0 then
-			pt_str = "|cff00FF00+" .. ns.event[_event_name].pts .. "|r"
-		elseif ns.event[_event_name].pts < 0 then
-			pt_str = "|cffFF0000-" .. ns.event[_event_name].pts .. "|r"
+		if _event_name then
+			local _char_name, _ = string.split("-", _event["Name"])
+			font_strings[i]["Name"]:SetText(_char_name)
+			font_strings[i]["Date"]:SetText(date("%m/%d/%y, %H:%M", _event["Date"] + 1730639674))
+			font_strings[i]["Race"]:SetText(ns.id_race[_event["Race"]])
+			font_strings[i]["Class"]:SetText(ns.id_class[_event["Class"]] or "")
+			font_strings[i]["Event"]:SetText(ns.event[_event_name].title or "")
+			font_strings[i]["Type"]:SetText(ns.event[_event_name].type or "")
+			local pt_str = ""
+			if ns.event[_event_name].pts > 0 then
+				pt_str = "|cff00FF00+" .. ns.event[_event_name].pts .. "|r"
+			elseif ns.event[_event_name].pts < 0 then
+				pt_str = "|cffFF0000-" .. ns.event[_event_name].pts .. "|r"
+			end
+			font_strings[i]["Points"]:SetText(pt_str)
 		end
-		font_strings[i]["Points"]:SetText(pt_str)
 	end
 end
 
@@ -683,7 +684,8 @@ local function makeMilestoneLabel(_v)
 	if ns.claimed_milestones[_v.name] == nil then
 		_claimed_by:SetText("Unclaimed")
 	else
-		_claimed_by:SetText("Claimed by: " .. ns.claimed_milestones[_v.name])
+		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetText("Claimed by: " .. _short_n)
 	end
 	_claimed_by:SetHeight(140)
 	_claimed_by:SetWidth(800)
@@ -821,7 +823,8 @@ local function makeFirstToFindLabel(_v)
 	if ns.claimed_milestones[_v.name] == nil then
 		_claimed_by:SetText("Unclaimed")
 	else
-		_claimed_by:SetText("Claimed by: " .. ns.claimed_milestones[_v.name])
+		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetText("Claimed by: " .. _short_n)
 	end
 	_claimed_by:SetHeight(140)
 	_claimed_by:SetWidth(400)
@@ -881,7 +884,8 @@ local function makeFirstToCompleteLabel(_v)
 	if ns.claimed_milestones[_v.name] == nil then
 		_claimed_by:SetText("Unclaimed")
 	else
-		_claimed_by:SetText("Claimed by: " .. ns.claimed_milestones[_v.name])
+		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetText("Claimed by: " .. _short_n)
 	end
 	_claimed_by:SetHeight(140)
 	_claimed_by:SetWidth(800)

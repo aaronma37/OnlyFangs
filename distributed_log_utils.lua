@@ -122,15 +122,17 @@ local function refreshClaimedMilestones()
 	local guild_name = guildName()
 	for k, v in pairs(distributed_log[guild_name]["data"]) do
 		local event_name = ns.id_event[v["value"][EVENT_IDX]]
-		local type = ns.event[event_name].type
-		if type == "Milestone" then
-			if ns.claimed_milestones[event_name] == nil then
-				ns.claimed_milestones[event_name] = k
-			elseif
-				v["value"][DATE_IDX]
-				< distributed_log[guild_name]["data"][ns.claimed_milestones[event_name]]["value"][DATE_IDX]
-			then
-				ns.claimed_milestones[event_name] = k
+		if event_name then
+			local type = ns.event[event_name].type
+			if type == "Milestone" then
+				if ns.claimed_milestones[event_name] == nil then
+					ns.claimed_milestones[event_name] = k
+				elseif
+					v["value"][DATE_IDX]
+					< distributed_log[guild_name]["data"][ns.claimed_milestones[event_name]]["value"][DATE_IDX]
+				then
+					ns.claimed_milestones[event_name] = k
+				end
 			end
 		end
 	end
@@ -292,14 +294,22 @@ ns.aggregateLog = function()
 	for k, v in pairs(distributed_log[guild_name]["data"]) do
 		local event_log = v["value"]
 		local event_name = ns.id_event[event_log[EVENT_IDX]]
-		if ns.event[event_name].type == "Milestone" then
-			if ns.claimed_milestones[event_name] == k then
+		if event_name then
+			if ns.event[event_name].type == "Milestone" then
+				if ns.claimed_milestones[event_name] == k then
+					ns.event[event_name].aggregrate(distributed_log, event_log)
+					addPointsToLeaderBoardData(
+						k,
+						event_name,
+						event_log,
+						current_adjusted_time,
+						ns.event[event_name].pts
+					)
+				end
+			else
 				ns.event[event_name].aggregrate(distributed_log, event_log)
 				addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
 			end
-		else
-			ns.event[event_name].aggregrate(distributed_log, event_log)
-			addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
 		end
 	end
 end
