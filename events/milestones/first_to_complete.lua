@@ -194,6 +194,7 @@ local function loadQuestEvent(_metadata)
 	_event.name = _metadata.name
 	_event.zone = _metadata.zone
 	_event.quest_name = _metadata.quest_name
+	_event.quest_id = _metadata.quest_id
 	_event.type = "Milestone"
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
@@ -221,7 +222,7 @@ local function loadQuestEvent(_metadata)
 			return
 		end
 		if e == "QUEST_TURNED_IN" then
-			if _args[1] ~= nil and _args[1] == _event.quest_id then
+			if _args ~= nil and tonumber(_args) == _event.quest_id then
 				ns.triggerEvent(_event.name)
 				sent = true
 			end

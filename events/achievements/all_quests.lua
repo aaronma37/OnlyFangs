@@ -269,6 +269,7 @@ local function loadQuestEvent(_metadata)
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
 	_event.test_only = _metadata.test_only
+	_event.quest_id = _metadata.quest_id
 	_event.pts = 3
 	_event.subtype = "Quest"
 	_event.max_lvl = _metadata.max_lvl
@@ -295,8 +296,8 @@ local function loadQuestEvent(_metadata)
 		end
 		if e == "QUEST_TURNED_IN" then
 			if
-				_args[1] ~= nil
-				and _args[1] == _event.quest_id
+				_args ~= nil
+				and tonumber(_args) == _event.quest_id
 				and (
 					UnitLevel("player") <= _event.max_lvl
 					or (ns.recent_level_up ~= nil and UnitLevel("player") <= _event.max_lvl + 1)

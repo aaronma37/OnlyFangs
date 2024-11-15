@@ -148,6 +148,18 @@ ns.loadDistributedLog = function()
 	if distributed_log[guild_name] == nil then
 		distributed_log[guild_name] = { ["meta"] = { ["newest"] = nil, ["oldest"] = nil, ["size"] = 0 }, ["data"] = {} }
 	end
+	if distributed_log["points"] == nil then
+		distributed_log["points"] = {
+			["Orc"] = 0,
+			["Troll"] = 0,
+			["Tauren"] = 0,
+			["Undead"] = 0,
+			["Human"] = 0,
+			["Gnome"] = 0,
+			["Night Elf"] = 0,
+			["Dwarf"] = 0,
+		}
+	end
 	refreshClaimedMilestones()
 	ns.aggregateLog()
 	estimated_score_num_entries = distributed_log[guild_name]["meta"]["size"]
