@@ -68,6 +68,7 @@ end
 local function handleEvent(self, event, ...)
 	if event == "PLAYER_ENTERING_WORLD" then
 		initMinimapButton()
+		C_ChatInfo.RegisterAddonMessagePrefix("OnlyFangsAddon")
 	elseif event == "PLAYER_LEVEL_UP" then
 		ns.recent_level_up = 1
 		C_Timer.After(3, function()
