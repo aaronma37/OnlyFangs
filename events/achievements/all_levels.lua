@@ -72,12 +72,12 @@ local function loadLevelEvent(_metadata)
 
 	-- Register Definitions
 	local sent = false
-	_event:SetScript("OnEvent", function(self, e, _args)
+	_event:SetScript("OnEvent", function(self, e, lvl)
 		if sent == true then
 			return
 		end
 
-		if UnitLevel("Player") == _event.lvl and sent == false then
+		if lvl == _event.lvl and sent == false then
 			ns.triggerEvent(_event.name)
 			sent = true
 		end
