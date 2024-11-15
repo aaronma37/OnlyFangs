@@ -7,7 +7,7 @@ local COMM_COMMAND_DIRECT_EVENT = "DE"
 local COMM_COMMAND_DELIM = "|"
 local COMM_FIELD_DELIM = "~"
 local COMM_CHANNEL = "GUILD"
-local HB_DUR = 15
+local HB_DUR = 5
 local ERASE_CACHE = false
 local DEBUG = false
 -- Node
@@ -478,6 +478,9 @@ end
 ns.logAsList = function()
 	local guild_name = guildName()
 	local new_list = {}
+	if distributed_log[guild_name] == nil then
+		ns.loadDistributedLog()
+	end
 	for k, v in pairs(distributed_log[guild_name]["data"]) do
 		new_list[#new_list + 1] = {
 			["Name"] = k,
