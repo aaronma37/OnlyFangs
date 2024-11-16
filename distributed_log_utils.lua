@@ -108,6 +108,8 @@ local function guildName()
 	local guild_name, _, _ = GetGuildInfo("Player")
 	local in_guild = (guild_name ~= nil)
 	guild_name = guild_name or "guildless"
+	guild_name = guild_name .. "-" .. REALM_NAME
+	print(guild_name)
 	return guild_name, in_guild
 end
 
