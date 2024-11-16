@@ -310,6 +310,9 @@ local function setLogData()
 			elseif ns.event[_event_name].pts < 0 then
 				pt_str = "|cffFF0000-" .. ns.event[_event_name].pts .. "|r"
 			end
+			if ns.event[_event_name].type == "Milestone" and ns.claimed_milestones[_event_name] ~= _event["Name"] then
+				pt_str = "|cff808080already claimed|r"
+			end
 			font_strings[i]["Points"]:SetText(pt_str)
 		end
 	end

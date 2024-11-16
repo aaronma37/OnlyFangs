@@ -80,8 +80,11 @@ local function loadEvent(item_metadata)
 			return
 		end
 		if ns.claimed_milestones[_event.name] == nil then
-			ns.triggerEvent(_event.name)
-			sent = true
+			local guild_name, _, _ = GetGuildInfo("Player")
+			if guild_name ~= nil then
+				ns.triggerEvent(_event.name)
+				sent = true
+			end
 		end
 	end
 end

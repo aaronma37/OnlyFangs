@@ -112,10 +112,6 @@ local function guildName()
 	return guild_name, in_guild
 end
 
---- [key] = {value: {}, prev: string or nil, next: string or nil}
---- [guild][meta] -> {newest, oldest}
---- [guild][data][key] -> {value: {}, prev: string or nil, next: string or nil}
-
 local distributed_log = nil
 local key_list = nil
 ns.claimed_milestones = {}
@@ -212,22 +208,9 @@ local function lruSet(key, v)
 		distributed_log[guild_name]["meta"]["size"] = distributed_log[guild_name]["meta"]["size"] + 1
 	end
 
-	local oldest = distributed_log[guild_name]["meta"]["oldest"]
-	if oldest == key then
-		oldest = distributed_log[guild_name]["data"][key]["next"]
-	end
 	distributed_log[guild_name]["data"][key] = {
 		["value"] = v,
-		["next"] = oldest,
-		["prev"] = nil,
 	}
-	if oldest ~= nil then
-		distributed_log[guild_name]["data"][oldest]["prev"] = key
-	end
-	distributed_log[guild_name]["meta"]["oldest"] = key
-	if distributed_log[guild_name]["meta"]["newest"] == nil then
-		distributed_log[guild_name]["meta"]["newest"] = key
-	end
 end
 
 -- local num_gets = {}
@@ -236,43 +219,7 @@ local function lruGet(key_id)
 	if distributed_log[guild_name]["data"][key_id] == nil then
 		return nil
 	end
-
-	-- if num_gets[key_id] == nil then
-	-- 	num_gets[key_id] = 0
-	-- end
-	-- num_gets[key_id] = num_gets[key_id] + 1
-	-- print("Gets: ")
-	-- for k, v in pairs(num_gets) do
-	-- 	print(k .. ": " .. v)
-	-- end
-
-	local v = distributed_log[guild_name]["data"][key_id]["value"]
-	local prev = distributed_log[guild_name]["data"][key_id]["prev"]
-	local next = distributed_log[guild_name]["data"][key_id]["next"]
-
-	if key_id == distributed_log[guild_name]["meta"]["newest"] and prev ~= nil then
-		distributed_log[guild_name]["meta"]["newest"] = prev
-	end
-	if prev ~= nil then
-		distributed_log[guild_name]["data"][prev]["next"] = next
-	end
-	if next ~= nil then
-		distributed_log[guild_name]["data"][next]["prev"] = prev
-	end
-
-	local oldest = distributed_log[guild_name]["meta"]["oldest"]
-
-	if oldest ~= key_id then
-		distributed_log[guild_name]["data"][key_id]["next"] = oldest
-	end
-	distributed_log[guild_name]["data"][key_id]["prev"] = nil
-
-	if oldest ~= nil then
-		distributed_log[guild_name]["data"][oldest]["prev"] = key_id
-	end
-
-	distributed_log[guild_name]["meta"]["oldest"] = key_id
-	return v
+	return distributed_log[guild_name]["data"][key_id]
 end
 
 ns.eventName = function(event_id)
@@ -307,6 +254,7 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 	local _char_name, _ = string.split("-", _fletcher)
 	_char_name = _char_name .. "-" .. REALM_NAME
 	local streamer_name = ns.streamer_map[_char_name] or OnlyFangsStreamerMap[_char_name]
+
 	if streamer_name then
 		if top_players_all_time[streamer_name] == nil then
 			top_players_all_time[streamer_name] = { ["pts"] = 0 }
@@ -430,7 +378,7 @@ C_Timer.NewTicker(HB_DUR, function(self)
 	end
 	local newest = getNextEntry() --distributed_log[guild_name]["meta"]["newest"]
 	local message = nil
-	if newest == nil then
+	if newest == nil or distributed_log[guild_name]["data"][newest] == nil then
 		message = ""
 	else
 		message = toMessage(newest, distributed_log[guild_name]["data"][newest]["value"])
@@ -559,4 +507,4 @@ ns.fakeEntries = function()
 end
 
 -- ns.showToast("First to Kill Taskmaster Whipfang", "", "Milestone")
-ns.showToast(ns.event["First to Find The 1 Ring"].title, "", "Milestone")
+-- ns.showToast(ns.event["First to Find The 1 Ring"].title, "", "Milestone")
