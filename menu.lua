@@ -22,6 +22,7 @@ local addonName, ns = ...
 
 local off_race_sel = nil
 local off_pt_num = nil
+local off_char_name = nil
 local ticker_handler = nil
 local _menu_width = 1100
 local _inner_menu_width = 800
@@ -312,6 +313,19 @@ local function setLogData()
 			end
 			if ns.event[_event_name].type == "Milestone" and ns.claimed_milestones[_event_name] ~= _event["Name"] then
 				pt_str = "|cff808080already claimed|r"
+			end
+			if _event_name == "AdjustPoints" then
+				local str = "return " .. _event["AdditionalArgs"]
+				local func = assert(loadstring(str))
+				local args = func()
+				pt_str = args["pts"]
+				local _parsed_name = args["char_name"]
+				font_strings[i]["Name"]:SetText(font_strings[i]["Name"]:GetText() .. "->" .. (_parsed_name or ""))
+				if pt_str > 0 then
+					pt_str = "|cff00FF00+" .. pt_str .. "|r"
+				elseif pt_str < 0 then
+					pt_str = "|cffFF0000-" .. pt_str .. "|r"
+				end
 			end
 			font_strings[i]["Points"]:SetText(pt_str)
 		end
@@ -1146,11 +1160,16 @@ local function drawEventTypeTab(container, _title, _frames)
 			_group_description:SetJustifyH("LEFT")
 			scroll_frame:AddChild(_group_description)
 			if CanEditOfficerNote() then
+				off_race_sel = nil
+				off_pt_num = nil
+				off_char_name = nil
 				local __f = AceGUI:Create("InlineGroup")
 				__f:SetFullWidth(true)
 				__f:SetLayout("Flow")
 				__f:SetHeight(100)
 				scroll_frame:AddChild(__f)
+
+				local _commit_label = AceGUI:Create("Label")
 				local _desc = AceGUI:Create("Label")
 				_desc:SetText("Add/Subtract Points")
 				_desc:SetHeight(25)
@@ -1168,7 +1187,9 @@ local function drawEventTypeTab(container, _title, _frames)
 				_addorsub:SetWidth(100)
 				_addorsub:SetCallback("OnValueChanged", function(self, val, race)
 					off_race_sel = race
-					print(off_race_sel)
+					_commit_label:SetText(
+						(off_race_sel or "[Race]") .. ", " .. (off_char_name or "") .. ": " .. (off_pt_num or "[pts]")
+					)
 				end)
 				__f:AddChild(_addorsub)
 
@@ -1178,8 +1199,23 @@ local function drawEventTypeTab(container, _title, _frames)
 				_num:SetWidth(100)
 				_num:SetCallback("OnEnterPressed", function(self, val, pts)
 					off_pt_num = tonumber(pts)
+					_commit_label:SetText(
+						(off_race_sel or "[Race]") .. ", " .. (off_char_name or "") .. ": " .. (off_pt_num or "[pts]")
+					)
 				end)
 				__f:AddChild(_num)
+
+				local _char = AceGUI:Create("EditBox")
+				_char:SetLabel("Character name [optional]")
+				_char:SetHeight(45)
+				_char:SetWidth(150)
+				_char:SetCallback("OnEnterPressed", function(self, val, _name)
+					off_char_name = _name
+					_commit_label:SetText(
+						(off_race_sel or "[Race]") .. ", " .. (off_char_name or "") .. ": " .. (off_pt_num or "[pts]")
+					)
+				end)
+				__f:AddChild(_char)
 
 				local _button = AceGUI:Create("Button")
 				_button:SetText("Submit")
@@ -1194,13 +1230,23 @@ local function drawEventTypeTab(container, _title, _frames)
 					end
 
 					print("Adjusting points. " .. off_race_sel .. ": " .. off_pt_num)
+					local char_string_name = "nil"
+					if off_char_name then
+						char_string_name = "'" .. off_char_name .. "'"
+					end
 					ns.sendOffEvent(
 						"AdjustPoints",
 						ns.race_id[off_race_sel],
-						'{["pts"]=' .. tostring(off_pt_num) .. "}"
+						'{["pts"]=' .. tostring(off_pt_num) .. ', ["char_name"]=' .. char_string_name .. "}"
 					)
 				end)
 				__f:AddChild(_button)
+				_commit_label:SetText(
+					(off_race_sel or "[Race]") .. ", " .. (off_char_name or "") .. ": " .. (off_pt_num or "[pts]")
+				)
+				_commit_label:SetHeight(25)
+				_commit_label:SetWidth(150)
+				__f:AddChild(_commit_label)
 			end
 		elseif group == "Profession" then
 			local _group_description = AceGUI:Create("Label")
