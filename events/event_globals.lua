@@ -179,6 +179,7 @@ ns.event_id = {
 	["First to Kill Scorpid Worker"] = 170,
 	["First to Kill Adder"] = 171,
 	["First to Kill Hare"] = 172,
+	["FirstBlueBoePriestWand"] = 173,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
@@ -406,6 +407,10 @@ if ns.enable_testing == true then
 end
 
 ns.triggerEvent = function(event_name)
+	local guild_name, _, _ = GetGuildInfo("Player")
+	if guild_name == nil then
+		return
+	end
 	if ns.event[event_name].test_only == nil or ns.enable_testing then
 		ns.showToast(event_name, ns.event[event_name].icon_path, ns.event[event_name].type)
 		ns.sendEvent(event_name)

@@ -4,7 +4,7 @@
 ## Author: Yazpad
 ## X-License: GNU GPL3
 ## X-Category: Leveling,Guild
-## Version: 0.1.2
+## Version: 0.1.3
 
 
 ## DefaultState: enabled
@@ -28,6 +28,7 @@ events/milestones/first_16_slot.lua
 events/milestones/first_315_skinning.lua
 events/milestones/first_devilsaur_set_crafted.lua
 events/milestones/first_epic_boe.lua
+events/milestones/first_blue_boe_priest_wand.lua
 
 events/failures/death.lua
 events/failures/coward.lua

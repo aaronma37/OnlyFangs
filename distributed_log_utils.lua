@@ -142,9 +142,11 @@ local key_counter = 0
 local function checkAndAddKeyList()
 	local guild_name = guildName()
 	if key_list[guild_name] == nil or (#key_list[guild_name] ~= distributed_log[guild_name]["meta"]["size"]) then
+		distributed_log[guild_name]["meta"]["size"] = 0
 		key_list[guild_name] = {}
 		for k, _ in pairs(distributed_log[guild_name]["data"]) do
 			key_list[guild_name][#key_list[guild_name] + 1] = k
+			distributed_log[guild_name]["meta"]["size"] = distributed_log[guild_name]["meta"]["size"] + 1
 		end
 	end
 	num_keys = #key_list[guild_name]
@@ -211,6 +213,7 @@ local function lruSet(key, v)
 	distributed_log[guild_name]["data"][key] = {
 		["value"] = v,
 	}
+	key_list[guild_name][#key_list[guild_name] + 1] = key
 end
 
 -- local num_gets = {}
@@ -463,15 +466,21 @@ ns.logAsList = function()
 	if distributed_log[guild_name] == nil then
 		ns.loadDistributedLog()
 	end
-	for k, v in pairs(distributed_log[guild_name]["data"]) do
-		new_list[#new_list + 1] = {
-			["Name"] = k,
-			["Date"] = v["value"][DATE_IDX],
-			["Race"] = v["value"][RACE_IDX],
-			["Event"] = v["value"][EVENT_IDX],
-			["Class"] = v["value"][CLASS_IDX],
-			["AdditionalArgs"] = (v["value"][ADD_ARGS_IDX] or ""),
-		}
+	if key_list[guild_name] then
+		for _idx = #key_list[guild_name], 1, -1 do
+			local k = key_list[guild_name][_idx]
+			local v = distributed_log[guild_name]["data"][k]
+			if v ~= nil then
+				new_list[#new_list + 1] = {
+					["Name"] = k,
+					["Date"] = v["value"][DATE_IDX],
+					["Race"] = v["value"][RACE_IDX],
+					["Event"] = v["value"][EVENT_IDX],
+					["Class"] = v["value"][CLASS_IDX],
+					["AdditionalArgs"] = (v["value"][ADD_ARGS_IDX] or ""),
+				}
+			end
+		end
 	end
 	return new_list
 end
