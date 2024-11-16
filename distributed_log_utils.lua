@@ -109,7 +109,6 @@ local function guildName()
 	local in_guild = (guild_name ~= nil)
 	guild_name = guild_name or "guildless"
 	guild_name = guild_name .. "-" .. REALM_NAME
-	print(guild_name)
 	return guild_name, in_guild
 end
 
@@ -118,6 +117,7 @@ end
 --- [guild][data][key] -> {value: {}, prev: string or nil, next: string or nil}
 
 local distributed_log = nil
+local key_list = nil
 ns.claimed_milestones = {}
 
 local function refreshClaimedMilestones()
@@ -140,16 +140,47 @@ local function refreshClaimedMilestones()
 	end
 end
 
+local num_keys = 0
+local key_counter = 0
+
+local function checkAndAddKeyList()
+	local guild_name = guildName()
+	if key_list[guild_name] == nil or (#key_list[guild_name] ~= distributed_log[guild_name]["meta"]["size"]) then
+		key_list[guild_name] = {}
+		for k, _ in pairs(distributed_log[guild_name]["data"]) do
+			key_list[guild_name][#key_list[guild_name] + 1] = k
+		end
+	end
+	num_keys = #key_list[guild_name]
+end
+
+local function getNextEntry()
+	local guild_name = guildName()
+	if num_keys < 1 then
+		return nil
+	end
+	local idx = num_keys - key_counter
+	key_counter = key_counter + 1
+	if key_counter >= num_keys then
+		checkAndAddKeyList()
+		key_counter = 0
+	end
+	return key_list[guild_name][idx]
+end
+
 ns.loadDistributedLog = function()
 	distributed_log = ns.distributed_log
+	key_list = ns.key_list
 	local guild_name = guildName()
 
 	if ERASE_CACHE then
-		distributed_log[guild_name] = nil
+		distributed_log = {}
+		key_list = {}
 	end
 	if distributed_log[guild_name] == nil then
 		distributed_log[guild_name] = { ["meta"] = { ["newest"] = nil, ["oldest"] = nil, ["size"] = 0 }, ["data"] = {} }
 	end
+
 	if distributed_log["points"] == nil then
 		distributed_log["points"] = {
 			["Orc"] = 0,
@@ -171,6 +202,7 @@ ns.loadDistributedLog = function()
 		["Tauren"] = distributed_log.points["Tauren"],
 		["Troll"] = distributed_log.points["Troll"],
 	}
+	checkAndAddKeyList()
 end
 
 -- got a node that points to itself
@@ -396,7 +428,7 @@ C_Timer.NewTicker(HB_DUR, function(self)
 	if distributed_log == nil or distributed_log[guild_name] == nil then
 		return
 	end
-	local newest = distributed_log[guild_name]["meta"]["newest"]
+	local newest = getNextEntry() --distributed_log[guild_name]["meta"]["newest"]
 	local message = nil
 	if newest == nil then
 		message = ""

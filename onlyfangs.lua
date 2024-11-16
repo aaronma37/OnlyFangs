@@ -82,6 +82,10 @@ local function handleEvent(self, event, ...)
 	elseif event == "ADDON_LOADED" then
 		OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
 		ns.distributed_log = OnlyFangsDistributedLog
+
+		OnlyFangsKeyList = OnlyFangsKeyList or {}
+		ns.key_list = OnlyFangsKeyList
+
 		ns.loadDistributedLog()
 		-- ns.fakeEntries()
 	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
@@ -161,6 +165,8 @@ local function handleEvent(self, event, ...)
 		if full_load == nil then
 			OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
 			ns.distributed_log = OnlyFangsDistributedLog
+			OnlyFangsKeyList = OnlyFangsKeyList or {}
+			ns.key_list = OnlyFangsKeyList
 			ns.loadDistributedLog()
 			full_load = true
 		end

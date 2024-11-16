@@ -8,7 +8,7 @@
 
 
 ## DefaultState: enabled
-## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap
+## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList
 ## SavedVariablesPerCharacter: 
 
 events/event_globals.lua
