@@ -557,3 +557,6 @@ ns.fakeEntries = function()
 
 	ns.aggregateLog()
 end
+
+-- ns.showToast("First to Kill Taskmaster Whipfang", "", "Milestone")
+ns.showToast(ns.event["First to Find The 1 Ring"].title, "", "Milestone")

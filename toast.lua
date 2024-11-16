@@ -35,7 +35,7 @@ frame.icon:SetPoint("LEFT", 35, -5)
 frame.icon:SetHeight(frame:GetHeight() * 0.55)
 frame.icon:SetWidth(frame:GetHeight() * 0.55)
 frame.icon:SetDrawLayer("OVERLAY", 7)
-frame.icon:SetTexture("Interface\\ICONS\\ClassIcon_Warrior")
+frame.icon:SetTexture("Interface\\FriendsFrame\\PlusManz-Horde.PNG")
 frame.icon:Show()
 
 frame.iconback = frame:CreateTexture(nil, "OVERLAY")
@@ -82,17 +82,36 @@ local start_time = nil
 local swipe_x = 0
 ns.showToast = function(name, icon_path, toast_type)
 	frame.desc:SetText(toast_type)
-	if class then
-		frame.icon:SetTexture(icon_path)
-	end
+	-- if class then
+	-- 	frame.icon:SetTexture(icon_path)
+	-- end
 	start_time = time()
 
 	if #name < 11 then
-		frame.title:SetFont("Fonts\\blei00d.TTF", 28, "OUTLINE")
+		frame.title:SetFont("Fonts\\blei00d.TTF", 26, "OUTLINE")
+		frame.title:SetPoint("TOPLEFT", 100, -45)
+	elseif #name < 23 then
+		frame.title:SetFont("Fonts\\blei00d.TTF", 20, "OUTLINE")
+		frame.title:SetPoint("TOPLEFT", 100, -45)
+	elseif #name < 40 then
+		frame.title:SetFont("Fonts\\blei00d.TTF", 18, "OUTLINE")
+		if #name > 29 then
+			frame.title:SetPoint("TOPLEFT", 100, -40)
+		else
+			frame.title:SetPoint("TOPLEFT", 100, -45)
+		end
 	else
-		frame.title:SetFont("Fonts\\blei00d.TTF", 24, "OUTLINE")
+		frame.title:SetFont("Fonts\\blei00d.TTF", 14, "OUTLINE")
+		if #name > 29 then
+			frame.title:SetPoint("TOPLEFT", 100, -40)
+		else
+			frame.title:SetPoint("TOPLEFT", 100, -45)
+		end
 	end
 	frame.title:SetText(name)
+	frame.title:SetJustifyH("CENTER")
+	frame.title:SetWidth(180)
+	frame.title:SetWordWrap(true)
 	frame:Show()
 	main_alpha = 0
 	glow_alpha = 0
