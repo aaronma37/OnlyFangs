@@ -27,9 +27,11 @@ _equip_first_rare_event_handler:SetScript("OnEvent", function(self, e, slot, fil
 		return
 	end
 
-	if filled == false then
+	if filled == false and slot == 19 then
 		local _item_id = GetInventoryItemID("player", slot)
-		print(slot)
-		local _, _, q = GetItemInfo(_item_id)
+		if _item_id == 23192 then
+			ns.triggerEvent(_event.name)
+			sent = true
+		end
 	end
 end)
