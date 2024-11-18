@@ -21,6 +21,7 @@ events/achievements/all_professions.lua
 events/achievements/leet.lua
 events/achievements/equip_first_rare.lua
 events/achievements/equip_first_epic.lua
+events/achievements/equip_scarlet_tabard.lua
 
 events/milestones/all_professions.lua
 events/milestones/first_to_find.lua
