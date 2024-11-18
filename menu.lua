@@ -1492,6 +1492,11 @@ local function setGuildMemberData()
 			rows_used = rows_used + 1
 		end
 	end
+	for k = rows_used, guild_member_max_rows do
+		for _, col in ipairs(guild_member_subtitle_data) do
+			guild_member_font_strings[rows_used][col[1]]:SetText("")
+		end
+	end
 end
 
 local function DrawAccountabilityTab(container)
