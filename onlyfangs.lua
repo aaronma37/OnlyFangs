@@ -65,6 +65,36 @@ local function initMinimapButton()
 	onlyfangs_minimap_button_stub:Register("OnlyFangs", onlyfangs_minimap_button, onlyfangs_minimap_button_info)
 end
 
+ns.refreshGuildList = function(force_refresh)
+	-- Create a new dictionary of just online people every time roster is updated
+	ns.guild_online = {}
+	local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()
+	for i = 1, numTotal, 1 do
+		local name, rankName, rankIndex, level, classDisplayName, zone, _public_note, _officer_note, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
+			GetGuildRosterInfo(i)
+
+		-- For testing
+		-- if name == "Yazpad-DefiasPillager" then
+		-- 	_officer_note = "~Yazpad~ Some other Stuff"
+		-- end
+		if OnlyFangsStreamerMap[name] == nil or ns.streamer_map[name] == nil or force_refresh then
+			-- local _, streamer_name = string.split(STREAMER_TAG_DELIM, "~Yazpad~ Some other Stuff")
+			local _, streamer_name = string.split(STREAMER_TAG_DELIM, _public_note)
+			OnlyFangsStreamerMap[name] = streamer_name
+			ns.streamer_map[name] = streamer_name
+		end
+
+		-- name is nil after a gquit, so nil check here
+		if name and isOnline then
+			ns.guild_online[name] = {
+				name = name,
+				level = level,
+				classDisplayName = classDisplayName,
+			}
+		end
+	end
+end
+
 local function handleEvent(self, event, ...)
 	if event == "PLAYER_ENTERING_WORLD" then
 		initMinimapButton()
@@ -173,34 +203,7 @@ local function handleEvent(self, event, ...)
 				guild_loaded = true
 			end
 		end
-		local arg = { ... }
-		-- Create a new dictionary of just online people every time roster is updated
-		ns.guild_online = {}
-		local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()
-		for i = 1, numTotal, 1 do
-			local name, rankName, rankIndex, level, classDisplayName, zone, _public_note, _officer_note, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
-				GetGuildRosterInfo(i)
-
-			-- For testing
-			-- if name == "Yazpad-DefiasPillager" then
-			-- 	_officer_note = "~Yazpad~ Some other Stuff"
-			-- end
-			if OnlyFangsStreamerMap[name] == nil or ns.streamer_map[name] == nil then
-				-- local _, streamer_name = string.split(STREAMER_TAG_DELIM, "~Yazpad~ Some other Stuff")
-				local _, streamer_name = string.split(STREAMER_TAG_DELIM, _public_note)
-				OnlyFangsStreamerMap[name] = streamer_name
-				ns.streamer_map[name] = streamer_name
-			end
-
-			-- name is nil after a gquit, so nil check here
-			if name and isOnline then
-				ns.guild_online[name] = {
-					name = name,
-					level = level,
-					classDisplayName = classDisplayName,
-				}
-			end
-		end
+		ns.refreshGuildList(false)
 	end
 end
 

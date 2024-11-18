@@ -39,6 +39,9 @@ local environment_damage = {
 	[-7] = "Slime",
 }
 
+local REALM_NAME = GetRealmName()
+REALM_NAME = REALM_NAME:gsub("%s+", "")
+
 local main_font = Deathlog_L.main_font
 
 local onlyfangs_tab_container = nil
@@ -141,6 +144,16 @@ local subtitle_data = {
 		end,
 	},
 	{
+		"Streamer Name",
+		120,
+		function(_entry, _server_name)
+			if _entry["name"] == nil then
+				return " "
+			end
+			return ns.streamer_map[_entry["name"] .. "-" .. REALM_NAME] or ""
+		end,
+	},
+	{
 		"Class",
 		60,
 		function(_entry, _server_name)
@@ -178,14 +191,14 @@ local subtitle_data = {
 	},
 	{
 		"Points",
-		120,
+		100,
 		function(_entry, _server_name)
 			return _entry["guild"] or ""
 		end,
 	},
 	{
 		"Type",
-		200,
+		120,
 		function(_entry, _server_name)
 			if _entry["map_id"] == nil then
 				if _entry["instance_id"] ~= nil then
@@ -300,6 +313,12 @@ local function setLogData()
 		if _event_name then
 			local _char_name, _ = string.split("-", _event["Name"])
 			font_strings[i]["Name"]:SetText(_char_name)
+
+			local _streamer_name = ""
+			if _char_name ~= nil then
+				_streamer_name = ns.streamer_map[_char_name .. "-" .. REALM_NAME] or ""
+			end
+			font_strings[i]["Streamer Name"]:SetText(_streamer_name)
 			font_strings[i]["Date"]:SetText(date("%m/%d/%y, %H:%M", _event["Date"] + 1730639674))
 			font_strings[i]["Race"]:SetText(ns.id_race[_event["Race"]])
 			font_strings[i]["Class"]:SetText(ns.id_class[_event["Class"]] or "")
@@ -605,6 +624,22 @@ local function drawLogTab(container)
 		font_container.page_str:SetText("Page " .. page_number)
 		setLogData()
 	end)
+
+	local reset_button = AceGUI:Create("Button")
+	reset_button:SetText("Refresh")
+	reset_button:SetHeight(25)
+	reset_button:SetWidth(120)
+	reset_button.frame:SetPoint("CENTER", font_container.page_str, "CENTER", -400, 0)
+	reset_button:SetCallback("OnClick", function(self)
+		container:ReleaseChildren()
+		ns.refreshGuildList(true)
+		ns.aggregateLog()
+		drawLogTab(container)
+		clearDeathlogMenuLogData()
+		font_container.page_str:SetText("Page " .. page_number)
+		setLogData()
+	end)
+	scroll_frame:AddChild(reset_button)
 
 	deathlog_group.frame:HookScript("OnHide", function()
 		font_container:Hide()
@@ -1683,6 +1718,18 @@ local function drawLeaderboardTab(container)
 		count = count + 1
 		v:Show()
 	end
+
+	local reset_button = AceGUI:Create("Button")
+	reset_button:SetText("Refresh")
+	reset_button:SetHeight(25)
+	reset_button:SetWidth(120)
+	reset_button:SetCallback("OnClick", function(self)
+		container:ReleaseChildren()
+		ns.refreshGuildList(true)
+		ns.aggregateLog()
+		drawLeaderboardTab(container)
+	end)
+	main_frame:AddChild(reset_button)
 end
 
 local function createMenu()
