@@ -41,15 +41,11 @@ local onlyfangs_minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject(addo
 	OnClick = function(self, btn)
 		if btn == "LeftButton" then
 			ns.showMenu()
-		else
-			InterfaceAddOnsList_Update()
-			InterfaceOptionsFrame_OpenToCategory(addonName)
 		end
 	end,
 	OnTooltipShow = function(tooltip)
 		tooltip:AddLine(addonName)
 		tooltip:AddLine(Deathlog_L.minimap_btn_left_click)
-		tooltip:AddLine(Deathlog_L.minimap_btn_right_click .. GAMEOPTIONS_MENU)
 		tooltip:AddLine("Score:")
 		tooltip:AddDoubleLine("Orc:", ns.getScore("Orc"), 1, 1, 1, 1, 1, 1)
 		tooltip:AddDoubleLine("Troll:", ns.getScore("Troll"), 1, 1, 1, 1, 1, 1)
