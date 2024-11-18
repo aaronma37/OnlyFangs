@@ -19,6 +19,8 @@ events/achievements/all_quests.lua
 events/achievements/all_levels.lua
 events/achievements/all_professions.lua
 events/achievements/leet.lua
+events/achievements/equip_first_rare.lua
+events/achievements/equip_first_epic.lua
 
 events/milestones/all_professions.lua
 events/milestones/first_to_find.lua

@@ -190,6 +190,8 @@ ns.event_id = {
 	["Challenge Overlord Mok'Morokk"] = 181,
 	["The Ranger Lord's Behest"] = 182,
 	["leet"] = 183,
+	["EquipFirstRare"] = 184,
+	["EquipFirstEpic"] = 185,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
