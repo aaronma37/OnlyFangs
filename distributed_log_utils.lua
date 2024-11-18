@@ -25,6 +25,12 @@ local INIT_TIME = 1730639674
 local REALM_NAME = GetRealmName()
 REALM_NAME = REALM_NAME:gsub("%s+", "")
 
+local player_guid = UnitGUID("player")
+local player_guid_last_four = string.sub(player_guid, -4)
+local player_name = UnitName("player")
+local this_player_guid_tag = player_name .. "-" .. player_guid_last_four
+ns.already_achieved = {}
+
 local function spairs(t, order)
 	local keys = {}
 	for k in pairs(t) do
@@ -230,7 +236,7 @@ ns.eventName = function(event_id)
 end
 
 ns.stampEvent = function(date, race_id, event_id, class_id)
-	local flecher = ns.fletcher16(UnitName("Player"), race_id, event_id, date)
+	local flecher = ns.fletcher16(UnitName("Player"), race_id, event_id, date) .. "-" .. player_guid_last_four
 	return flecher, { tonumber(date), tonumber(race_id), tonumber(event_id), tonumber(class_id) }
 end
 
@@ -254,7 +260,14 @@ ns.getScore = function(team_name)
 end
 
 local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, current_adjusted_time, pts)
-	local _char_name, _ = string.split("-", _fletcher)
+	local _char_name, _, _last_guid = string.split("-", _fletcher)
+	if _char_name == player_name and _last_guid ~= nil then
+		local _player_tag = _char_name .. "-" .. _last_guid
+		if _player_tag == this_player_guid_tag then
+			ns.already_achieved[_event_name] = 1
+			-- print(_player_tag, _event_name)
+		end
+	end
 	_char_name = _char_name .. "-" .. REALM_NAME
 	local streamer_name = ns.streamer_map[_char_name] or OnlyFangsStreamerMap[_char_name]
 
@@ -283,6 +296,7 @@ ns.aggregateLog = function()
 	top_players_daily = {}
 	top_players_weekly = {}
 	top_players_all_time = {}
+	ns.already_achieved = {}
 	local current_adjusted_time = adjustedTime()
 	local guild_name = guildName()
 	for k, _ in pairs(distributed_log.points) do
@@ -515,5 +529,5 @@ ns.fakeEntries = function()
 	ns.aggregateLog()
 end
 
--- ns.showToast("First to Kill Taskmaster Whipfang", "", "Milestone")
--- ns.showToast(ns.event["First to Find The 1 Ring"].title, "", "Milestone")
+-- local test_name = "FirstTo10Unarmed"
+-- ns.showToast(ns.event[test_name].title, ns.event[test_name].icon_path, ns.event[test_name].type)
