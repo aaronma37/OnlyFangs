@@ -139,7 +139,7 @@ local function handleEvent(self, event, ...)
 		end
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-		local _, ev, ok, _, source_name, _, target_name, target_guid, _, cc, _, environmental_type, overkill_swing, _, _, overkill_range, _ =
+		local _, ev, ok, _, source_name, _, target_name, target_guid, _, cc, _, environmental_type, overkill_swing, _, range_dmg, overkill_range, _, swing_crit, _, _, range_crit =
 			CombatLogGetCurrentEventInfo()
 		-- print(ev, source_name, cc, target_guid)
 
@@ -150,6 +150,11 @@ local function handleEvent(self, event, ...)
 				end
 			end
 		elseif ev == "SWING_DAMAGE" then
+			if player_name == source_name then
+				if tonumber(environmental_type) == 1337 and swing_crit == true then
+					ns.triggerLeet()
+				end
+			end
 			if
 				overkill_swing > -1
 				and player_name == source_name
@@ -159,6 +164,11 @@ local function handleEvent(self, event, ...)
 				ns.kill_target_exec[creature_guid_map[target_guid]]()
 			end
 		elseif ev == "RANGE_DAMAGE" or ev == "SPELL_DAMAGE" or ev == "SPELL_PERIODIC_DAMAGE" then
+			if player_name == source_name then
+				if tonumber(range_dmg) == 1337 and range_crit == true then
+					ns.triggerLeet()
+				end
+			end
 			if
 				overkill_range > -1
 				and player_name == source_name

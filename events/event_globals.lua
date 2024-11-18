@@ -182,6 +182,14 @@ ns.event_id = {
 	["FirstBlueBoePriestWand"] = 173,
 	["1Unarmed"] = 174,
 	["FirstTo10Unarmed"] = 175,
+	["Isha Awak"] = 176,
+	["Serena Bloodfeather"] = 177,
+	["Free From the Hold"] = 178,
+	["The Tear of the Moons"] = 179,
+	["Voodoo Dues"] = 180,
+	["Challenge Overlord Mok'Morokk"] = 181,
+	["The Ranger Lord's Behest"] = 182,
+	["leet"] = 183,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do

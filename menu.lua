@@ -1084,6 +1084,10 @@ local function drawEventTypeTab(container, _title, _frames)
 			text = "Achievements",
 			children = {
 				{
+					value = "GeneralAchievement",
+					text = "General",
+				},
+				{
 					value = "Profession",
 					text = "Profession",
 				},
@@ -1148,6 +1152,13 @@ local function drawEventTypeTab(container, _title, _frames)
 		elseif group == "General" then
 			local _group_description = AceGUI:Create("Label")
 			_group_description:SetText("Be the first to complete the specified achievement.")
+			_group_description:SetHeight(140)
+			_group_description:SetWidth(800)
+			_group_description:SetJustifyH("LEFT")
+			scroll_frame:AddChild(_group_description)
+		elseif group == "GeneralAchievement" then
+			local _group_description = AceGUI:Create("Label")
+			_group_description:SetText("Complete the specified achievement.")
 			_group_description:SetHeight(140)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")
@@ -1310,6 +1321,8 @@ local function drawEventTypeTab(container, _title, _frames)
 				if v.type == group or v.subtype == group then
 					if group == "General" then
 						scroll_frame:AddChild(makeFirstToFindLabel(v))
+					elseif group == "GeneralAchievement" then
+						scroll_frame:AddChild(makeAchievementLabel2(v))
 					elseif group == "First to Kill" then
 						scroll_frame:AddChild(makeFirstToFindLabel(v))
 					elseif group == "First to Complete" then
