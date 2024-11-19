@@ -2,6 +2,17 @@ local addonName, ns = ...
 local rule_event_handler = nil
 rule_event_handler = CreateFrame("frame")
 
+local in_guild = function(_n)
+	for g_idx = 1, GetNumGuildMembers() do
+		member_name, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(g_idx)
+		local player_name_short = string.split("-", member_name)
+		if player_name_short == _n then
+			return true
+		end
+	end
+	return false
+end
+
 local on_mail_show = function()
 	for i = 1, 7 do
 		local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
@@ -13,17 +24,6 @@ local on_mail_show = function()
 				and UnitLevel("player") <= ns.whitelist[_n]
 			then
 				return true
-			end
-			return false
-		end
-
-		local in_guild = function(_n)
-			for g_idx = 1, GetNumGuildMembers() do
-				member_name, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(g_idx)
-				local player_name_short = string.split("-", member_name)
-				if player_name_short == _n then
-					return true
-				end
 			end
 			return false
 		end
@@ -50,5 +50,22 @@ rule_event_handler:SetScript("OnEvent", function(self, event, ...)
 		on_mail_show()
 	elseif event == "AUCTION_HOUSE_SHOW" then
 		CloseAuctionHouse()
+		print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not trade outside of the guild.")
 	end
 end)
+
+TradeFrameTradeButton:SetScript("OnClick", function()
+	local target_trader = TradeFrameRecipientNameText:GetText()
+	if in_guild(target_trader) or CanEditOfficerNote() then
+		AcceptTrade()
+	else
+		print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not trade outside of the guild.")
+	end
+end)
+
+-- local handler = CreateFrame("frame")
+-- handler:RegisterEvent("UNIT_TARGET")
+--
+-- handler:SetScript("OnEvent", function(self, event, ...)
+-- 	print(in_guild(UnitName("target")))
+-- end)
