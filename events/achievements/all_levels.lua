@@ -53,6 +53,8 @@ local level_metadata = {
 	},
 }
 
+ns.leveling_menu_order = { "ReachLvl10", "ReachLvl20", "ReachLvl30", "ReachLvl40", "ReachLvl50", "ReachLvl60" }
+
 local function loadLevelEvent(_metadata)
 	local _event = CreateFrame("Frame")
 	ns.event[_metadata["name"]] = _event

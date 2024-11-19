@@ -115,14 +115,16 @@ local quest_metadata = {
 		["title"] = "First to Complete Arcane Refreshment",
 		["quest_name"] = "Arcane Refreshment",
 		["zone"] = "Dire Maul",
+		["class"] = "Mage",
 		["quest_id"] = 7463,
-		["pts"] = 30,
+		["pts"] = 50,
 	},
 	{
 		["name"] = "Dreadsteed of Xoroth",
 		["title"] = "First to Complete Dreadsteed of Xoroth",
 		["quest_name"] = "Dreadsteed of Xoroth",
 		["zone"] = "Dire Maul",
+		["class"] = "Warlock",
 		["quest_id"] = 7631,
 		["pts"] = 50,
 	},
@@ -180,10 +182,35 @@ local quest_metadata = {
 		["quest_name"] = "The Binding",
 		["zone"] = "Stranglethorn Vale",
 		["quest_id"] = 1795,
+		["class"] = "Warlock",
 		["pts"] = 50,
 	},
-
-	First315Skinning,
+	{
+		["name"] = "Call of Water",
+		["title"] = "First to Complete Call of Water",
+		["quest_name"] = "Call of Water",
+		["zone"] = "Silverpine Forest",
+		["class"] = "Shaman",
+		["quest_id"] = 96,
+		["pts"] = 50,
+	},
+	{
+		["name"] = "Hinott's Assistance",
+		["title"] = "First to Complete Hinott's Assistance",
+		["quest_name"] = "Hinott's Assistance",
+		["zone"] = "Hillsbrad Foothills",
+		["class"] = "Rogue",
+		["quest_id"] = 2480,
+		["pts"] = 50,
+	},
+	{
+		["name"] = "The Essence of Eranikus",
+		["title"] = "First to Complete The Essence of Eranikus",
+		["quest_name"] = "The Essence of Eranikus",
+		["zone"] = "Sunken Temple",
+		["quest_id"] = 3373,
+		["pts"] = 30,
+	},
 }
 
 local function loadQuestEvent(_metadata)
@@ -198,9 +225,13 @@ local function loadQuestEvent(_metadata)
 	_event.type = "Milestone"
 	_event.title = _metadata.title
 	_event.icon_path = _metadata.icon_path
-	_event.pts = 10
+	_event.pts = _metadata.pts
 	_event.test_only = _metadata.test_only
 	_event.subtype = "First to Complete"
+	_event.class = _metadata.class
+	if _metadata.class ~= nil then
+		_event.subtype = "Class"
+	end
 	_event.description = "|cffddddddBe the first to complete |r|cffFFA500[" .. _event.quest_name .. "]|r |cffdddddd."
 
 	-- Aggregation

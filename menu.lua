@@ -72,62 +72,6 @@ death_tomb_frame_tex_glow:SetHeight(55)
 death_tomb_frame_tex_glow:SetWidth(55)
 death_tomb_frame_tex_glow:Hide()
 
-local function WPDropDownDemo_Menu(frame, level, menuList)
-	local info = UIDropDownMenu_CreateInfo()
-
-	if death_tomb_frame.map_id and death_tomb_frame.coordinates then
-	end
-
-	local function openWorldMap()
-		if not (death_tomb_frame.map_id and death_tomb_frame.coordinates) then
-			return
-		end
-		if C_Map.GetMapInfo(death_tomb_frame["map_id"]) == nil then
-			return
-		end
-		if tonumber(death_tomb_frame.coordinates[1]) == nil or tonumber(death_tomb_frame.coordinates[2]) == nil then
-			return
-		end
-
-		WorldMapFrame:SetShown(not WorldMapFrame:IsShown())
-		WorldMapFrame:SetMapID(death_tomb_frame.map_id)
-		WorldMapFrame:GetCanvas()
-		local mWidth, mHeight = WorldMapFrame:GetCanvas():GetSize()
-		death_tomb_frame_tex:SetPoint(
-			"CENTER",
-			WorldMapButton,
-			"TOPLEFT",
-			mWidth * death_tomb_frame.coordinates[1],
-			-mHeight * death_tomb_frame.coordinates[2]
-		)
-		death_tomb_frame_tex:Show()
-
-		death_tomb_frame_tex_glow:SetPoint(
-			"CENTER",
-			WorldMapButton,
-			"TOPLEFT",
-			mWidth * death_tomb_frame.coordinates[1],
-			-mHeight * death_tomb_frame.coordinates[2]
-		)
-		death_tomb_frame_tex_glow:Show()
-		death_tomb_frame:Show()
-		deathlog_menu:Hide()
-	end
-
-	local function blockUser() end
-
-	if level == 1 then
-		info.text, info.hasArrow, info.func, info.disabled = "Show death location", false, openWorldMap, false
-		UIDropDownMenu_AddButton(info)
-		info.text, info.hasArrow, info.func, info.disabled = "Block user", false, blockUser, false
-		UIDropDownMenu_AddButton(info)
-	end
-end
-
-hooksecurefunc(WorldMapFrame, "OnMapChanged", function()
-	death_tomb_frame:Hide()
-end)
-
 local subtitle_data = {
 	{
 		"Date",
@@ -467,13 +411,13 @@ local function drawLogTab(container)
 	header_label:SetText(" ")
 	scroll_frame:AddChild(header_label)
 
-	local deathlog_group = AceGUI:Create("ScrollFrame")
-	deathlog_group:SetFullWidth(true)
-	deathlog_group:SetHeight(340)
-	scroll_frame:AddChild(deathlog_group)
-	-- deathlog_group.frame:SetPoint("TOP", scroll_container.frame, "TOP", 0, -100)
-	font_container:SetParent(deathlog_group.frame)
-	-- font_container:SetPoint("TOP", deathlog_group.frame, "TOP", 0, -100)
+	local only_fangs_group = AceGUI:Create("ScrollFrame")
+	only_fangs_group:SetFullWidth(true)
+	only_fangs_group:SetHeight(340)
+	scroll_frame:AddChild(only_fangs_group)
+	-- only_fangs_group.frame:SetPoint("TOP", scroll_container.frame, "TOP", 0, -100)
+	font_container:SetParent(only_fangs_group.frame)
+	-- font_container:SetPoint("TOP", only_fangs_group.frame, "TOP", 0, -100)
 	font_container:SetHeight(400)
 	font_container:Show()
 	for i = 1, max_rows do
@@ -571,9 +515,9 @@ local function drawLogTab(container)
 			GameTooltip:Show()
 		end)
 
-		deathlog_group:SetScroll(0)
-		deathlog_group.scrollbar:Hide()
-		deathlog_group:AddChild(_entry)
+		only_fangs_group:SetScroll(0)
+		only_fangs_group.scrollbar:Hide()
+		only_fangs_group:AddChild(_entry)
 	end
 	scroll_frame.scrollbar:Hide()
 
@@ -641,7 +585,7 @@ local function drawLogTab(container)
 	end)
 	scroll_frame:AddChild(reset_button)
 
-	deathlog_group.frame:HookScript("OnHide", function()
+	only_fangs_group.frame:HookScript("OnHide", function()
 		font_container:Hide()
 	end)
 end
@@ -773,8 +717,12 @@ local function makeAchievementLabel2(_v)
 		alt2 = 1
 	end
 
+	local _checkmark = ""
+	if ns.already_achieved[_v.name] ~= nil then
+		_checkmark = "|TInterface\\RAIDFRAME\\ReadyCheck-Ready:16:16:0:0:64:64:4:60:4:60|t"
+	end
 	local _title = AceGUI:Create("Label")
-	_title:SetText(_v.title)
+	_title:SetText(_checkmark .. _v.title)
 	_title:SetHeight(30)
 	_title:SetWidth(280)
 	_title:SetJustifyH("LEFT")
@@ -793,14 +741,14 @@ local function makeAchievementLabel2(_v)
 	local _desc = AceGUI:Create("Label")
 	_desc:SetText(_v.description)
 	_desc:SetHeight(30)
-	_desc:SetWidth(400)
+	_desc:SetWidth(290)
 	_desc:SetJustifyH("LEFT")
 	__f:AddChild(_desc)
 
 	local _claimed_by = AceGUI:Create("Label")
 	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
 	_claimed_by:SetText(_v.zone)
-	_claimed_by:SetHeight(140)
+	_claimed_by:SetHeight(50)
 	_claimed_by:SetWidth(400)
 	_claimed_by:SetJustifyH("LEFT")
 	__f:AddChild(_claimed_by)
@@ -869,6 +817,15 @@ local function makeFirstToFindLabel(_v)
 	_desc:SetWidth(400)
 	_desc:SetJustifyH("LEFT")
 	__f:AddChild(_desc)
+
+	if _v.class then
+		local _class = AceGUI:Create("Label")
+		_class:SetText("|c" .. ns.class_colors[_v.class].colorStr .. _v.class .. "|r")
+		_class:SetHeight(30)
+		_class:SetWidth(400)
+		_class:SetJustifyH("LEFT")
+		__f:AddChild(_class)
+	end
 
 	local _claimed_by = AceGUI:Create("Label")
 	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
@@ -1076,6 +1033,10 @@ local function drawEventTypeTab(container, _title, _frames)
 				{
 					value = "First to Max Profession",
 					text = "First to Max Profession",
+				},
+				{
+					value = "Class",
+					text = "Class Firsts",
 				},
 			},
 		},
@@ -1316,31 +1277,39 @@ local function drawEventTypeTab(container, _title, _frames)
 			_group_description:SetJustifyH("LEFT")
 			scroll_frame:AddChild(_group_description)
 		end
-		for k, v in pairs(ns.event) do
-			if v.test_only == nil then
-				if v.type == group or v.subtype == group then
-					if group == "General" then
-						scroll_frame:AddChild(makeFirstToFindLabel(v))
-					elseif group == "GeneralAchievement" then
-						scroll_frame:AddChild(makeAchievementLabel2(v))
-					elseif group == "First to Kill" then
-						scroll_frame:AddChild(makeFirstToFindLabel(v))
-					elseif group == "First to Complete" then
-						scroll_frame:AddChild(makeFirstToFindLabel(v))
-					elseif group == "First to Find" then
-						scroll_frame:AddChild(makeFirstToFindLabel(v))
-					elseif group == "Profession" then
-						scroll_frame:AddChild(makeAchievementLabel2(v))
-					elseif group == "Quest" then
-						scroll_frame:AddChild(makeAchievementLabel2(v))
-					elseif group == "Leveling" then
-						scroll_frame:AddChild(makeAchievementLabel2(v))
-					elseif group == "First to Max Profession" then
-						scroll_frame:AddChild(makeFirstToFindLabel(v))
-					elseif group == "Failure" then
-						scroll_frame:AddChild(makeFailureLabel(v))
-					elseif group == "OfficerCommand" then
-						scroll_frame:AddChild(makeOfficerCommandLabel(v))
+		if group == "Leveling" then
+			for _, k in ipairs(ns.leveling_menu_order) do
+				scroll_frame:AddChild(makeAchievementLabel2(ns.event[k]))
+			end
+		elseif group == "Profession" then
+			for _, k in ipairs(ns.profession_menu_order) do
+				scroll_frame:AddChild(makeAchievementLabel2(ns.event[k]))
+			end
+		else
+			for k, v in pairs(ns.event) do
+				if v.test_only == nil then
+					if v.type == group or v.subtype == group then
+						if group == "General" then
+							scroll_frame:AddChild(makeFirstToFindLabel(v))
+						elseif group == "GeneralAchievement" then
+							scroll_frame:AddChild(makeAchievementLabel2(v))
+						elseif group == "First to Kill" then
+							scroll_frame:AddChild(makeFirstToFindLabel(v))
+						elseif group == "First to Complete" then
+							scroll_frame:AddChild(makeFirstToFindLabel(v))
+						elseif group == "First to Find" then
+							scroll_frame:AddChild(makeFirstToFindLabel(v))
+						elseif group == "Class" then
+							scroll_frame:AddChild(makeFirstToFindLabel(v))
+						elseif group == "Quest" then
+							scroll_frame:AddChild(makeAchievementLabel2(v))
+						elseif group == "First to Max Profession" then
+							scroll_frame:AddChild(makeFirstToFindLabel(v))
+						elseif group == "Failure" then
+							scroll_frame:AddChild(makeFailureLabel(v))
+						elseif group == "OfficerCommand" then
+							scroll_frame:AddChild(makeOfficerCommandLabel(v))
+						end
 					end
 				end
 			end

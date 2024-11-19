@@ -22,8 +22,8 @@ local item_metadata = {
 	{ ["item_id"] = 18706, ["item_name"] = "Arena Master", ["rarity"] = "rare", ["pts"] = 25 },
 	{ ["item_id"] = 23192, ["item_name"] = "Tabard of the Scarlet Crusade", ["rarity"] = "common", ["pts"] = 25 },
 	{ ["item_id"] = 19024, ["item_name"] = "Arena Grand Master", ["rarity"] = "rare", ["pts"] = 100 },
-	{ ["item_id"] = 8345, ["item_name"] = "Wolfshead Helm", ["rarity"] = "rare", ["pts"] = 50 },
-	{ ["item_id"] = 6975, ["item_name"] = "Whirlwind Axe", ["rarity"] = "rare", ["pts"] = 50 },
+	{ ["item_id"] = 8345, ["item_name"] = "Wolfshead Helm", ["rarity"] = "rare", ["pts"] = 50, ["class"] = "Druid" },
+	{ ["item_id"] = 6975, ["item_name"] = "Whirlwind Axe", ["rarity"] = "rare", ["pts"] = 50, ["class"] = "Warrior" },
 	{
 		["item_id"] = 16252,
 		["item_name"] = "Formula: Enchant Weapon - Crusader",
@@ -63,6 +63,10 @@ local function loadEvent(item_metadata)
 	_event.title = _name
 	_event.item_id = _item_id
 	_event.subtype = "First to Find"
+	_event.class = item_metadata.class
+	if item_metadata.class ~= nil then
+		_event.subtype = "Class"
+	end
 	_event.pts = item_metadata.pts
 	_event.test_only = item_metadata.test_only
 	_event.description = "|cffddddddBe the first to find " .. _item_link .. " |cffdddddd.|r"
