@@ -394,6 +394,39 @@ local function drawLogTab(container)
 	)
 	header_frame:AddChild(space1)
 
+	local _num_points = 0
+	local _milestones = 0
+	local _achievements = 0
+	for _k, _ in pairs(ns.already_achieved) do
+		if ns.event[_k] then
+			_num_points = _num_points + ns.event[_k].pts
+			if ns.event[_k].type == "Milestone" then
+				_milestones = _milestones + 1
+			end
+			if ns.event[_k].type == "Achievement" then
+				_achievements = _achievements + 1
+			end
+		end
+	end
+
+	local _player_summary = AceGUI:Create("Label")
+	_player_summary:SetWidth(700)
+	_player_summary:SetHeight(60)
+	_player_summary:SetText(
+		UnitName("player")
+			.. " stats:\n"
+			.. "Total Points: "
+			.. _num_points
+			.. "\n"
+			.. "#Milestones: "
+			.. _milestones
+			.. "\n"
+			.. "#Achievements: "
+			.. _achievements
+			.. "\n"
+	)
+	header_frame:AddChild(_player_summary)
+
 	local header_label = AceGUI:Create("InteractiveLabel")
 	header_label:SetFullWidth(true)
 	header_label:SetHeight(60)
