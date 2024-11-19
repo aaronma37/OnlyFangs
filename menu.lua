@@ -1751,7 +1751,7 @@ local function drawLeaderboardTab(container)
 end
 
 local function createMenu()
-	local ace_deathlog_menu = AceGUI:Create("DeathlogMenu")
+	local ace_deathlog_menu = AceGUI:Create("OnlyFangsMenu")
 	_G["AceOnlyFangsMenu"] = ace_deathlog_menu.frame -- Close on <ESC>
 	ace_deathlog_menu:SetCallback("OnClose", function(widget)
 		if ticker_handler ~= nil then
@@ -1802,7 +1802,7 @@ local function createMenu()
 		ace_deathlog_menu.exit_button_x:SetVertexColor(1, 1, 1, 0.8)
 	end
 
-	onlyfangs_tab_container = AceGUI:Create("DeathlogTabGroup") -- "InlineGroup" is also good
+	onlyfangs_tab_container = AceGUI:Create("OnlyFangsTabGroup") -- "InlineGroup" is also good
 	local tab_table = {}
 	for _, v in ipairs(Deathlog_L.tab_table) do
 		if v["value"] == "TestingPoints" then

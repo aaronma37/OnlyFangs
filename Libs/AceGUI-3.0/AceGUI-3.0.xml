@@ -10,11 +10,11 @@
 	<Script file="widgets\AceGUIContainer-ScrollFrame.lua"/>
 	<Script file="widgets\AceGUIContainer-SimpleGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-SimpleGroupOF.lua"/>
-	<Script file="widgets\AceGUIContainer-DeathlogTabGroup.lua"/>
+	<Script file="widgets\AceGUIContainer-OnlyFangsTabGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-TabGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-TreeGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-Window.lua"/>
-	<Script file="widgets\AceGUIContainer-DeathlogMenu.lua"/>
+	<Script file="widgets\AceGUIContainer-OnlyFangsMenu.lua"/>
 	<!-- Widgets -->
 	<Script file="widgets\AceGUIWidget-Button.lua"/>
 	<Script file="widgets\AceGUIWidget-CheckBox.lua"/>

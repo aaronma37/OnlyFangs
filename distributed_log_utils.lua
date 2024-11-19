@@ -367,11 +367,23 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				local _event_type = ns.event[_event_name].type
 				if _event_type == "Achievement" then
-					print("|cff33ff99OnlyFangs: " .. sender .. " completed achievement: " .. _event_name .. "|r")
+					print(
+						"|cff33ff99OnlyFangs: "
+							.. sender
+							.. " completed achievement: "
+							.. ns.event[_event_name].title
+							.. "|r"
+					)
 				elseif _event_type == "Milestone" then
-					print("|cff33ff99OnlyFangs: " .. sender .. " has completed milestone: " .. _event_name .. "|r")
+					print(
+						"|cff33ff99OnlyFangs: "
+							.. sender
+							.. " has completed milestone: "
+							.. ns.event[_event_name].title
+							.. "|r"
+					)
 				elseif _event_type == "Failure" then
-					print("|cff33ff99OnlyFangs: " .. sender .. " " .. _event_name .. "|r")
+					print("|cff33ff99OnlyFangs: " .. sender .. " " .. ns.event[_event_name].title .. "|r")
 				end
 				lruSet(_fletcher, _new_data)
 				if ns.event[_event_name].type == "Milestone" then
