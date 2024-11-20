@@ -8,7 +8,7 @@ _event.name = "Death"
 _event.type = "Failure"
 _event.title = "Death"
 _event.icon_path = "Interface\\ICONS\\INV_Misc_Bone_ElfSkull_01"
-_event.pts = -10
+_event.pts = -30
 _event.description = "Don't die!"
 
 -- Aggregation

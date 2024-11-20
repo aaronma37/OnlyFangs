@@ -1,5 +1,28 @@
 local addonName, ns = ...
 
+local function spairs(t, order)
+	local keys = {}
+	for k in pairs(t) do
+		keys[#keys + 1] = k
+	end
+
+	if order then
+		table.sort(keys, function(a, b)
+			return order(t, a, b)
+		end)
+	else
+		table.sort(keys)
+	end
+
+	local i = 0
+	return function()
+		i = i + 1
+		if keys[i] then
+			return keys[i], t[keys[i]]
+		end
+	end
+end
+
 local quest_metadata = {
 	{
 		["name"] = "YourPlaceInTheWorld",
@@ -319,6 +342,15 @@ local quest_metadata = {
 		["quest_id"] = 6133,
 	},
 }
+
+ns.all_quests_menu_order = {}
+for k, v in
+	spairs(quest_metadata, function(t, a, b)
+		return t[a].max_lvl < t[b].max_lvl
+	end)
+do
+	ns.all_quests_menu_order[#ns.all_quests_menu_order + 1] = quest_metadata[k].name
+end
 
 local function loadQuestEvent(_metadata)
 	local _event = CreateFrame("Frame")

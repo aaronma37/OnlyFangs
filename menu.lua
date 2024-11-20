@@ -272,7 +272,7 @@ local function setLogData()
 			if ns.event[_event_name].pts > 0 then
 				pt_str = "|cff00FF00+" .. ns.event[_event_name].pts .. "|r"
 			elseif ns.event[_event_name].pts < 0 then
-				pt_str = "|cffFF0000-" .. ns.event[_event_name].pts .. "|r"
+				pt_str = "|cffFF0000" .. ns.event[_event_name].pts .. "|r"
 			end
 			if ns.event[_event_name].type == "Milestone" and ns.claimed_milestones[_event_name] ~= _event["Name"] then
 				pt_str = "|cff808080already claimed|r"
@@ -1297,7 +1297,7 @@ local function drawEventTypeTab(container, _title, _frames)
 			scroll_frame:AddChild(_group_description)
 		elseif group == "Quest" then
 			local _group_description = AceGUI:Create("Label")
-			_group_description:SetText("Complete the quest by the specified level.")
+			_group_description:SetText("Complete the quest by the specified level.  These quests must be done solo.")
 			_group_description:SetHeight(140)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")
@@ -1318,6 +1318,10 @@ local function drawEventTypeTab(container, _title, _frames)
 			for _, k in ipairs(ns.profession_menu_order) do
 				scroll_frame:AddChild(makeAchievementLabel2(ns.event[k]))
 			end
+		elseif group == "Quest" then
+			for _, k in ipairs(ns.all_quests_menu_order) do
+				scroll_frame:AddChild(makeAchievementLabel2(ns.event[k]))
+			end
 		else
 			for k, v in pairs(ns.event) do
 				if v.test_only == nil then
@@ -1334,8 +1338,6 @@ local function drawEventTypeTab(container, _title, _frames)
 							scroll_frame:AddChild(makeFirstToFindLabel(v))
 						elseif group == "Class" then
 							scroll_frame:AddChild(makeFirstToFindLabel(v))
-						elseif group == "Quest" then
-							scroll_frame:AddChild(makeAchievementLabel2(v))
 						elseif group == "First to Max Profession" then
 							scroll_frame:AddChild(makeFirstToFindLabel(v))
 						elseif group == "Failure" then
