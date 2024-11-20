@@ -265,7 +265,6 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 		local _player_tag = _char_name .. "-" .. _last_guid
 		if _player_tag == this_player_guid_tag then
 			ns.already_achieved[_event_name] = 1
-			-- print(_player_tag, _event_name)
 		end
 	end
 	_char_name = _char_name .. "-" .. REALM_NAME
@@ -305,7 +304,12 @@ ns.aggregateLog = function()
 	for k, v in pairs(distributed_log[guild_name]["data"]) do
 		local event_log = v["value"]
 		local event_name = ns.id_event[event_log[EVENT_IDX]]
-		if event_name then
+		if
+			event_name
+			and tonumber(event_log[RACE_IDX]) ~= nil
+			and tonumber(event_log[RACE_IDX]) > 0
+			and tonumber(event_log[RACE_IDX]) < 9
+		then
 			if ns.event[event_name].type == "Milestone" then
 				if ns.claimed_milestones[event_name] == k then
 					ns.event[event_name].aggregrate(distributed_log, event_log)
@@ -398,6 +402,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 		end
 	end
 end)
+-- local _checker = {}
 
 -- Heartbeat
 C_Timer.NewTicker(HB_DUR, function(self)
@@ -412,6 +417,8 @@ C_Timer.NewTicker(HB_DUR, function(self)
 	else
 		message = toMessage(newest, distributed_log[guild_name]["data"][newest]["value"])
 	end
+	-- _checker[newest] = (_checker[newest] or 0) + 1
+	-- print(newest, message, _checker[newest])
 	local comm_message = COMM_COMMAND_HEARTBEAT
 		.. COMM_COMMAND_DELIM
 		.. GetAddOnMetadata("OnlyFangs", "Version")
