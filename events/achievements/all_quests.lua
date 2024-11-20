@@ -360,6 +360,7 @@ local function loadQuestEvent(_metadata)
 		if e == "QUEST_TURNED_IN" then
 			if
 				_args ~= nil
+				and UnitInParty("player") == false
 				and tonumber(_args) == _event.quest_id
 				and (
 					UnitLevel("player") <= _event.max_lvl
