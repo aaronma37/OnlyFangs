@@ -341,6 +341,14 @@ local quest_metadata = {
 		["max_lvl"] = 57,
 		["quest_id"] = 6133,
 	},
+	{
+		["name"] = "Master Angler2",
+		["title"] = "Master Angler",
+		["quest_name"] = "Master Angler",
+		["zone"] = "Stranglethorn Vale",
+		["quest_id"] = 8193,
+		["max_lvl"] = 60,
+	},
 }
 
 ns.all_quests_menu_order = {}

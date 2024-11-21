@@ -145,6 +145,15 @@ local distributed_log = nil
 local key_list = nil
 ns.claimed_milestones = {}
 
+local function updateThisWeeksPoints(_event, event_log)
+	if _event and _event.pts and event_log[2] and ns.id_race[event_log[2]] then
+		local race_name = ns.id_race[event_log[2]]
+		if distributed_log and distributed_log.this_week_points then
+			distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _event.pts
+		end
+	end
+end
+
 local function refreshClaimedMilestones()
 	local guild_name = guildName()
 	for k, v in pairs(distributed_log[guild_name]["data"]) do
@@ -421,9 +430,11 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					if ns.claimed_milestones[_event_name] == nil then
 						ns.event[_event_name].aggregrate(distributed_log, _new_data)
 						ns.claimed_milestones[_event_name] = _fletcher
+						updateThisWeeksPoints(ns.event[_event_name], _new_data)
 					end
 				else
 					ns.event[_event_name].aggregrate(distributed_log, _new_data)
+					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
 			if tonumber(_num_entries) > estimated_score_num_entries then
@@ -488,9 +499,11 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					if ns.claimed_milestones[_event_name] == nil then
 						ns.event[_event_name].aggregrate(distributed_log, _new_data)
 						ns.claimed_milestones[_event_name] = _fletcher
+						updateThisWeeksPoints(ns.event[_event_name], _new_data)
 					end
 				else
 					ns.event[_event_name].aggregrate(distributed_log, _new_data)
+					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
 		end

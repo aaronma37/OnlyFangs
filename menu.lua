@@ -1372,7 +1372,9 @@ local function drawEventTypeTab(container, _title, _frames)
 			end
 		elseif group == "Quest" then
 			for _, k in ipairs(ns.all_quests_menu_order) do
-				scroll_frame:AddChild(makeAchievementLabel2(ns.event[k]))
+				if ns.event[k].test_only == nil then
+					scroll_frame:AddChild(makeAchievementLabel2(ns.event[k]))
+				end
 			end
 		else
 			for k, v in pairs(ns.event) do
@@ -1764,7 +1766,7 @@ local function drawLeaderboardTab(container)
 	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
 		local __f = AceGUI:Create("InlineGroup")
 		__f:SetLayout("Flow")
-		__f:SetHeight(700)
+		__f:SetHeight(300)
 		__f:SetWidth(330)
 		main_frame:AddChild(__f)
 
@@ -1773,11 +1775,47 @@ local function drawLeaderboardTab(container)
 		_header:SetText(_type .. " Leaderboard")
 		__f:AddChild(_header)
 
-		for j = 1, 30 do
+		for j = 1, 20 do
 			local _line = AceGUI:Create("Label")
 			_line:SetWidth(250)
 			if top_scores[_type][j] ~= nil then
 				_line:SetText(j .. ". " .. top_scores[_type][j].streamer_name .. "(" .. top_scores[_type][j].pts .. ")")
+			else
+				_line:SetText(j .. ". ")
+			end
+			__f:AddChild(_line)
+			local _pts = AceGUI:Create("Label")
+			_pts:SetWidth(40)
+			_pts:SetText("")
+			__f:AddChild(_pts)
+			_frames[#_frames + 1] = __f.frame
+		end
+	end
+
+	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
+		local __f = AceGUI:Create("InlineGroup")
+		__f:SetLayout("Flow")
+		__f:SetHeight(300)
+		__f:SetWidth(330)
+		main_frame:AddChild(__f)
+
+		local _header = AceGUI:Create("Heading")
+		_header:SetFullWidth(true)
+		_header:SetText("Lowest " .. _type .. " Leaderboard")
+		__f:AddChild(_header)
+
+		for j = 1, 5 do
+			local _line = AceGUI:Create("Label")
+			_line:SetWidth(250)
+			if top_scores[_type][#top_scores[_type] - j + 1] ~= nil then
+				_line:SetText(
+					j
+						.. ". "
+						.. top_scores[_type][#top_scores[_type] - j + 1].streamer_name
+						.. "("
+						.. top_scores[_type][#top_scores[_type] - j + 1].pts
+						.. ")"
+				)
 			else
 				_line:SetText(j .. ". ")
 			end

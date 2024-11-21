@@ -70,9 +70,14 @@ ns.refreshGuildList = function(force_refresh)
 			GetGuildRosterInfo(i)
 
 		-- For testing
-		-- if name == "Yazpad-DefiasPillager" then
-		-- 	_officer_note = "~Yazpad~ Some other Stuff"
+		-- if name == "Jaytullobald-DefiasPillager" then
+		-- 	_public_note = "~Jay~ Some other Stuff"
 		-- end
+		-- ns.streamer_map["Jaytullobald-DefiasPillager"] = "Jay"
+		-- ns.streamer_map["Yazpadc-DefiasPillager"] = "Yazpad"
+		-- ns.streamer_map["Tthetester-DefiasPillager"] = "testtest"
+		-- ns.streamer_map["Dadreamland-DefiasPillager"] = "ream"
+		-- ns.streamer_map["Testnut-DefiasPillager"] = "nut"
 		if OnlyFangsStreamerMap[name] == nil or ns.streamer_map[name] == nil or force_refresh then
 			-- local _, streamer_name = string.split(STREAMER_TAG_DELIM, "~Yazpad~ Some other Stuff")
 			local _, streamer_name = string.split(STREAMER_TAG_DELIM, _public_note)
