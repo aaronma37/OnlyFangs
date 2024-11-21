@@ -9,6 +9,7 @@ local COMM_FIELD_DELIM = "~"
 local COMM_SUBFIELD_DELIM = "&"
 local COMM_CHANNEL = "GUILD"
 local HB_DUR = 5
+local HB_DUR_MAX = 60
 local ERASE_CACHE = false
 local DEBUG = false
 -- Node
@@ -511,57 +512,68 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 end)
 -- local _checker = {}
 
+local last_ticked = nil
 -- Heartbeat
 C_Timer.NewTicker(HB_DUR, function(self)
-	local guild_name, in_guild = guildName()
-	if distributed_log == nil or distributed_log[guild_name] == nil then
-		return
+	local d_dur = ns.num_guild_online or 1
+	if d_dur < HB_DUR then
+		d_dur = HB_DUR
+	elseif d_dur > HB_DUR_MAX then
+		d_dur = HB_DUR_MAX
 	end
-	local newest = getNextEntry() --distributed_log[guild_name]["meta"]["newest"]
-	local message = nil
-	if newest == nil or distributed_log[guild_name]["data"][newest] == nil then
-		message = ""
-	else
-		message = toMessage(newest, distributed_log[guild_name]["data"][newest]["value"])
-	end
-	-- _checker[newest] = (_checker[newest] or 0) + 1
-	-- print(newest, message, _checker[newest])
-	local comm_message = COMM_COMMAND_HEARTBEAT
-		.. COMM_COMMAND_DELIM
-		.. GetAddOnMetadata("OnlyFangs", "Version")
-		.. COMM_FIELD_DELIM
-		.. distributed_log[guild_name]["meta"]["size"]
-		.. COMM_FIELD_DELIM
-		.. distributed_log.points["Orc"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.last_week_points["Orc"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.this_week_points["Orc"]
-		.. COMM_FIELD_DELIM
-		.. distributed_log.points["Undead"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.last_week_points["Undead"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.this_week_points["Undead"]
-		.. COMM_FIELD_DELIM
-		.. distributed_log.points["Tauren"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.last_week_points["Tauren"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.this_week_points["Tauren"]
-		.. COMM_FIELD_DELIM
-		.. distributed_log.points["Troll"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.last_week_points["Troll"]
-		.. COMM_SUBFIELD_DELIM
-		.. distributed_log.this_week_points["Troll"]
-		.. COMM_FIELD_DELIM
-		.. message
+	local st = GetServerTime()
+	if st - (last_ticked or 0) >= d_dur then
+		last_ticked = GetServerTime()
+		local guild_name, in_guild = guildName()
+		if distributed_log == nil or distributed_log[guild_name] == nil then
+			return
+		end
+		local newest = getNextEntry() --distributed_log[guild_name]["meta"]["newest"]
+		local message = nil
+		if newest == nil or distributed_log[guild_name]["data"][newest] == nil then
+			message = ""
+		else
+			message = toMessage(newest, distributed_log[guild_name]["data"][newest]["value"])
+		end
+		-- _checker[newest] = (_checker[newest] or 0) + 1
+		-- print(newest, message, _checker[newest])
+		local comm_message = COMM_COMMAND_HEARTBEAT
+			.. COMM_COMMAND_DELIM
+			.. GetAddOnMetadata("OnlyFangs", "Version")
+			.. COMM_FIELD_DELIM
+			.. distributed_log[guild_name]["meta"]["size"]
+			.. COMM_FIELD_DELIM
+			.. distributed_log.points["Orc"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.last_week_points["Orc"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.this_week_points["Orc"]
+			.. COMM_FIELD_DELIM
+			.. distributed_log.points["Undead"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.last_week_points["Undead"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.this_week_points["Undead"]
+			.. COMM_FIELD_DELIM
+			.. distributed_log.points["Tauren"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.last_week_points["Tauren"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.this_week_points["Tauren"]
+			.. COMM_FIELD_DELIM
+			.. distributed_log.points["Troll"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.last_week_points["Troll"]
+			.. COMM_SUBFIELD_DELIM
+			.. distributed_log.this_week_points["Troll"]
+			.. COMM_FIELD_DELIM
+			.. message
 
-	if in_guild then
-		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
-	else
-		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, "SAY")
+		if in_guild then
+			CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+		else
+			CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, "SAY")
+		end
 	end
 end)
 
@@ -673,3 +685,4 @@ end
 
 -- local test_name = "FirstTo10Unarmed"
 -- ns.showToast(ns.event[test_name].title, ns.event[test_name].icon_path, ns.event[test_name].type)
+-- ns.triggerEvent("FirstToSixty")

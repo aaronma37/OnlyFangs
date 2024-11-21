@@ -84,6 +84,7 @@ ns.refreshGuildList = function(force_refresh)
 	-- Create a new dictionary of just online people every time roster is updated
 	ns.guild_online = {}
 	local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()
+	ns.num_guild_online = numOnline
 	for i = 1, numTotal, 1 do
 		local name, rankName, rankIndex, level, classDisplayName, zone, _public_note, _officer_note, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
 			GetGuildRosterInfo(i)

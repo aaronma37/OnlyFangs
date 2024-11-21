@@ -436,7 +436,7 @@ function SetAchievementTooltip(achievement_icon, achievement, _player_name)
 	end)
 end
 
-ns.enable_testing = true
+ns.enable_testing = false
 if ns.enable_testing == true then
 	print("OnlyFangs Testing Version Enabled")
 end

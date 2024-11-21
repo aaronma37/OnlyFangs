@@ -1431,7 +1431,7 @@ local guild_member_subtitle_data = {
 		"Lvl",
 		30,
 		function(_player_name_short, _player_name_long)
-			if ns.guild_online[_player_name_long] == nil then
+			if ns.guild_online == nil or ns.guild_online[_player_name_long] == nil then
 				return ""
 			end
 			return ns.guild_online[_player_name_long].level or ""
