@@ -35,6 +35,8 @@ events/milestones/first_devilsaur_set_crafted.lua
 events/milestones/first_epic_boe.lua
 events/milestones/first_blue_boe_priest_wand.lua
 events/milestones/first_blue_boe_ranged_hunter.lua
+events/milestones/first_to_die.lua
+events/milestones/first_to_die_at_60.lua
 
 events/failures/death.lua
 events/failures/coward.lua
