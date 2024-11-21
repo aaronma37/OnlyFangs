@@ -46,11 +46,29 @@ local onlyfangs_minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject(addo
 	OnTooltipShow = function(tooltip)
 		tooltip:AddLine(addonName)
 		tooltip:AddLine(Deathlog_L.minimap_btn_left_click)
-		tooltip:AddLine("Score:")
-		tooltip:AddDoubleLine("Orc:", ns.getScore("Orc"), 1, 1, 1, 1, 1, 1)
-		tooltip:AddDoubleLine("Troll:", ns.getScore("Troll"), 1, 1, 1, 1, 1, 1)
-		tooltip:AddDoubleLine("Tauren:", ns.getScore("Tauren"), 1, 1, 1, 1, 1, 1)
-		tooltip:AddDoubleLine("Undead:", ns.getScore("Undead"), 1, 1, 1, 1, 1, 1)
+
+		local orc_all_time, orc_last_week, orc_this_week = ns.getScore("Orc")
+		local troll_all_time, troll_last_week, troll_this_week = ns.getScore("Troll")
+		local tauren_all_time, tauren_last_week, tauren_this_week = ns.getScore("Tauren")
+		local undead_all_time, undead_last_week, undead_this_week = ns.getScore("Undead")
+
+		tooltip:AddLine("All Time Score:")
+		tooltip:AddDoubleLine("Orc:", orc_all_time, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Troll:", troll_all_time, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Tauren:", tauren_all_time, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Undead:", undead_all_time, 1, 1, 1, 1, 1, 1)
+
+		tooltip:AddLine("Last Week's Score:")
+		tooltip:AddDoubleLine("Orc:", orc_last_week, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Troll:", troll_last_week, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Tauren:", tauren_last_week, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Undead:", undead_last_week, 1, 1, 1, 1, 1, 1)
+
+		tooltip:AddLine("This Week's Score:")
+		tooltip:AddDoubleLine("Orc:", orc_this_week, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Troll:", troll_this_week, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Tauren:", tauren_this_week, 1, 1, 1, 1, 1, 1)
+		tooltip:AddDoubleLine("Undead:", undead_this_week, 1, 1, 1, 1, 1, 1)
 	end,
 })
 local function initMinimapButton()
@@ -59,6 +77,7 @@ local function initMinimapButton()
 		return
 	end
 	onlyfangs_minimap_button_stub:Register("OnlyFangs", onlyfangs_minimap_button, onlyfangs_minimap_button_info)
+	onlyfangs_minimap_button_stub:SetButtonToPosition("OnlyFangs", 190)
 end
 
 ns.refreshGuildList = function(force_refresh)
