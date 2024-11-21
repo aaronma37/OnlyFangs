@@ -379,20 +379,58 @@ local function drawLogTab(container)
 	_header:SetText("Summary")
 	header_frame:AddChild(_header)
 
+	local orc_all_time, orc_last_week, orc_this_week = ns.getScore("Orc")
+	local troll_all_time, troll_last_week, troll_this_week = ns.getScore("Troll")
+	local tauren_all_time, tauren_last_week, tauren_this_week = ns.getScore("Tauren")
+	local undead_all_time, undead_last_week, undead_this_week = ns.getScore("Undead")
+
 	local space1 = AceGUI:Create("Label")
 	space1:SetWidth(140)
 	space1:SetHeight(60)
 	space1:SetText(
-		"Orc: "
-			.. ns.getScore("Orc")
+		"|cffd4af37All Time:|r \n"
+			.. "Orc: "
+			.. orc_all_time
 			.. "\nTroll: "
-			.. ns.getScore("Troll")
+			.. troll_all_time
 			.. "\nTauren: "
-			.. ns.getScore("Tauren")
+			.. tauren_all_time
 			.. "\nUndead: "
-			.. ns.getScore("Undead")
+			.. undead_all_time
 	)
 	header_frame:AddChild(space1)
+
+	local last_week = AceGUI:Create("Label")
+	last_week:SetWidth(140)
+	last_week:SetHeight(60)
+	last_week:SetText(
+		"|cffd4af37Last Week:|r \n"
+			.. "Orc: "
+			.. orc_last_week
+			.. "\nTroll: "
+			.. troll_last_week
+			.. "\nTauren: "
+			.. tauren_last_week
+			.. "\nUndead: "
+			.. undead_last_week
+	)
+	header_frame:AddChild(last_week)
+
+	local this_week = AceGUI:Create("Label")
+	this_week:SetWidth(140)
+	this_week:SetHeight(60)
+	this_week:SetText(
+		"|cffd4af37This Week:|r \n"
+			.. "Orc: "
+			.. (orc_this_week or -1)
+			.. "\nTroll: "
+			.. (troll_this_week or -1)
+			.. "\nTauren: "
+			.. (tauren_this_week or -1)
+			.. "\nUndead: "
+			.. (undead_this_week or -1)
+	)
+	header_frame:AddChild(this_week)
 
 	local _num_points = 0
 	local _milestones = 0
@@ -410,11 +448,12 @@ local function drawLogTab(container)
 	end
 
 	local _player_summary = AceGUI:Create("Label")
-	_player_summary:SetWidth(700)
+	_player_summary:SetWidth(200)
 	_player_summary:SetHeight(60)
 	_player_summary:SetText(
-		UnitName("player")
-			.. " stats:\n"
+		"|cffd4af37"
+			.. UnitName("player")
+			.. " stats:|r\n"
 			.. "Total Points: "
 			.. _num_points
 			.. "\n"
@@ -423,7 +462,7 @@ local function drawLogTab(container)
 			.. "\n"
 			.. "#Achievements: "
 			.. _achievements
-			.. "\n"
+			.. "\n\n"
 	)
 	header_frame:AddChild(_player_summary)
 
@@ -446,7 +485,7 @@ local function drawLogTab(container)
 
 	local only_fangs_group = AceGUI:Create("ScrollFrame")
 	only_fangs_group:SetFullWidth(true)
-	only_fangs_group:SetHeight(340)
+	only_fangs_group:SetHeight(330)
 	scroll_frame:AddChild(only_fangs_group)
 	-- only_fangs_group.frame:SetPoint("TOP", scroll_container.frame, "TOP", 0, -100)
 	font_container:SetParent(only_fangs_group.frame)
@@ -998,6 +1037,19 @@ local function makeFailureLabel(_v)
 	-- _gap2:SetFullWidth(true)
 	__f:AddChild(_gap2)
 
+	local _claimed_by = AceGUI:Create("Label")
+	_claimed_by:SetColor(128 / 255, 128 / 255, 128 / 255, 1)
+	if ns.claimed_milestones[_v.name] == nil and _v.type == "Milestone" then
+		_claimed_by:SetText("Unclaimed")
+	elseif _v.type == "Milestone" then
+		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetText("Claimed by: " .. _short_n)
+	end
+	_claimed_by:SetHeight(140)
+	_claimed_by:SetWidth(800)
+	_claimed_by:SetJustifyH("LEFT")
+	__f:AddChild(_claimed_by)
+
 	return __f
 end
 
@@ -1325,7 +1377,11 @@ local function drawEventTypeTab(container, _title, _frames)
 		else
 			for k, v in pairs(ns.event) do
 				if v.test_only == nil then
-					if v.type == group or v.subtype == group then
+					if
+						v.type == group
+						or v.subtype == group
+						or (group == "Failure" and v.subtype == "MilestoneFailure")
+					then
 						if group == "General" then
 							scroll_frame:AddChild(makeFirstToFindLabel(v))
 						elseif group == "GeneralAchievement" then

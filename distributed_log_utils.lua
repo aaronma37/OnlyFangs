@@ -6,6 +6,7 @@ local COMM_COMMAND_HEARTBEAT = "HB"
 local COMM_COMMAND_DIRECT_EVENT = "DE"
 local COMM_COMMAND_DELIM = "|"
 local COMM_FIELD_DELIM = "~"
+local COMM_SUBFIELD_DELIM = "&"
 local COMM_CHANNEL = "GUILD"
 local HB_DUR = 5
 local ERASE_CACHE = false
@@ -21,6 +22,19 @@ local CLASS_IDX = 4
 local ADD_ARGS_IDX = 5
 
 local INIT_TIME = 1730639674
+local WEEK_SECONDS = 604800
+local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
+
+local DAY_SECONDS = 86400
+
+local function getThisWeekPeriodStart()
+	local server_time = GetServerTime()
+	local delta = server_time - LAUNCH_DATE
+	local rem = math.fmod(delta, WEEK_SECONDS)
+	-- print(date("%m/%d/%y, %H:%M", server_time - rem))
+	-- print(date("%m/%d/%y, %H:%M", server_time - rem - WEEK_SECONDS))
+	return server_time - rem, server_time - rem - WEEK_SECONDS
+end
 
 local REALM_NAME = GetRealmName()
 REALM_NAME = REALM_NAME:gsub("%s+", "")
@@ -61,9 +75,6 @@ local function fromAdjustedTime(t)
 	return t + INIT_TIME
 end
 
-local DAY_SECONDS = 86400
-local WEEK_SECONDS = 604800
-
 local top_players_daily = {}
 local top_players_weekly = {}
 local top_players_all_time = {}
@@ -103,6 +114,18 @@ end
 
 local estimated_score_num_entries = 0
 local estimated_score = {
+	["Orc"] = 0,
+	["Undead"] = 0,
+	["Tauren"] = 0,
+	["Troll"] = 0,
+}
+local last_week_estimated_score = {
+	["Orc"] = 0,
+	["Undead"] = 0,
+	["Tauren"] = 0,
+	["Troll"] = 0,
+}
+local this_week_estimated_score = {
 	["Orc"] = 0,
 	["Undead"] = 0,
 	["Tauren"] = 0,
@@ -197,6 +220,30 @@ ns.loadDistributedLog = function()
 			["Dwarf"] = 0,
 		}
 	end
+	if distributed_log["last_week_points"] == nil then
+		distributed_log["last_week_points"] = {
+			["Orc"] = 0,
+			["Troll"] = 0,
+			["Tauren"] = 0,
+			["Undead"] = 0,
+			["Human"] = 0,
+			["Gnome"] = 0,
+			["Night Elf"] = 0,
+			["Dwarf"] = 0,
+		}
+	end
+	if distributed_log["this_week_points"] == nil then
+		distributed_log["this_week_points"] = {
+			["Orc"] = 0,
+			["Troll"] = 0,
+			["Tauren"] = 0,
+			["Undead"] = 0,
+			["Human"] = 0,
+			["Gnome"] = 0,
+			["Night Elf"] = 0,
+			["Dwarf"] = 0,
+		}
+	end
 	refreshClaimedMilestones()
 	ns.aggregateLog()
 	estimated_score_num_entries = distributed_log[guild_name]["meta"]["size"]
@@ -205,6 +252,18 @@ ns.loadDistributedLog = function()
 		["Undead"] = distributed_log.points["Undead"],
 		["Tauren"] = distributed_log.points["Tauren"],
 		["Troll"] = distributed_log.points["Troll"],
+	}
+	last_week_estimated_score = {
+		["Orc"] = distributed_log.last_week_points["Orc"],
+		["Undead"] = distributed_log.last_week_points["Undead"],
+		["Tauren"] = distributed_log.last_week_points["Tauren"],
+		["Troll"] = distributed_log.last_week_points["Troll"],
+	}
+	this_week_estimated_score = {
+		["Orc"] = distributed_log.this_week_points["Orc"],
+		["Undead"] = distributed_log.this_week_points["Undead"],
+		["Tauren"] = distributed_log.this_week_points["Tauren"],
+		["Troll"] = distributed_log.this_week_points["Troll"],
 	}
 	checkAndAddKeyList()
 end
@@ -256,10 +315,11 @@ local function toMessage(key, log_event)
 end
 
 ns.getScore = function(team_name)
-	return estimated_score[team_name]
+	return estimated_score[team_name], last_week_estimated_score[team_name], this_week_estimated_score[team_name]
 end
 
 local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, current_adjusted_time, pts)
+	local this_week_period_start, last_week_period_start = getThisWeekPeriodStart()
 	local _char_name, _, _last_guid = string.split("-", _fletcher)
 	if _char_name == player_name and _last_guid ~= nil then
 		local _player_tag = _char_name .. "-" .. _last_guid
@@ -289,6 +349,16 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 			top_players_daily[streamer_name].pts = top_players_daily[streamer_name].pts + ns.event[_event_name].pts
 		end
 	end
+
+	local adjusted_time = fromAdjustedTime(_event_log[DATE_IDX])
+	local race_name = ns.id_race[_event_log[RACE_IDX]]
+	if adjusted_time > this_week_period_start then
+		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name]
+			+ ns.event[_event_name].pts
+	elseif adjusted_time > last_week_period_start then
+		distributed_log.last_week_points[race_name] = distributed_log.last_week_points[race_name]
+			+ ns.event[_event_name].pts
+	end
 end
 
 ns.aggregateLog = function()
@@ -300,6 +370,8 @@ ns.aggregateLog = function()
 	local guild_name = guildName()
 	for k, _ in pairs(distributed_log.points) do
 		distributed_log.points[k] = 0
+		distributed_log.last_week_points[k] = 0
+		distributed_log.this_week_points[k] = 0
 	end
 	for k, v in pairs(distributed_log[guild_name]["data"]) do
 		local event_log = v["value"]
@@ -356,11 +428,33 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 			end
 			if tonumber(_num_entries) > estimated_score_num_entries then
 				estimated_score_num_entries = tonumber(_num_entries)
+
+				local orc_all_time, orc_last_week, orc_this_week = string.split(COMM_SUBFIELD_DELIM, _orc_score)
+				local troll_all_time, troll_last_week, troll_this_week = string.split(COMM_SUBFIELD_DELIM, _troll_score)
+				local tauren_all_time, tauren_last_week, tauren_this_week =
+					string.split(COMM_SUBFIELD_DELIM, _tauren_score)
+				local undead_all_time, undead_last_week, undead_this_week =
+					string.split(COMM_SUBFIELD_DELIM, _undead_score)
+
 				estimated_score = {
-					["Orc"] = tonumber(_orc_score),
-					["Undead"] = tonumber(_undead_score),
-					["Tauren"] = tonumber(_tauren_score),
-					["Troll"] = tonumber(_troll_score),
+					["Orc"] = tonumber(orc_all_time),
+					["Undead"] = tonumber(undead_all_time),
+					["Tauren"] = tonumber(tauren_all_time),
+					["Troll"] = tonumber(troll_all_time),
+				}
+
+				last_week_estimated_score = {
+					["Orc"] = tonumber(orc_last_week) or -1,
+					["Undead"] = tonumber(undead_last_week) or -1,
+					["Tauren"] = tonumber(tauren_last_week) or -1,
+					["Troll"] = tonumber(troll_last_week) or -1,
+				}
+
+				this_week_estimated_score = {
+					["Orc"] = tonumber(orc_this_week) or -1,
+					["Undead"] = tonumber(undead_this_week) or -1,
+					["Tauren"] = tonumber(tauren_this_week) or -1,
+					["Troll"] = tonumber(troll_this_week) or -1,
 				}
 			end
 		elseif command == COMM_COMMAND_DIRECT_EVENT then
@@ -426,12 +520,28 @@ C_Timer.NewTicker(HB_DUR, function(self)
 		.. distributed_log[guild_name]["meta"]["size"]
 		.. COMM_FIELD_DELIM
 		.. distributed_log.points["Orc"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Orc"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Orc"]
 		.. COMM_FIELD_DELIM
 		.. distributed_log.points["Undead"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Undead"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Undead"]
 		.. COMM_FIELD_DELIM
 		.. distributed_log.points["Tauren"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Tauren"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Tauren"]
 		.. COMM_FIELD_DELIM
 		.. distributed_log.points["Troll"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Troll"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Troll"]
 		.. COMM_FIELD_DELIM
 		.. message
 

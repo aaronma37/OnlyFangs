@@ -212,6 +212,8 @@ ns.event_id = {
 	["The Essence of Eranikus"] = 203,
 	["Call of Water"] = 204,
 	["FirstBlueBoeHunter"] = 205,
+	["FirstToDie"] = 206,
+	["FirstToDieAt60"] = 207,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
