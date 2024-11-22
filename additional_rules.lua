@@ -2,6 +2,8 @@ local addonName, ns = ...
 local rule_event_handler = nil
 rule_event_handler = CreateFrame("frame")
 
+local mail_button = {}
+
 local in_guild = function(_n)
 	for g_idx = 1, GetNumGuildMembers() do
 		member_name, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(g_idx)
@@ -15,7 +17,8 @@ end
 
 local on_mail_show = function()
 	for i = 1, 7 do
-		local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
+		local _name = _G["MailItem" .. tostring(i) .. "Sender"]:GetText()
+		-- local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
 		local in_whitelist = function(_n)
 			if
 				ns.whitelist ~= nil
@@ -28,15 +31,31 @@ local on_mail_show = function()
 			return false
 		end
 
+		-- if mail_button[i] == nil then
+		-- 	mail_button[i] = CreateFrame("Button", "MyButton", _G["InboxFrame"], "UIPanelButtonTemplate")
+		-- 	mail_button[i]:SetSize(130, 22) -- width, height
+		-- 	mail_button[i]:SetText("Return to Sender")
+		-- 	mail_button[i]:SetPoint("CENTER", _G["MailItem" .. tostring(i) .. "Sender"], "CENTER", 250, 0)
+		-- 	mail_button[i]:SetScript("OnClick", function()
+		-- 		CheckInbox()
+		-- 		if InboxItemCanDelete(i) then
+		-- 			print("Returned mail to sender." .. i)
+		-- 			DeleteInboxItem(i)
+		-- 		end
+		-- 	end)
+		-- end
+
 		if _name == nil or in_whitelist(_name) or in_guild(_name) then
 			_G["MailItem" .. tostring(i)]:SetAlpha(1.0)
 			_G["MailItem" .. tostring(i)]:EnableMouse(1)
 			_G["MailItem" .. tostring(i) .. "Button"]:Enable()
+			-- mail_button[i]:Hide()
 		else
 			print("Disabling mail from: ", _name)
 			_G["MailItem" .. tostring(i)]:SetAlpha(0.5)
 			_G["MailItem" .. tostring(i)]:EnableMouse(0)
 			_G["MailItem" .. tostring(i) .. "Button"]:Disable()
+			-- mail_button[i]:Show()
 		end
 	end
 end
