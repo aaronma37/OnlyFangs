@@ -338,36 +338,44 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 		end
 	end
 	_char_name = _char_name .. "-" .. REALM_NAME
+
+	local _adjusted_pts = nil
+	if _event_log[EVENT_IDX] == 2 then
+		_adjusted_pts, _char_name = ns.getAdjustPoints(_event_log)
+		_char_name = _char_name:gsub("^%l", string.upper)
+		_char_name = _char_name .. "-" .. REALM_NAME
+	else
+		_adjusted_pts = ns.event[_event_name].pts
+	end
+
 	local streamer_name = ns.streamer_map[_char_name] or OnlyFangsStreamerMap[_char_name]
 
 	if streamer_name then
 		if top_players_all_time[streamer_name] == nil then
 			top_players_all_time[streamer_name] = { ["pts"] = 0 }
 		end
-		top_players_all_time[streamer_name].pts = top_players_all_time[streamer_name].pts + ns.event[_event_name].pts
+		top_players_all_time[streamer_name].pts = top_players_all_time[streamer_name].pts + _adjusted_pts
 
 		if _event_log[DATE_IDX] + WEEK_SECONDS > current_adjusted_time then
 			if top_players_weekly[streamer_name] == nil then
 				top_players_weekly[streamer_name] = { ["pts"] = 0 }
 			end
-			top_players_weekly[streamer_name].pts = top_players_weekly[streamer_name].pts + ns.event[_event_name].pts
+			top_players_weekly[streamer_name].pts = top_players_weekly[streamer_name].pts + _adjusted_pts
 		end
 		if _event_log[DATE_IDX] + DAY_SECONDS > current_adjusted_time then
 			if top_players_daily[streamer_name] == nil then
 				top_players_daily[streamer_name] = { ["pts"] = 0 }
 			end
-			top_players_daily[streamer_name].pts = top_players_daily[streamer_name].pts + ns.event[_event_name].pts
+			top_players_daily[streamer_name].pts = top_players_daily[streamer_name].pts + _adjusted_pts
 		end
 	end
 
 	local adjusted_time = fromAdjustedTime(_event_log[DATE_IDX])
 	local race_name = ns.id_race[_event_log[RACE_IDX]]
 	if adjusted_time > this_week_period_start then
-		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name]
-			+ ns.event[_event_name].pts
+		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _adjusted_pts
 	elseif adjusted_time > last_week_period_start then
-		distributed_log.last_week_points[race_name] = distributed_log.last_week_points[race_name]
-			+ ns.event[_event_name].pts
+		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _adjusted_pts
 	end
 end
 
@@ -689,10 +697,14 @@ end
 --
 local working_checker = nil
 working_checker = C_Timer.NewTicker(10, function()
-	if ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME] == nil then
-		print("|cff33ff99OnlyFangs: Addon is not connected.  Have you relogged?|r")
-	else
-		print("|cff33ff99OnlyFangs: Addon is connected and working.|r")
-		working_checker:Cancel()
+	local guild_name, _, _ = GetGuildInfo("Player")
+	local in_guild = (guild_name ~= nil)
+	if in_guild then
+		if ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME] == nil then
+			print("|cff33ff99OnlyFangs: Addon is not connected.  Have you relogged?|r")
+		else
+			print("|cff33ff99OnlyFangs: Addon is connected and working.|r")
+			working_checker:Cancel()
+		end
 	end
 end)

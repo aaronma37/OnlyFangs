@@ -16,48 +16,25 @@ local in_guild = function(_n)
 end
 
 local on_mail_show = function()
-	for i = 1, 7 do
-		local _name = _G["MailItem" .. tostring(i) .. "Sender"]:GetText()
-		-- local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
-		local in_whitelist = function(_n)
-			if
-				ns.whitelist ~= nil
-				and ns.whitelist ~= nil
-				and ns.whitelist[_n] ~= nil
-				and UnitLevel("player") <= ns.whitelist[_n]
-			then
-				return true
+	C_Timer.NewTicker(0.2, function(self)
+		if _G["MailFrame"]:IsVisible() == false then
+			self:Cancel()
+		end
+		for i = 1, 7 do
+			local _name = _G["MailItem" .. tostring(i) .. "Sender"]:GetText()
+			-- local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
+
+			if _name == nil or in_guild(_name) then
+				_G["MailItem" .. tostring(i)]:SetAlpha(1.0)
+				_G["MailItem" .. tostring(i)]:EnableMouse(1)
+				_G["MailItem" .. tostring(i) .. "Button"]:Enable()
+			else
+				print("Returning mail from: ", _name)
+				ReturnInboxItem(i)
+				return
 			end
-			return false
 		end
-
-		-- if mail_button[i] == nil then
-		-- 	mail_button[i] = CreateFrame("Button", "MyButton", _G["InboxFrame"], "UIPanelButtonTemplate")
-		-- 	mail_button[i]:SetSize(130, 22) -- width, height
-		-- 	mail_button[i]:SetText("Return to Sender")
-		-- 	mail_button[i]:SetPoint("CENTER", _G["MailItem" .. tostring(i) .. "Sender"], "CENTER", 250, 0)
-		-- 	mail_button[i]:SetScript("OnClick", function()
-		-- 		CheckInbox()
-		-- 		if InboxItemCanDelete(i) then
-		-- 			print("Returned mail to sender." .. i)
-		-- 			DeleteInboxItem(i)
-		-- 		end
-		-- 	end)
-		-- end
-
-		if _name == nil or in_whitelist(_name) or in_guild(_name) then
-			_G["MailItem" .. tostring(i)]:SetAlpha(1.0)
-			_G["MailItem" .. tostring(i)]:EnableMouse(1)
-			_G["MailItem" .. tostring(i) .. "Button"]:Enable()
-			-- mail_button[i]:Hide()
-		else
-			print("Disabling mail from: ", _name)
-			_G["MailItem" .. tostring(i)]:SetAlpha(0.5)
-			_G["MailItem" .. tostring(i)]:EnableMouse(0)
-			_G["MailItem" .. tostring(i) .. "Button"]:Disable()
-			-- mail_button[i]:Show()
-		end
-	end
+	end)
 end
 
 rule_event_handler:RegisterEvent("MAIL_SHOW")

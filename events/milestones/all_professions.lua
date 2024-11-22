@@ -79,6 +79,27 @@ local profession_metadata = {
 		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
 		["lvl"] = 300,
 	},
+	{
+		["name"] = "FirstTo300Alchemy",
+		["title"] = "1st to 300 Alchemy",
+		["profession_name"] = "Alchemy",
+		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
+		["lvl"] = 300,
+	},
+	{
+		["name"] = "FirstTo300Engineering",
+		["title"] = "1st to 300 Engineering",
+		["profession_name"] = "Engineering",
+		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
+		["lvl"] = 300,
+	},
+	{
+		["name"] = "FirstTo300Leatherworking",
+		["title"] = "1st to 300 Leatherworking",
+		["profession_name"] = "Leatherworking",
+		["icon_path"] = "Interface\\ICONS\\Spell_Frost_IceClaw",
+		["lvl"] = 300,
+	},
 }
 
 local professions_ex = {}

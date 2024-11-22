@@ -13,12 +13,9 @@ _event.description = "[Guild Master Only] Allows guild master to add or subtract
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)
-	local str = "return " .. event_log[5]
-	local func = assert(loadstring(str))
-	local args = func()
-
+	local pts, _ = ns.getAdjustPoints(event_log)
 	local race_name = ns.id_race[event_log[2]]
-	distributed_log.points[race_name] = distributed_log.points[race_name] + tonumber(args["pts"])
+	distributed_log.points[race_name] = distributed_log.points[race_name] + tonumber(pts)
 end
 
 -- Registers

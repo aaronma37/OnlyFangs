@@ -46,6 +46,7 @@ deathlog_strings_en = {
 		{ value = "GuildMembersTab", text = "GuildMembers" },
 		{ value = "PointsTab", text = "Points" },
 		{ value = "LogTab", text = "Log" },
+		{ value = "FrontPage", text = "FrontPage" },
 		{ value = "LeaderboardTab", text = "Leaderboard" },
 		{ value = "TestingPoints", text = "Testing Points" },
 	},

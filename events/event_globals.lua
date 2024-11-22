@@ -215,6 +215,9 @@ ns.event_id = {
 	["FirstToDie"] = 206,
 	["FirstToDieAt60"] = 207,
 	["Master Angler2"] = 208,
+	["FirstTo300Alchemy"] = 209,
+	["FirstTo300Engineering"] = 210,
+	["FirstTo300Leatherworking"] = 211,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
@@ -452,4 +455,14 @@ ns.triggerEvent = function(event_name)
 			ns.sendEvent(event_name)
 		end
 	end
+end
+
+ns.getAdjustPoints = function(event_log)
+	local _, _back, _other = string.split("=", event_log[5])
+	local pts = string.split(",", _back)
+	pts = tonumber(pts)
+	if _other then
+		_, _other = string.split("'", _other)
+	end
+	return pts, _other
 end

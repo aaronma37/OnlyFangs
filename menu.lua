@@ -299,6 +299,76 @@ local _stats = {}
 local _log_normal_params = {}
 local initialized = false
 
+local function drawFrontPage(container)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Fill")
+	onlyfangs_tab_container:AddChild(scroll_container)
+
+	local main_frame = AceGUI:Create("SimpleGroup")
+	main_frame:SetLayout("Flow")
+	main_frame:SetFullWidth(true)
+	main_frame:SetFullHeight(true)
+	scroll_container:AddChild(main_frame)
+
+	local orc_all_time, orc_last_week, orc_this_week = ns.getScore("Orc")
+	local troll_all_time, troll_last_week, troll_this_week = ns.getScore("Troll")
+	local tauren_all_time, tauren_last_week, tauren_this_week = ns.getScore("Tauren")
+	local undead_all_time, undead_last_week, undead_this_week = ns.getScore("Undead")
+
+	local space1 = AceGUI:Create("Label")
+	space1:SetWidth(300)
+	space1:SetFullHeight(true)
+	space1:SetFont(main_font, 36, "")
+	space1:SetText(
+		"\n\n\n\n|cffd4af37All Time:|r \n"
+			.. "Orc: "
+			.. orc_all_time
+			.. "\nTroll: "
+			.. troll_all_time
+			.. "\nTauren: "
+			.. tauren_all_time
+			.. "\nUndead: "
+			.. undead_all_time
+	)
+	main_frame:AddChild(space1)
+
+	local space2 = AceGUI:Create("Label")
+	space2:SetWidth(300)
+	space2:SetFullHeight(true)
+	space2:SetFont(main_font, 36, "")
+	space2:SetText(
+		"\n\n\n\n|cffd4af37Last Week:|r \n"
+			.. "Orc: "
+			.. orc_last_week
+			.. "\nTroll: "
+			.. troll_last_week
+			.. "\nTauren: "
+			.. tauren_last_week
+			.. "\nUndead: "
+			.. undead_last_week
+	)
+	main_frame:AddChild(space2)
+
+	local space3 = AceGUI:Create("Label")
+	space3:SetWidth(300)
+	space3:SetFullHeight(true)
+	space3:SetFont(main_font, 36, "")
+	space3:SetText(
+		"\n\n\n\n|cffd4af37This Week:|r \n"
+			.. "Orc: "
+			.. orc_this_week
+			.. "\nTroll: "
+			.. troll_this_week
+			.. "\nTauren: "
+			.. tauren_this_week
+			.. "\nUndead: "
+			.. undead_this_week
+	)
+	main_frame:AddChild(space3)
+end
+
 local function drawLogTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
@@ -1922,6 +1992,8 @@ local function createMenu()
 			drawEventTypeTab(container)
 		elseif group == "LogTab" then
 			drawLogTab(container)
+		elseif group == "FrontPage" then
+			drawFrontPage(container)
 		elseif group == "LeaderboardTab" then
 			drawLeaderboardTab(container)
 		elseif group == "GuildMembersTab" then
@@ -1941,6 +2013,6 @@ deathlog_menu = createMenu()
 
 ns.showMenu = function()
 	deathlog_menu:Show()
-	onlyfangs_tab_container:SelectTab("LogTab")
+	onlyfangs_tab_container:SelectTab("FrontPage")
 	setLogData()
 end
