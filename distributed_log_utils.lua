@@ -686,3 +686,13 @@ end
 -- local test_name = "FirstTo10Unarmed"
 -- ns.showToast(ns.event[test_name].title, ns.event[test_name].icon_path, ns.event[test_name].type)
 -- ns.triggerEvent("FirstToSixty")
+--
+local working_checker = nil
+working_checker = C_Timer.NewTicker(10, function()
+	if ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME] == nil then
+		print("|cff33ff99OnlyFangs: Addon is not connected.  Have you reloaded?|r")
+	else
+		print("|cff33ff99OnlyFangs: Addon is connected and working.|r")
+		working_checker:Cancel()
+	end
+end)
