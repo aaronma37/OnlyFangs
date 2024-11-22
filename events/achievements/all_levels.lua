@@ -78,21 +78,33 @@ local function loadLevelEvent(_metadata)
 
 	-- Registers
 	_event:RegisterEvent("PLAYER_LEVEL_UP")
+	_event:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 	-- Register Definitions
 	local sent = false
 	_event:SetScript("OnEvent", function(self, e, arg)
-		C_Timer.After(1, function()
+		if e == "PLAYER_LEVEL_UP" then
+			C_Timer.After(1, function()
+				if sent == true then
+					return
+				end
+
+				local lvl = UnitLevel("player")
+				if lvl == _event.lvl and sent == false then
+					ns.triggerEvent(_event.name)
+					sent = true
+				end
+			end)
+		elseif e == "PLAYER_ENTERING_WORLD" then
 			if sent == true then
 				return
 			end
-
 			local lvl = UnitLevel("player")
-			if lvl == _event.lvl and sent == false then
+			if lvl >= _event.lvl and sent == false then
 				ns.triggerEvent(_event.name)
 				sent = true
 			end
-		end)
+		end
 	end)
 end
 
