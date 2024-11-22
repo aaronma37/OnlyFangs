@@ -690,7 +690,7 @@ end
 local working_checker = nil
 working_checker = C_Timer.NewTicker(10, function()
 	if ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME] == nil then
-		print("|cff33ff99OnlyFangs: Addon is not connected.  Have you reloaded?|r")
+		print("|cff33ff99OnlyFangs: Addon is not connected.  Have you relogged?|r")
 	else
 		print("|cff33ff99OnlyFangs: Addon is connected and working.|r")
 		working_checker:Cancel()
