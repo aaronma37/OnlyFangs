@@ -2014,5 +2014,6 @@ deathlog_menu = createMenu()
 ns.showMenu = function()
 	deathlog_menu:Show()
 	onlyfangs_tab_container:SelectTab("FrontPage")
+	font_container:Hide()
 	setLogData()
 end

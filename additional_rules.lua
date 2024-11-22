@@ -16,25 +16,29 @@ local in_guild = function(_n)
 end
 
 local on_mail_show = function()
-	C_Timer.NewTicker(0.2, function(self)
-		if _G["MailFrame"]:IsVisible() == false then
-			self:Cancel()
-		end
-		for i = 1, 7 do
-			local _name = _G["MailItem" .. tostring(i) .. "Sender"]:GetText()
-			-- local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
-
-			if _name == nil or in_guild(_name) then
-				_G["MailItem" .. tostring(i)]:SetAlpha(1.0)
-				_G["MailItem" .. tostring(i)]:EnableMouse(1)
-				_G["MailItem" .. tostring(i) .. "Button"]:Enable()
-			else
-				print("Returning mail from: ", _name)
-				ReturnInboxItem(i)
-				return
+	if CanEditOfficerNote() == false then
+		C_Timer.NewTicker(0.2, function(self)
+			if _G["MailFrame"]:IsVisible() == false then
+				self:Cancel()
 			end
-		end
-	end)
+			for i = 1, 7 do
+				local _name = _G["MailItem" .. tostring(i) .. "Sender"]:GetText()
+				-- local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
+
+				if _name == nil or in_guild(_name) then
+					_G["MailItem" .. tostring(i)]:SetAlpha(1.0)
+					_G["MailItem" .. tostring(i)]:EnableMouse(1)
+					_G["MailItem" .. tostring(i) .. "Button"]:Enable()
+				else
+					print("Returning mail from: ", _name)
+					ReturnInboxItem(i)
+					return
+				end
+			end
+		end)
+	else
+		print("Officer's mail is not blocked.")
+	end
 end
 
 rule_event_handler:RegisterEvent("MAIL_SHOW")

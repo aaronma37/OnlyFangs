@@ -23,13 +23,16 @@ _event:RegisterEvent("PLAYER_LEVEL_UP")
 
 -- Register Definitions
 local sent = false
-_event:SetScript("OnEvent", function(self, e, lvl)
+_event:SetScript("OnEvent", function(self, e, _)
 	if ns.claimed_milestones[_event.name] ~= nil then
 		return
 	end
 
-	if lvl == 60 and sent == false then
-		ns.triggerEvent(_event.name)
-		sent = true
-	end
+	C_Timer.After(1, function()
+		local lvl = UnitLevel("player")
+		if lvl == 60 and sent == false then
+			ns.triggerEvent(_event.name)
+			sent = true
+		end
+	end)
 end)
