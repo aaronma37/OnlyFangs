@@ -15,8 +15,8 @@ local target_metadata = {
 	{ ["target_name"] = "Mottled Boar", ["pts"] = 15, ["test_only"] = 1 },
 	{ ["target_name"] = "Sarkoth", ["pts"] = 15, ["test_only"] = 1 },
 	{ ["target_name"] = "Scorpid Worker", ["pts"] = 30, ["test_only"] = 1 },
-	{ ["target_name"] = "Adder", ["pts"] = 100, ["test_only"] = 1 },
-	{ ["target_name"] = "Hare", ["pts"] = 100, ["test_only"] = 1 },
+	{ ["target_name"] = "Adder", ["pts"] = 0, ["test_only"] = 1 },
+	{ ["target_name"] = "Hare", ["pts"] = 0, ["test_only"] = 1 },
 }
 
 local function loadEvent(target_metadata)
