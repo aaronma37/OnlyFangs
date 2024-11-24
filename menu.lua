@@ -1158,14 +1158,14 @@ local function drawEventTypeTab(container, _title, _frames)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Flow")
+	scroll_container:SetLayout("Fill")
 	onlyfangs_tab_container:AddChild(scroll_container)
 
-	local header_frame = AceGUI:Create("SimpleGroup")
-	header_frame:SetLayout("Flow")
-	header_frame:SetFullWidth(true)
-	header_frame:SetHeight(100)
-	scroll_container:AddChild(header_frame)
+	-- local header_frame = AceGUI:Create("SimpleGroup")
+	-- header_frame:SetLayout("Flow")
+	-- header_frame:SetFullWidth(true)
+	-- header_frame:SetHeight(100)
+	-- scroll_container:AddChild(header_frame)
 
 	local recently_selected_group = "Milestones"
 	local tree = {
