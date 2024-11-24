@@ -81,6 +81,13 @@ local function initMinimapButton()
 end
 
 ns.refreshGuildList = function(force_refresh)
+	local guild_info_text = GetGuildInfoText()
+	if guild_info_text then
+		local _, _this_week_start, _ = string.split("~", guild_info_text)
+		if _this_week_start and tonumber(_this_week_start) then
+			OnlyFangsWeekStart = tonumber(_this_week_start)
+		end
+	end
 	-- Create a new dictionary of just online people every time roster is updated
 	ns.guild_online = {}
 	local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()

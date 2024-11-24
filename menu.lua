@@ -823,6 +823,7 @@ local function makeMilestoneLabel(_v)
 		_claimed_by:SetText("Unclaimed")
 	else
 		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetColor(212 / 255, 175 / 255, 55 / 255, 1)
 		_claimed_by:SetText("Claimed by: " .. _short_n)
 	end
 	_claimed_by:SetHeight(140)
@@ -975,6 +976,7 @@ local function makeFirstToFindLabel(_v)
 		_claimed_by:SetText("Unclaimed")
 	else
 		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetColor(212 / 255, 175 / 255, 55 / 255, 1)
 		_claimed_by:SetText("Claimed by: " .. _short_n)
 	end
 	_claimed_by:SetHeight(140)
@@ -1036,6 +1038,7 @@ local function makeFirstToCompleteLabel(_v)
 		_claimed_by:SetText("Unclaimed")
 	else
 		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetColor(212 / 255, 175 / 255, 55 / 255, 1)
 		_claimed_by:SetText("Claimed by: " .. _short_n)
 	end
 	_claimed_by:SetHeight(140)
@@ -1113,6 +1116,7 @@ local function makeFailureLabel(_v)
 		_claimed_by:SetText("Unclaimed")
 	elseif _v.type == "Milestone" then
 		local _short_n, _ = string.split("-", ns.claimed_milestones[_v.name])
+		_claimed_by:SetColor(212 / 255, 175 / 255, 55 / 255, 1)
 		_claimed_by:SetText("Claimed by: " .. _short_n)
 	end
 	_claimed_by:SetHeight(140)
@@ -1848,8 +1852,33 @@ local function drawLeaderboardTab(container)
 		for j = 1, 20 do
 			local _line = AceGUI:Create("Label")
 			_line:SetWidth(250)
+			local race_img = ""
+			if ns.streamer_to_race[top_scores[_type][j].streamer_name] then
+				if ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Tauren" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
+				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Undead" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
+				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Troll" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
+				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Orc" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+				end
+			end
+
 			if top_scores[_type][j] ~= nil then
-				_line:SetText(j .. ". " .. top_scores[_type][j].streamer_name .. "(" .. top_scores[_type][j].pts .. ")")
+				_line:SetText(
+					j
+						.. ". "
+						.. race_img
+						.. top_scores[_type][j].streamer_name
+						.. "("
+						.. top_scores[_type][j].pts
+						.. ")"
+				)
 			else
 				_line:SetText(j .. ". ")
 			end
@@ -1875,12 +1904,28 @@ local function drawLeaderboardTab(container)
 		__f:AddChild(_header)
 
 		for j = 1, 5 do
+			if ns.streamer_to_race[top_scores[_type][j].streamer_name] then
+				if ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Tauren" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
+				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Undead" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
+				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Troll" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
+				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Orc" then
+					race_img =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+				end
+			end
 			local _line = AceGUI:Create("Label")
 			_line:SetWidth(250)
 			if top_scores[_type][#top_scores[_type] - j + 1] ~= nil then
 				_line:SetText(
 					j
 						.. ". "
+						.. race_img
 						.. top_scores[_type][#top_scores[_type] - j + 1].streamer_name
 						.. "("
 						.. top_scores[_type][#top_scores[_type] - j + 1].pts

@@ -29,12 +29,8 @@ local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
 local DAY_SECONDS = 86400
 
 local function getThisWeekPeriodStart()
-	local server_time = GetServerTime()
-	local delta = server_time - LAUNCH_DATE
-	local rem = math.fmod(delta, WEEK_SECONDS)
-	-- print(date("%m/%d/%y, %H:%M", server_time - rem))
-	-- print(date("%m/%d/%y, %H:%M", server_time - rem - WEEK_SECONDS))
-	return server_time - rem, server_time - rem - WEEK_SECONDS
+	local this_week_start_time = OnlyFangsWeekStart or LAUNCH_DATE
+	return tonumber(this_week_start_time), tonumber(this_week_start_time - WEEK_SECONDS)
 end
 
 local REALM_NAME = GetRealmName()
@@ -45,6 +41,7 @@ local player_guid_last_four = string.sub(player_guid, -4)
 local player_name = UnitName("player")
 local this_player_guid_tag = player_name .. "-" .. player_guid_last_four
 ns.already_achieved = {}
+ns.streamer_to_race = {}
 
 local function spairs(t, order)
 	local keys = {}
@@ -353,6 +350,7 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 	if streamer_name then
 		if top_players_all_time[streamer_name] == nil then
 			top_players_all_time[streamer_name] = { ["pts"] = 0 }
+			ns.streamer_to_race[streamer_name] = ns.id_race[_event_log[RACE_IDX]]
 		end
 		top_players_all_time[streamer_name].pts = top_players_all_time[streamer_name].pts + _adjusted_pts
 
@@ -375,7 +373,7 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 	if adjusted_time > this_week_period_start then
 		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _adjusted_pts
 	elseif adjusted_time > last_week_period_start then
-		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _adjusted_pts
+		distributed_log.last_week_points[race_name] = distributed_log.last_week_points[race_name] + _adjusted_pts
 	end
 end
 
@@ -446,6 +444,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
+			-- print(_num_entries, _addon_version, sender)
 			if tonumber(_num_entries) > estimated_score_num_entries then
 				estimated_score_num_entries = tonumber(_num_entries)
 
@@ -484,24 +483,51 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					{ tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id), _add_args }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				local _event_type = ns.event[_event_name].type
+				local _race_name = ""
+				if tonumber(_race_id) ~= nil then
+					_race_name = ns.id_race[tonumber(_race_id)] or ""
+				end
+				local _sender_short, _ = string.split("-", sender)
+
 				if _event_type == "Achievement" then
 					print(
-						"|cff33ff99OnlyFangs: "
-							.. sender
+						"|cff33ff99"
+							.. "<"
+							.. _race_name
+							.. ">"
+							.. (_sender_short or "")
 							.. " completed achievement: "
 							.. ns.event[_event_name].title
-							.. "|r"
+							.. ". ("
+							.. (ns.event[_event_name].pts or "")
+							.. ")|r"
 					)
 				elseif _event_type == "Milestone" then
 					print(
-						"|cff33ff99OnlyFangs: "
-							.. sender
+						"|cff33ff99"
+							.. "<"
+							.. _race_name
+							.. ">"
+							.. (_sender_short or "")
 							.. " has completed milestone: "
 							.. ns.event[_event_name].title
-							.. "|r"
+							.. ". ("
+							.. (ns.event[_event_name].pts or "")
+							.. ")|r"
 					)
 				elseif _event_type == "Failure" then
-					print("|cff33ff99OnlyFangs: " .. sender .. " " .. ns.event[_event_name].title .. "|r")
+					print(
+						"|cffff0000"
+							.. "<"
+							.. _race_name
+							.. ">"
+							.. (_sender_short or "")
+							.. " "
+							.. ns.event[_event_name].title
+							.. ". ("
+							.. (ns.event[_event_name].pts or "")
+							.. ")|r"
+					)
 				end
 				lruSet(_fletcher, _new_data)
 				if ns.event[_event_name].type == "Milestone" then
@@ -549,7 +575,7 @@ C_Timer.NewTicker(HB_DUR, function(self)
 			.. COMM_COMMAND_DELIM
 			.. GetAddOnMetadata("OnlyFangs", "Version")
 			.. COMM_FIELD_DELIM
-			.. distributed_log[guild_name]["meta"]["size"]
+			.. distributed_log[guild_name]["meta"]["size"] + 4
 			.. COMM_FIELD_DELIM
 			.. distributed_log.points["Orc"]
 			.. COMM_SUBFIELD_DELIM
@@ -701,7 +727,7 @@ working_checker = C_Timer.NewTicker(10, function()
 	local in_guild = (guild_name ~= nil)
 	if in_guild then
 		if ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME] == nil then
-			print("|cff33ff99OnlyFangs: Addon is not connected.  Have you relogged?|r")
+			print("|cff33ff99OnlyFangs: Addon is not connected.  Log off and log back in to fix.|r")
 		else
 			print("|cff33ff99OnlyFangs: Addon is connected and working.|r")
 			working_checker:Cancel()
