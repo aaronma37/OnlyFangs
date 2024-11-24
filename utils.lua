@@ -143,3 +143,28 @@ ns.getVersion = function()
 	return tonumber(major), tonumber(minor), tonumber(patch), tostring(hash), tostring(buildType)
 end
 ns.getVersion()
+
+local race_in_chat_loaded = false
+ns.loadRaceInChat = function()
+	if race_in_chat_loaded == true then
+		return
+	end
+	race_in_chat_loaded = true
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(frame, event, message, sender, ...)
+		local _streamer = ns.streamer_map[sender]
+		local _race = ""
+		if _streamer and ns.streamer_to_race and ns.streamer_to_race[_streamer] then
+			if ns.streamer_to_race[_streamer] == "Tauren" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
+			elseif ns.streamer_to_race[_streamer] == "Undead" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
+			elseif ns.streamer_to_race[_streamer] == "Troll" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
+			elseif ns.streamer_to_race[_streamer] == "Orc" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+			end
+		end
+		message = _race .. message
+		return false, message, sender, ... -- don't hide this message
+	end)
+end

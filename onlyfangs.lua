@@ -147,6 +147,9 @@ local function handleEvent(self, event, ...)
 		ns.key_list = OnlyFangsKeyList
 
 		ns.loadDistributedLog()
+		if OnlyFangsRaceInChat and OnlyFangsRaceInChat == 1 then
+			ns.loadRaceInChat()
+		end
 		-- ns.fakeEntries()
 	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
 		for bag = 0, 5 do
@@ -266,6 +269,26 @@ local options = {
 	type = "group",
 	args = {},
 }
+
+local function SlashHandler(msg, editbox)
+	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
+	if cmd == "raceInChat" then
+		local opt = ""
+		for substring in args:gmatch("%S+") do
+			opt = substring
+		end
+		if opt == "1" then
+			OnlyFangsRaceInChat = 1
+			ns.loadRaceInChat()
+		else
+			OnlyFangsRaceInChat = nil
+			print("Reload to remove race image in chat")
+		end
+	end
+end
+
+SLASH_ONLYFANGS1 = "/onlyfangs"
+SlashCmdList["ONLYFANGS"] = SlashHandler
 
 LibStub("AceConfig-3.0"):RegisterOptionsTable("OnlyFangs", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("OnlyFangs", "OnlyFangs", nil)

@@ -1904,17 +1904,17 @@ local function drawLeaderboardTab(container)
 		__f:AddChild(_header)
 
 		for j = 1, 5 do
-			if ns.streamer_to_race[top_scores[_type][j].streamer_name] then
-				if ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Tauren" then
+			if ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name] then
+				if ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name] == "Tauren" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
-				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Undead" then
+				elseif ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name] == "Undead" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
-				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Troll" then
+				elseif ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name] == "Troll" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
-				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Orc" then
+				elseif ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name] == "Orc" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
 				end

@@ -486,15 +486,28 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				local _race_name = ""
 				if tonumber(_race_id) ~= nil then
 					_race_name = ns.id_race[tonumber(_race_id)] or ""
+					if _race_name then
+						if _race_name == "Tauren" then
+							_race_name =
+								"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
+						elseif _race_name == "Undead" then
+							_race_name =
+								"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
+						elseif _race_name == "Troll" then
+							_race_name =
+								"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
+						elseif _race_name == "Orc" then
+							_race_name =
+								"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+						end
+					end
 				end
 				local _sender_short, _ = string.split("-", sender)
 
 				if _event_type == "Achievement" then
 					print(
 						"|cff33ff99"
-							.. "<"
 							.. _race_name
-							.. ">"
 							.. (_sender_short or "")
 							.. " completed achievement: "
 							.. ns.event[_event_name].title
@@ -505,9 +518,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				elseif _event_type == "Milestone" then
 					print(
 						"|cff33ff99"
-							.. "<"
 							.. _race_name
-							.. ">"
 							.. (_sender_short or "")
 							.. " has completed milestone: "
 							.. ns.event[_event_name].title
@@ -517,10 +528,8 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					)
 				elseif _event_type == "Failure" then
 					print(
-						"|cffff0000"
-							.. "<"
+						"|cffB32133"
 							.. _race_name
-							.. ">"
 							.. (_sender_short or "")
 							.. " "
 							.. ns.event[_event_name].title
