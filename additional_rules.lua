@@ -30,7 +30,7 @@ local on_mail_show = function()
 					_G["MailItem" .. tostring(i)]:EnableMouse(1)
 					_G["MailItem" .. tostring(i) .. "Button"]:Enable()
 				else
-					print("Returning mail from: ", _name)
+					-- print("Returning mail from: ", _name)
 					ReturnInboxItem(i)
 					return
 				end
