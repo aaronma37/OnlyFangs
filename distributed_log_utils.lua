@@ -28,6 +28,7 @@ local WEEK_SECONDS = 604800
 local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
 
 local DAY_SECONDS = 86400
+local OUT_CSV = false
 
 local function getThisWeekPeriodStart()
 	local this_week_start_time = OnlyFangsWeekStart or LAUNCH_DATE
@@ -414,6 +415,61 @@ ns.aggregateLog = function()
 				ns.event[event_name].aggregrate(distributed_log, event_log)
 				addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
 			end
+		end
+	end
+	if OUT_CSV then
+		OnlyCSVOut = { ["txt"] = "" }
+		OnlyCSVOut.txt = OnlyCSVOut.txt
+			.. '"all_time_orc, all_time_troll, all_time_tauren, all_time_undead, last_week_orc, last_week_troll, last_week_tauren, last_week_undead,this_week_orc, this_week_troll, this_week_tauren, this_week_undead\n'
+
+		OnlyCSVOut.txt = OnlyCSVOut.txt
+			.. distributed_log.points.Orc
+			.. ","
+			.. distributed_log.points.Troll
+			.. ","
+			.. distributed_log.points.Tauren
+			.. ","
+			.. distributed_log.points.Undead
+			.. ","
+			.. distributed_log.last_week_points.Orc
+			.. ","
+			.. distributed_log.last_week_points.Troll
+			.. ","
+			.. distributed_log.last_week_points.Tauren
+			.. ","
+			.. distributed_log.last_week_points.Undead
+			.. ","
+			.. distributed_log.this_week_points.Orc
+			.. ","
+			.. distributed_log.this_week_points.Troll
+			.. ","
+			.. distributed_log.this_week_points.Tauren
+			.. ","
+			.. distributed_log.this_week_points.Undead
+			.. "\n"
+
+		OnlyCSVOut.txt = OnlyCSVOut.txt
+			.. "character_name, streamer_name, date, race, class, event_name, event_points\n"
+
+		for k, v in pairs(distributed_log[guild_name]["data"]) do
+			local __event_log = v["value"]
+			local _name = string.split("-", k)
+			-- print(ns.event[ns.id_event[tonumber(__event_log[EVENT_IDX])]].title)
+			OnlyCSVOut.txt = OnlyCSVOut.txt
+				.. _name
+				.. ","
+				.. (OnlyFangsStreamerMap[_char_name] or "")
+				.. ","
+				.. __event_log[DATE_IDX]
+				.. ","
+				.. __event_log[RACE_IDX]
+				.. ","
+				.. __event_log[CLASS_IDX]
+				.. ","
+				.. ns.event[ns.id_event[tonumber(__event_log[EVENT_IDX])]].title
+				.. ","
+				.. tostring(ns.event[ns.id_event[tonumber(__event_log[EVENT_IDX])]].pts)
+				.. "\n"
 		end
 	end
 end
