@@ -822,6 +822,7 @@ C_Timer.NewTicker(60, function(self)
 		end
 		if c == 0 or #deathlog_record_list == 0 then
 			self:Cancel()
+			return
 		end
 	end
 	if deathlog_record_list_idx > #deathlog_record_list then
