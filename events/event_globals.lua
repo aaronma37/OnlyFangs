@@ -218,6 +218,7 @@ ns.event_id = {
 	["FirstTo300Alchemy"] = 209,
 	["FirstTo300Engineering"] = 210,
 	["FirstTo300Leatherworking"] = 211,
+	["EquipFirstTabard"] = 212,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
