@@ -1821,6 +1821,69 @@ local function drawTestTab(container)
 	end
 end
 
+local function drawMonitorTab(container)
+	local function spairs(t, order)
+		local keys = {}
+		for k in pairs(t) do
+			keys[#keys + 1] = k
+		end
+
+		if order then
+			table.sort(keys, function(a, b)
+				return order(t, a, b)
+			end)
+		else
+			table.sort(keys)
+		end
+
+		local i = 0
+		return function()
+			i = i + 1
+			if keys[i] then
+				return keys[i], t[keys[i]]
+			end
+		end
+	end
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Fill")
+	onlyfangs_tab_container:AddChild(scroll_container)
+
+	local main_frame = AceGUI:Create("ScrollFrame")
+	main_frame:SetLayout("Flow")
+	main_frame:SetFullWidth(true)
+	main_frame:SetFullHeight(true)
+	scroll_container:AddChild(main_frame)
+
+	if OnlyFangsMonitor then
+		for k, v in
+			spairs(OnlyFangsMonitor, function(t, a, b)
+				local d = string.gsub(a, "%a+", "")
+				d = string.gsub(d, "_", "")
+
+				local d2 = string.gsub(b, "%a+", "")
+				d2 = string.gsub(d2, "_", "")
+
+				return d > d2
+			end)
+		do
+			local _d = string.gsub(k, "%a+", "")
+			_d = string.gsub(_d, "_", "")
+			local _date = date("%m/%d/%y, %H:%M", _d)
+			local header_label = AceGUI:Create("InteractiveLabel")
+			header_label:SetFullWidth(true)
+			header_label:SetHeight(60)
+			header_label.font_strings = {}
+			header_label:SetFont(main_font, 10, "")
+			header_label:SetColor(1, 1, 1)
+
+			header_label:SetText("[" .. _date .. "] - " .. v)
+			main_frame:AddChild(header_label)
+		end
+	end
+end
+
 local function drawLeaderboardTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
@@ -1853,7 +1916,7 @@ local function drawLeaderboardTab(container)
 			local _line = AceGUI:Create("Label")
 			_line:SetWidth(250)
 			local race_img = ""
-			if ns.streamer_to_race[top_scores[_type][j].streamer_name] then
+			if top_scores[_type][j] and ns.streamer_to_race[top_scores[_type][j].streamer_name] then
 				if ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Tauren" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
@@ -1904,7 +1967,10 @@ local function drawLeaderboardTab(container)
 		__f:AddChild(_header)
 
 		for j = 1, 5 do
-			if ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name] then
+			if
+				top_scores[_type][#top_scores[_type] - j + 1]
+				and ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name]
+			then
 				if ns.streamer_to_race[top_scores[_type][#top_scores[_type] - j + 1].streamer_name] == "Tauren" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
@@ -2022,6 +2088,10 @@ local function createMenu()
 			if ns.enable_testing == true then
 				tab_table[#tab_table + 1] = v
 			end
+		elseif v["value"] == "MonitorTab" then
+			if CanEditOfficerNote() then
+				tab_table[#tab_table + 1] = v
+			end
 		else
 			tab_table[#tab_table + 1] = v
 		end
@@ -2045,6 +2115,8 @@ local function createMenu()
 			DrawAccountabilityTab(container)
 		elseif group == "TestingPoints" then
 			drawTestTab(container)
+		elseif group == "MonitorTab" then
+			drawMonitorTab(container)
 		end
 	end
 

@@ -135,6 +135,13 @@ local function loadProfessionEvent(name, metadata)
 	_event.title = "Reach " .. metadata.lvl .. " " .. metadata.name
 	_event.profession_name = metadata.name
 	_event.pts = 3
+	if metadata.lvl == 150 then
+		_event.pts = 5
+	elseif metadata.lvl == 225 then
+		_event.pts = 10
+	elseif metadata.lvl == 300 then
+		_event.pts = 25
+	end
 	_event.test_only = metadata.test_only
 	_event.lvl = metadata.lvl
 	_event.subtype = "Profession"

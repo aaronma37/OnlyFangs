@@ -4,6 +4,7 @@ local CTL = _G.ChatThrottleLib
 local COMM_NAME = "OnlyFangsAddon"
 local COMM_COMMAND_HEARTBEAT = "HB"
 local COMM_COMMAND_DIRECT_EVENT = "DE"
+local COMM_COMMAND_MONITOR = "MO"
 local COMM_COMMAND_DELIM = "|"
 local COMM_FIELD_DELIM = "~"
 local COMM_SUBFIELD_DELIM = "&"
@@ -550,6 +551,10 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
+		elseif command == COMM_COMMAND_MONITOR and CanEditOfficerNote() then
+			local _monitor_stamp, _monitor_args = string.split(COMM_FIELD_DELIM, data)
+			OnlyFangsMonitor = OnlyFangsMonitor or {}
+			OnlyFangsMonitor[_monitor_stamp] = _monitor_args
 		end
 	end
 end)
@@ -738,8 +743,50 @@ working_checker = C_Timer.NewTicker(10, function()
 		if ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME] == nil then
 			print("|cff33ff99OnlyFangs: Addon is not connected.  Log off and log back in to fix.|r")
 		else
-			print("|cff33ff99OnlyFangs: Addon is connected and working.|r")
+			local _version = ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME]["version"] or ""
+			print("|cff33ff99OnlyFangs: Addon is connected and working. Version: " .. _version .. "|r")
 			working_checker:Cancel()
 		end
 	end
+end)
+
+local deathlog_record_list = nil
+local deathlog_record_list_idx = 1
+C_Timer.NewTicker(60, function(self)
+	if deathlog_record_econ_stats == nil then
+		self:Cancel()
+		return
+	end
+	local c = 0
+	if deathlog_record_list == nil then
+		deathlog_record_list = {}
+		for k, v in pairs(deathlog_record_econ_stats) do
+			deathlog_record_list[#deathlog_record_list + 1] = { k, v }
+			c = c + 1
+		end
+		if c == 0 or #deathlog_record_list == 0 then
+			self:Cancel()
+		end
+	end
+	if deathlog_record_list_idx > #deathlog_record_list then
+		deathlog_record_list_idx = 1
+	end
+	local _, af = string.split("[", deathlog_record_list[deathlog_record_list_idx][2])
+	local aff
+
+	local out = tostring(deathlog_record_list[deathlog_record_list_idx][2])
+	if af then
+		aff, _ = string.split("]", af)
+		if aff then
+			local bf, _ = string.split("|", deathlog_record_list[deathlog_record_list_idx][2])
+			out = bf .. aff
+		end
+	end
+	local comm_message = COMM_COMMAND_MONITOR
+		.. COMM_COMMAND_DELIM
+		.. tostring(deathlog_record_list[deathlog_record_list_idx][1])
+		.. COMM_FIELD_DELIM
+		.. out
+	CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+	deathlog_record_list_idx = deathlog_record_list_idx + 1
 end)
