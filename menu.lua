@@ -20,6 +20,7 @@ along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 
 local addonName, ns = ...
 
+local _direct_ach_data = {}
 local off_race_sel = nil
 local off_pt_num = nil
 local off_char_name = nil
@@ -1413,6 +1414,162 @@ local function drawEventTypeTab(container, _title, _frames)
 				_commit_label:SetHeight(25)
 				_commit_label:SetWidth(150)
 				__f:AddChild(_commit_label)
+
+				local _direct_ach_group = AceGUI:Create("InlineGroup")
+				_direct_ach_data["Date"] = GetServerTime()
+				_direct_ach_group:SetFullWidth(true)
+				_direct_ach_group:SetLayout("Flow")
+				_direct_ach_group:SetHeight(100)
+				scroll_frame:AddChild(_direct_ach_group)
+
+				local _warning_label = AceGUI:Create("Label")
+				_warning_label:SetHeight(25)
+				_warning_label:SetFullWidth(true)
+				_warning_label:SetText("ONLY USE THIS IF YOU ARE FAMILIAR WITH WHAT IT DOES")
+
+				local _direct_ach_commit_label = AceGUI:Create("Label")
+				local function refreshCommitLabel()
+					_direct_ach_commit_label:SetText(
+						"Date: "
+							.. (_direct_ach_data["Date"] or "n/a")
+							.. ", Race: "
+							.. (_direct_ach_data["Race"] or "n/a")
+							.. ", Class: "
+							.. (_direct_ach_data["Class"] or "n/a")
+							.. ", Name: "
+							.. (_direct_ach_data["Name"] or "n/a")
+							.. ", Fletcher: "
+							.. (_direct_ach_data["Fletcher"] or "n/a")
+							.. ", GUID4: "
+							.. (_direct_ach_data["GUID4"] or "n/a")
+							.. ", Event: "
+							.. (_direct_ach_data["Event"] or "n/a")
+					)
+				end
+				refreshCommitLabel()
+				_direct_ach_commit_label:SetHeight(25)
+				_direct_ach_commit_label:SetFullWidth(true)
+
+				local _direct_ach_race_dd = AceGUI:Create("Dropdown")
+				_direct_ach_race_dd:SetLabel("Race")
+				_direct_ach_race_dd:SetList(ns.id_race)
+				_direct_ach_race_dd:SetHeight(25)
+				_direct_ach_race_dd:SetWidth(100)
+				_direct_ach_race_dd:SetCallback("OnValueChanged", function(self, val, _race)
+					_direct_ach_data["Race"] = _race
+					refreshCommitLabel()
+				end)
+
+				local _direct_ach_name = AceGUI:Create("EditBox")
+				_direct_ach_name:SetLabel("Name: ")
+				_direct_ach_name:SetHeight(45)
+				_direct_ach_name:SetWidth(100)
+				_direct_ach_name:SetCallback("OnEnterPressed", function(self, val, _d)
+					_direct_ach_data["Name"] = _d
+					refreshCommitLabel()
+				end)
+
+				local _direct_ach_fletcher = AceGUI:Create("EditBox")
+				_direct_ach_fletcher:SetLabel("Fletcher: ")
+				_direct_ach_fletcher:SetHeight(45)
+				_direct_ach_fletcher:SetWidth(100)
+				_direct_ach_fletcher:SetCallback("OnEnterPressed", function(self, val, _d)
+					_direct_ach_data["Fletcher"] = _d
+					refreshCommitLabel()
+				end)
+
+				local _direct_ach_guid = AceGUI:Create("EditBox")
+				_direct_ach_guid:SetLabel("GUID: ")
+				_direct_ach_guid:SetHeight(45)
+				_direct_ach_guid:SetWidth(100)
+				_direct_ach_guid:SetCallback("OnEnterPressed", function(self, val, _d)
+					_direct_ach_data["GUID4"] = _d
+					refreshCommitLabel()
+				end)
+
+				local _direct_ach_date_box = AceGUI:Create("EditBox")
+				_direct_ach_date_box:SetLabel("Date: ")
+				_direct_ach_date_box:SetHeight(45)
+				_direct_ach_date_box:SetWidth(100)
+				_direct_ach_date_box:SetText(_direct_ach_data["Date"])
+				_direct_ach_date_box:SetCallback("OnEnterPressed", function(self, val, _d)
+					_direct_ach_data["Date"] = _d
+					refreshCommitLabel()
+				end)
+
+				local _direct_ach_class_dd = AceGUI:Create("Dropdown")
+				_direct_ach_class_dd:SetLabel("Class: ")
+				_direct_ach_class_dd:SetList(ns.id_class)
+				_direct_ach_class_dd:SetHeight(25)
+				_direct_ach_class_dd:SetWidth(125)
+				_direct_ach_class_dd:SetCallback("OnValueChanged", function(self, val, _event)
+					_direct_ach_data["Class"] = _event
+					refreshCommitLabel()
+				end)
+
+				local _direct_ach_event_dd = AceGUI:Create("Dropdown")
+				_direct_ach_event_dd:SetLabel("Event: ")
+				_direct_ach_event_dd:SetList(ns.id_event)
+				_direct_ach_event_dd:SetHeight(25)
+				_direct_ach_event_dd:SetWidth(200)
+				_direct_ach_event_dd:SetCallback("OnValueChanged", function(self, val, _event)
+					_direct_ach_data["Event"] = _event
+					refreshCommitLabel()
+				end)
+
+				local _direct_ach_button = AceGUI:Create("Button")
+				_direct_ach_button:SetText("Submit")
+				_direct_ach_button:SetHeight(25)
+				_direct_ach_button:SetWidth(120)
+				_direct_ach_button:SetCallback("OnClick", function(self)
+					if _direct_ach_data["Date"] == nil then
+						print("Missing Date")
+						return
+					end
+					if _direct_ach_data["Fletcher"] == nil then
+						print("Missing Fletcher")
+						return
+					end
+					if _direct_ach_data["GUID4"] == nil then
+						print("Missing GUID4")
+						return
+					end
+					if _direct_ach_data["Race"] == nil then
+						print("Missing Race")
+						return
+					end
+					if _direct_ach_data["Class"] == nil then
+						print("Missing Class")
+						return
+					end
+					if _direct_ach_data["Name"] == nil then
+						print("Missing Name")
+						return
+					end
+					if _direct_ach_data["Event"] == nil then
+						print("Missing Event")
+						return
+					end
+					ns.sendOffDirEvent(
+						_direct_ach_data["Date"],
+						_direct_ach_data["Fletcher"],
+						_direct_ach_data["GUID4"],
+						_direct_ach_data["Race"],
+						_direct_ach_data["Class"],
+						_direct_ach_data["Name"],
+						_direct_ach_data["Event"]
+					)
+				end)
+				_direct_ach_group:AddChild(_warning_label)
+				_direct_ach_group:AddChild(_direct_ach_date_box)
+				_direct_ach_group:AddChild(_direct_ach_race_dd)
+				_direct_ach_group:AddChild(_direct_ach_name)
+				_direct_ach_group:AddChild(_direct_ach_fletcher)
+				_direct_ach_group:AddChild(_direct_ach_guid)
+				_direct_ach_group:AddChild(_direct_ach_class_dd)
+				_direct_ach_group:AddChild(_direct_ach_event_dd)
+				_direct_ach_group:AddChild(_direct_ach_commit_label)
+				_direct_ach_group:AddChild(_direct_ach_button)
 			end
 		elseif group == "Profession" then
 			local _group_description = AceGUI:Create("Label")

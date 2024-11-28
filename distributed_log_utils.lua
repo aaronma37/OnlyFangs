@@ -732,6 +732,28 @@ ns.sendOffEvent = function(event_name, _race_id, _add)
 	end
 end
 
+ns.sendOffDirEvent = function(_date, _fletcher_code, _guid, _race_id, _class_id, _name, _event_id)
+	local guild_name, in_guild = guildName()
+	local _fletcher = _name .. "-" .. _fletcher_code .. "-" .. _guid
+	local comm_message = COMM_COMMAND_DIRECT_EVENT
+		.. COMM_COMMAND_DELIM
+		.. _fletcher
+		.. COMM_FIELD_DELIM
+		.. _date
+		.. COMM_FIELD_DELIM
+		.. _race_id
+		.. COMM_FIELD_DELIM
+		.. _event_id
+		.. COMM_FIELD_DELIM
+		.. _class_id
+		.. COMM_FIELD_DELIM
+		.. ""
+	print(comm_message)
+	if in_guild then
+		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+	end
+end
+
 ns.logAsList = function()
 	local guild_name = guildName()
 	local new_list = {}
