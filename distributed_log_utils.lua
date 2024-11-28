@@ -384,6 +384,8 @@ ns.aggregateLog = function()
 	top_players_weekly = {}
 	top_players_all_time = {}
 	ns.already_achieved = {}
+	local duplicate_check = {}
+	local duplicate_count = 0
 	local current_adjusted_time = adjustedTime()
 	local guild_name = guildName()
 	for k, _ in pairs(distributed_log.points) do
@@ -412,11 +414,42 @@ ns.aggregateLog = function()
 					)
 				end
 			else
-				ns.event[event_name].aggregrate(distributed_log, event_log)
-				addPointsToLeaderBoardData(k, event_name, event_log, current_adjusted_time, ns.event[event_name].pts)
+				local __name, __f, __guid = string.split("-", k)
+				if __name and __guid then
+					local duplicate_check_id = __name .. "-" .. __guid .. "-" .. event_log[EVENT_IDX]
+					if duplicate_check[duplicate_check_id] == nil or event_log[EVENT_IDX] == 2 then
+						duplicate_check[duplicate_check_id] = 1
+						ns.event[event_name].aggregrate(distributed_log, event_log)
+						addPointsToLeaderBoardData(
+							k,
+							event_name,
+							event_log,
+							current_adjusted_time,
+							ns.event[event_name].pts
+						)
+					else
+						duplicate_count = duplicate_count + 1
+						-- print("Found Duplicate: " .. duplicate_check_id)
+					end
+				else
+					ns.event[event_name].aggregrate(distributed_log, event_log)
+					addPointsToLeaderBoardData(
+						k,
+						event_name,
+						event_log,
+						current_adjusted_time,
+						ns.event[event_name].pts
+					)
+				end
 			end
 		end
 	end
+	-- for k, v in pairs(distributed_log.this_week_points) do
+	-- 	if v > 0 then
+	-- 		print(k, v)
+	-- 	end
+	-- end
+	-- print(duplicate_count)
 	if OUT_CSV then
 		OnlyCSVOut = { ["txt"] = "" }
 		OnlyCSVOut.txt = OnlyCSVOut.txt
