@@ -29,6 +29,7 @@ local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
 
 local DAY_SECONDS = 86400
 local OUT_CSV = false
+local MONITOR = false
 
 local function getThisWeekPeriodStart()
 	local this_week_start_time = OnlyFangsWeekStart or LAUNCH_DATE
@@ -379,6 +380,71 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 	end
 end
 
+ns.getStreamerInfo = function(streamer_name)
+	local streamer_meta = {}
+	streamer_meta["num_streamers"] = 1
+	streamer_meta["rank"] = "n/a"
+	streamer_meta["all_time_score"] = 0
+	streamer_meta["race"] = ns.streamer_to_race[streamer_name]
+	streamer_meta["#achievements"] = 0
+	streamer_meta["#milestones"] = 0
+	streamer_meta["#deaths"] = 0
+	streamer_meta["status"] = "Offline"
+	streamer_meta["version"] = "Unknown"
+
+	local _character_meta = {}
+
+	local guild_name = guildName()
+	for k, v in pairs(distributed_log[guild_name]["data"]) do
+		local _char_name, _, _last_guid = string.split("-", k)
+		if
+			OnlyFangsStreamerMap[_char_name .. "-" .. REALM_NAME] ~= nil
+			and OnlyFangsStreamerMap[_char_name .. "-" .. REALM_NAME] == streamer_name
+			and _last_guid ~= nil
+		then
+			local unique_char = _char_name .. "-" .. _last_guid
+			if _character_meta[unique_char] == nil then
+				_character_meta[unique_char] = {}
+				_character_meta[unique_char]["name"] = _char_name
+				_character_meta[unique_char]["race"] = v["value"][RACE_IDX]
+				_character_meta[unique_char]["class"] = v["value"][CLASS_IDX]
+				_character_meta[unique_char]["#achievements"] = {}
+				_character_meta[unique_char]["#milestones"] = {}
+				_character_meta[unique_char]["status"] = "Alive"
+			end
+			local event_name = ns.id_event[v["value"][EVENT_IDX]]
+			if ns.event[event_name].type == "Achievement" then
+				_character_meta[unique_char]["#achievements"][#_character_meta[unique_char]["#achievements"] + 1] =
+					ns.event[event_name].title
+				streamer_meta["#achievements"] = streamer_meta["#achievements"] + 1
+			elseif ns.event[event_name].type == "Milestone" then
+				_character_meta[unique_char]["#milestones"][#_character_meta[unique_char]["#milestones"] + 1] =
+					ns.event[event_name].title
+				streamer_meta["#milestones"] = streamer_meta["#milestones"] + 1
+			elseif ns.event[event_name].type == "Failure" then
+				_character_meta[unique_char]["status"] = "Dead"
+				streamer_meta["#deaths"] = streamer_meta["#deaths"] + 1
+			end
+
+			if ns.guild_online[_char_name .. "-" .. REALM_NAME] then
+				streamer_meta["status"] = "Online"
+			end
+			if ns.guild_member_addon_info[_char_name .. "-" .. REALM_NAME] then
+				streamer_meta["version"] = ns.guild_member_addon_info[_char_name .. "-" .. REALM_NAME]["version"]
+			end
+		end
+	end
+	local _, _, _top_all_time_list = ns.getTopPlayers()
+	streamer_meta["num_streamers"] = #_top_all_time_list
+	for idx, v in ipairs(_top_all_time_list) do
+		if v["streamer_name"] == streamer_name then
+			streamer_meta["rank"] = idx
+			streamer_meta["all_time_score"] = v["pts"]
+		end
+	end
+	return streamer_meta, _character_meta
+end
+
 ns.aggregateLog = function()
 	top_players_daily = {}
 	top_players_weekly = {}
@@ -482,8 +548,9 @@ ns.aggregateLog = function()
 			.. "\n"
 
 		OnlyCSVOut.txt = OnlyCSVOut.txt
-			.. "character_name, streamer_name, date, race, class, event_name, event_points\n"
+			.. "character_name, streamer_name, date, race, class, event_name, event_points, lvl\n"
 
+		OFGuildMemberLvl = OFGuildMemberLvl or {}
 		for k, v in pairs(distributed_log[guild_name]["data"]) do
 			local __event_log = v["value"]
 			local _name = string.split("-", k)
@@ -491,7 +558,7 @@ ns.aggregateLog = function()
 			OnlyCSVOut.txt = OnlyCSVOut.txt
 				.. _name
 				.. ","
-				.. (OnlyFangsStreamerMap[_char_name] or "")
+				.. (OnlyFangsStreamerMap[_name .. "-" .. REALM_NAME] or "")
 				.. ","
 				.. __event_log[DATE_IDX]
 				.. ","
@@ -502,6 +569,8 @@ ns.aggregateLog = function()
 				.. ns.event[ns.id_event[tonumber(__event_log[EVENT_IDX])]].title
 				.. ","
 				.. tostring(ns.event[ns.id_event[tonumber(__event_log[EVENT_IDX])]].pts)
+				.. ","
+				.. (OFGuildMemberLvl[_name .. "-" .. REALM_NAME] or "")
 				.. "\n"
 		end
 	end
@@ -640,7 +709,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
-		elseif command == COMM_COMMAND_MONITOR and CanEditOfficerNote() then
+		elseif command == COMM_COMMAND_MONITOR and (CanEditOfficerNote() or MONITOR) then
 			local _monitor_stamp, _monitor_args = string.split(COMM_FIELD_DELIM, data)
 			OnlyFangsMonitor = OnlyFangsMonitor or {}
 			OnlyFangsMonitor[_monitor_stamp] = _monitor_args

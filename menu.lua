@@ -1978,6 +1978,181 @@ local function drawTestTab(container)
 	end
 end
 
+local function drawCharacterTab(container)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Fill")
+	onlyfangs_tab_container:AddChild(scroll_container)
+
+	local main_frame = AceGUI:Create("ScrollFrame")
+	main_frame:SetLayout("Flow")
+	main_frame:SetFullWidth(true)
+	main_frame:SetHeight(100)
+	scroll_container:AddChild(main_frame)
+
+	local _header = AceGUI:Create("Heading")
+	_header:SetFullWidth(true)
+	_header:SetText("")
+	local char_name = ""
+	local streamer_name = ""
+
+	local left_frame = AceGUI:Create("ScrollFrame")
+	left_frame:SetLayout("Flow")
+	left_frame:SetWidth(400)
+	left_frame:SetHeight(700)
+
+	local right_frame = AceGUI:Create("ScrollFrame")
+	right_frame:SetLayout("Flow")
+	right_frame:SetWidth(500)
+	right_frame:SetHeight(700)
+
+	local function refreshInfo()
+		local _left_header = AceGUI:Create("Heading")
+		_left_header:SetFullWidth(true)
+		_left_header:SetText("Streamer Information")
+		left_frame:AddChild(_left_header)
+		local streamer_info = nil
+		local character_metadata = nil
+		if streamer_name and streamer_name ~= "" then
+			streamer_info, character_metadata = ns.getStreamerInfo(streamer_name)
+		end
+
+		local _left_info_left = AceGUI:Create("Label")
+		_left_info_left:SetWidth(150)
+		_left_info_left:SetHeight(500)
+		_left_info_left:SetFont(main_font, 12, "")
+		_left_info_left:SetText("Name:")
+		if streamer_name and streamer_name ~= "" then
+			_left_info_left:SetText(
+				"Name: "
+					.. "\nRank: "
+					.. "\nRace: "
+					.. "\nAll Time Score: "
+					.. "\n#Achievements: "
+					.. "\n#Milestones: "
+					.. "\n#Deaths: "
+					.. "\nStatus: "
+					.. "\nAddon Version: "
+			)
+		end
+		left_frame:AddChild(_left_info_left)
+
+		local _left_info_right = AceGUI:Create("Label")
+		_left_info_right:SetWidth(150)
+		_left_info_right:SetHeight(500)
+		_left_info_right:SetFont(main_font, 12, "")
+		_left_info_right:SetText("Not Found")
+		_left_info_right:SetJustifyH("RIGHT")
+		if streamer_name and streamer_name ~= "" then
+			_left_info_right:SetText(
+				streamer_name
+					.. "\n"
+					.. (streamer_info["rank"] or "")
+					.. "/"
+					.. streamer_info["num_streamers"]
+					.. "\n"
+					.. (streamer_info["race"] or "")
+					.. "\n"
+					.. streamer_info["all_time_score"]
+					.. "\n"
+					.. streamer_info["#achievements"]
+					.. "\n"
+					.. streamer_info["#milestones"]
+					.. "\n"
+					.. streamer_info["#deaths"]
+					.. "\n"
+					.. streamer_info["status"]
+					.. "\n"
+					.. streamer_info["version"]
+			)
+		end
+		left_frame:AddChild(_left_info_right)
+
+		local _right_header = AceGUI:Create("Heading")
+		_right_header:SetFullWidth(true)
+		_right_header:SetText("Characters")
+		right_frame:AddChild(_right_header)
+
+		local function addCharacterInfo(_unique_char_meta)
+			local _inline = AceGUI:Create("InlineGroup")
+			_inline:SetFullWidth(true)
+			_inline:SetHeight(150)
+			_inline:SetLayout("Flow")
+			right_frame:AddChild(_inline)
+
+			local _heading = AceGUI:Create("Heading")
+			_heading:SetFullWidth(true)
+			_heading:SetText(_unique_char_meta["name"] .. "-" .. _unique_char_meta["status"])
+			_inline:AddChild(_heading)
+
+			local _inline_info_left = AceGUI:Create("Label")
+			_inline_info_left:SetFullWidth(true)
+			_inline_info_left:SetHeight(100)
+			_inline_info_left:SetFont(main_font, 10, "")
+			_inline_info_left:SetText("Name:")
+			if streamer_name and streamer_name ~= "" then
+				_inline_info_left:SetText(
+					"Race: "
+						.. ns.id_race[_unique_char_meta["race"]]
+						.. ", Class: "
+						.. ns.id_class[_unique_char_meta["class"]]
+						.. ", #Achievements: "
+						.. #_unique_char_meta["#achievements"]
+						.. ", #Milestones: "
+						.. #_unique_char_meta["#milestones"]
+				)
+			end
+			_inline:AddChild(_inline_info_left)
+
+			local _txt = ""
+			local _inline_info_right = AceGUI:Create("Label")
+			_inline_info_right:SetFullWidth(true)
+			_inline_info_right:SetHeight(400)
+			_inline_info_right:SetFont(main_font, 12, "")
+			_txt = "|cffd4af37Achievements|r"
+			if streamer_name and streamer_name ~= "" then
+				for _, _v in ipairs(_unique_char_meta["#achievements"]) do
+					_txt = _txt .. "\n" .. _v
+				end
+
+				_txt = _txt .. "\n\n|cffd4af37Milestones|r"
+				for _, _v in ipairs(_unique_char_meta["#milestones"]) do
+					_txt = _txt .. "\n" .. _v
+				end
+				_inline_info_right:SetText(_txt)
+			end
+			_inline:AddChild(_inline_info_right)
+		end
+
+		if character_metadata then
+			for k, v in pairs(character_metadata) do
+				addCharacterInfo(v)
+			end
+		end
+	end
+
+	local _character_search_box = AceGUI:Create("EditBox")
+	_character_search_box:SetLabel("Character Search:")
+	_character_search_box:SetHeight(45)
+	_character_search_box:SetWidth(200)
+	_character_search_box:SetCallback("OnEnterPressed", function(self, val, _name)
+		_name = string.lower(_name)
+		_name = _name:gsub("^%l", string.upper)
+		_character_search_box:SetText(_name)
+		_header:SetText("Character: " .. _name)
+		char_name = _name
+		streamer_name = OnlyFangsStreamerMap[_name .. "-" .. REALM_NAME] or ""
+		left_frame:ReleaseChildren()
+		right_frame:ReleaseChildren()
+		refreshInfo()
+	end)
+	main_frame:AddChild(_character_search_box)
+	main_frame:AddChild(_header)
+	main_frame:AddChild(left_frame)
+	main_frame:AddChild(right_frame)
+end
+
 local function drawMonitorTab(container)
 	local function spairs(t, order)
 		local keys = {}
@@ -2274,6 +2449,8 @@ local function createMenu()
 			drawTestTab(container)
 		elseif group == "MonitorTab" then
 			drawMonitorTab(container)
+		elseif group == "CharacterTab" then
+			drawCharacterTab(container)
 		end
 	end
 
