@@ -176,6 +176,7 @@ end
 
 local num_keys = 0
 local key_counter = 0
+local random_key_counter = 0
 
 local function checkAndAddKeyList()
 	local guild_name = guildName()
@@ -188,6 +189,7 @@ local function checkAndAddKeyList()
 		end
 	end
 	num_keys = #key_list[guild_name]
+	random_key_counter = random(0, num_keys)
 end
 
 local function getNextEntry()
@@ -200,6 +202,20 @@ local function getNextEntry()
 	if key_counter >= num_keys then
 		checkAndAddKeyList()
 		key_counter = 0
+	end
+	return key_list[guild_name][idx]
+end
+
+local function getNextEntryRandom()
+	local guild_name = guildName()
+	if num_keys < 1 then
+		return nil
+	end
+	local idx = num_keys - random_key_counter
+	random_key_counter = random_key_counter + 1
+	if random_key_counter >= num_keys then
+		checkAndAddKeyList()
+		random_key_counter = 0
 	end
 	return key_list[guild_name][idx]
 end
@@ -974,4 +990,56 @@ C_Timer.NewTicker(60, function(self)
 		.. out
 	CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
 	deathlog_record_list_idx = deathlog_record_list_idx + 1
+end)
+
+-- Random Heartbeat
+C_Timer.NewTicker(65, function(self)
+	local guild_name, in_guild = guildName()
+	if distributed_log == nil or distributed_log[guild_name] == nil then
+		return
+	end
+	local newest = getNextEntryRandom() --distributed_log[guild_name]["meta"]["newest"]
+	local message = nil
+	if newest == nil or distributed_log[guild_name]["data"][newest] == nil then
+		message = ""
+	else
+		message = toMessage(newest, distributed_log[guild_name]["data"][newest]["value"])
+	end
+	-- _checker[newest] = (_checker[newest] or 0) + 1
+	-- print(newest, message, _checker[newest])
+	local comm_message = COMM_COMMAND_HEARTBEAT
+		.. COMM_COMMAND_DELIM
+		.. GetAddOnMetadata("OnlyFangs", "Version")
+		.. COMM_FIELD_DELIM
+		.. distributed_log[guild_name]["meta"]["size"] + 5
+		.. COMM_FIELD_DELIM
+		.. distributed_log.points["Orc"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Orc"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Orc"]
+		.. COMM_FIELD_DELIM
+		.. distributed_log.points["Undead"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Undead"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Undead"]
+		.. COMM_FIELD_DELIM
+		.. distributed_log.points["Tauren"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Tauren"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Tauren"]
+		.. COMM_FIELD_DELIM
+		.. distributed_log.points["Troll"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.last_week_points["Troll"]
+		.. COMM_SUBFIELD_DELIM
+		.. distributed_log.this_week_points["Troll"]
+		.. COMM_FIELD_DELIM
+		.. message
+
+	if in_guild then
+		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+	end
 end)
