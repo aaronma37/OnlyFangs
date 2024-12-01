@@ -1590,7 +1590,9 @@ local function drawEventTypeTab(container, _title, _frames)
 			scroll_frame:AddChild(_group_description)
 		elseif group == "Quest" then
 			local _group_description = AceGUI:Create("Label")
-			_group_description:SetText("Complete the quest by the specified level.  These quests must be done solo.")
+			_group_description:SetText(
+				"Complete the quest at or before the specified level.  These quests must be done solo."
+			)
 			_group_description:SetHeight(140)
 			_group_description:SetWidth(800)
 			_group_description:SetJustifyH("LEFT")

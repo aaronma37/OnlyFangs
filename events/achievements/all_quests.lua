@@ -378,7 +378,7 @@ local function loadQuestEvent(_metadata)
 	_event.max_lvl = _metadata.max_lvl
 	_event.description = "|cffddddddComplete |r|cffFFA500["
 		.. _event.quest_name
-		.. "]|r |cffddddddby lvl. "
+		.. "]|r |cffddddddat or before lvl. "
 		.. _event.max_lvl
 		.. ".|r"
 
