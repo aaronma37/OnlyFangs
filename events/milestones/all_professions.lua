@@ -119,6 +119,9 @@ local function loadProfessionEvent(_metadata)
 	_event.ex_string = _event.ex_string:gsub("%%d", _metadata.lvl)
 	_event.subtype = "First to Max Profession"
 	_event.pts = 50
+	if _event.profession_name == "Lockpicking" then
+		_event.pts = 0
+	end
 	_event.description = "|cffddddddBe the first to reach 300 |r|cffFFA500["
 		.. _event.profession_name
 		.. "]|r |cffdddddd.|r"

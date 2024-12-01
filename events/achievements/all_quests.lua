@@ -140,7 +140,7 @@ local quest_metadata = {
 		["icon_path"] = "Interface\\ICONS\\INV_Misc_Shovel_01",
 		["quest_name"] = "Rites of the Earthmother",
 		["zone"] = "Mulgore",
-		["max_lvl"] = 10,
+		["max_lvl"] = 11,
 		["quest_id"] = 776,
 	},
 	{
@@ -257,7 +257,7 @@ local quest_metadata = {
 		["icon_path"] = "Interface\\ICONS\\INV_Misc_Shovel_01",
 		["quest_name"] = "The Family Crypt",
 		["zone"] = "Tirisfal Glades",
-		["max_lvl"] = 12,
+		["max_lvl"] = 11,
 		["quest_id"] = 408,
 	},
 	{

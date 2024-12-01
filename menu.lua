@@ -2421,7 +2421,7 @@ local function createMenu()
 				tab_table[#tab_table + 1] = v
 			end
 		elseif v["value"] == "MonitorTab" then
-			if CanEditOfficerNote() then
+			if OnlyMonitorOn ~= nil and OnlyMonitorOn == true then
 				tab_table[#tab_table + 1] = v
 			end
 		else
@@ -2463,6 +2463,21 @@ end
 deathlog_menu = createMenu()
 
 ns.showMenu = function()
+	local tab_table = {}
+	for _, v in ipairs(Deathlog_L.tab_table) do
+		if v["value"] == "TestingPoints" then
+			if ns.enable_testing == true then
+				tab_table[#tab_table + 1] = v
+			end
+		elseif v["value"] == "MonitorTab" then
+			if OnlyMonitorOn ~= nil and OnlyMonitorOn == true then
+				tab_table[#tab_table + 1] = v
+			end
+		else
+			tab_table[#tab_table + 1] = v
+		end
+	end
+	onlyfangs_tab_container:SetTabs(tab_table)
 	deathlog_menu:Show()
 	onlyfangs_tab_container:SelectTab("FrontPage")
 	font_container:Hide()

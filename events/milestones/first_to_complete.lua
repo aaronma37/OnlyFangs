@@ -127,6 +127,7 @@ local quest_metadata = {
 		["class"] = "Warlock",
 		["quest_id"] = 7631,
 		["pts"] = 50,
+		["test_only"] = 1,
 	},
 	{
 		["name"] = "Master Angler",

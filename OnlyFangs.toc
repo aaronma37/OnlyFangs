@@ -4,11 +4,11 @@
 ## Author: Yazpad
 ## X-License: GNU GPL3
 ## X-Category: Leveling,Guild
-## Version: 1.0.6
+## Version: 1.0.7
 
 
 ## DefaultState: enabled
-## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut
+## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut, OnlyMonitorOn
 ## SavedVariablesPerCharacter: 
 
 events/event_globals.lua

@@ -29,7 +29,6 @@ local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
 
 local DAY_SECONDS = 86400
 local OUT_CSV = false
-local MONITOR = false
 
 local function getThisWeekPeriodStart()
 	local this_week_start_time = OnlyFangsWeekStart or LAUNCH_DATE
@@ -709,7 +708,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
-		elseif command == COMM_COMMAND_MONITOR and (CanEditOfficerNote() or MONITOR) then
+		elseif command == COMM_COMMAND_MONITOR and OnlyMonitorOn ~= nil and OnlyMonitorOn == true then
 			local _monitor_stamp, _monitor_args = string.split(COMM_FIELD_DELIM, data)
 			OnlyFangsMonitor = OnlyFangsMonitor or {}
 			OnlyFangsMonitor[_monitor_stamp] = _monitor_args
@@ -747,7 +746,7 @@ C_Timer.NewTicker(HB_DUR, function(self)
 			.. COMM_COMMAND_DELIM
 			.. GetAddOnMetadata("OnlyFangs", "Version")
 			.. COMM_FIELD_DELIM
-			.. distributed_log[guild_name]["meta"]["size"] + 4
+			.. distributed_log[guild_name]["meta"]["size"] + 5
 			.. COMM_FIELD_DELIM
 			.. distributed_log.points["Orc"]
 			.. COMM_SUBFIELD_DELIM

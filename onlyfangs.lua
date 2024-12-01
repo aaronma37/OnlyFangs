@@ -81,6 +81,9 @@ local function initMinimapButton()
 end
 
 ns.refreshGuildList = function(force_refresh)
+	if CanEditOfficerNote() then
+		OnlyMonitorOn = true
+	end
 	local guild_info_text = GetGuildInfoText()
 	if guild_info_text then
 		local _, _this_week_start, _ = string.split("~", guild_info_text)

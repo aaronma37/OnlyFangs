@@ -142,6 +142,9 @@ local function loadProfessionEvent(name, metadata)
 	elseif metadata.lvl == 300 then
 		_event.pts = 25
 	end
+	if _event.profession_name == "Lockpicking" then
+		_event.pts = 0
+	end
 	_event.test_only = metadata.test_only
 	_event.lvl = metadata.lvl
 	_event.subtype = "Profession"
