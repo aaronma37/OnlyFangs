@@ -10,7 +10,7 @@ local COMM_FIELD_DELIM = "~"
 local COMM_SUBFIELD_DELIM = "&"
 local COMM_CHANNEL = "GUILD"
 local HB_DUR = 5
-local HB_DUR_MAX = 60
+local HB_DUR_MAX = 80
 local ERASE_CACHE = false
 local DEBUG = false
 -- Node
@@ -993,7 +993,7 @@ C_Timer.NewTicker(60, function(self)
 end)
 
 -- Random Heartbeat
-C_Timer.NewTicker(65, function(self)
+C_Timer.NewTicker(55, function(self)
 	local guild_name, in_guild = guildName()
 	if distributed_log == nil or distributed_log[guild_name] == nil then
 		return

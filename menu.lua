@@ -2482,6 +2482,9 @@ end
 deathlog_menu = createMenu()
 
 ns.showMenu = function()
+	local num_entries, estimated_num_entries = ns.logProgress()
+	local entry_perc = string.format("%.2f", num_entries / estimated_num_entries * 100.0)
+	deathlog_menu:SetVersion(GetAddOnMetadata("OnlyFangs", "Version") .. " - " .. entry_perc .. "% logs found.")
 	local tab_table = {}
 	for _, v in ipairs(Deathlog_L.tab_table) do
 		if v["value"] == "TestingPoints" then
