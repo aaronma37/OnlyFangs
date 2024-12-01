@@ -2157,6 +2157,15 @@ local function drawCharacterTab(container)
 		right_frame:ReleaseChildren()
 		refreshInfo()
 	end)
+
+	local _initial_name = UnitName("player")
+	_character_search_box:SetText(_initial_name)
+	_header:SetText("Character: " .. _initial_name)
+	streamer_name = OnlyFangsStreamerMap[_initial_name .. "-" .. REALM_NAME] or ""
+	left_frame:ReleaseChildren()
+	right_frame:ReleaseChildren()
+	refreshInfo()
+
 	main_frame:AddChild(_character_search_box)
 	main_frame:AddChild(_header)
 	main_frame:AddChild(left_frame)
