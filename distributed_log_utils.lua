@@ -910,6 +910,11 @@ ns.fakeEntries = function()
 	ns.aggregateLog()
 end
 
+ns.logProgress = function()
+	local guild_name = guildName()
+	return distributed_log[guild_name]["meta"]["size"], estimated_score_num_entries
+end
+
 -- local test_name = "FirstTo10Unarmed"
 -- ns.showToast(ns.event[test_name].title, ns.event[test_name].icon_path, ns.event[test_name].type)
 -- ns.triggerEvent("FirstToSixty")

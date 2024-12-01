@@ -521,6 +521,8 @@ local function drawLogTab(container)
 	local _player_summary = AceGUI:Create("Label")
 	_player_summary:SetWidth(200)
 	_player_summary:SetHeight(60)
+	local num_entries, estimated_num_entries = ns.logProgress()
+	local entry_perc = string.format("%.2f", num_entries / estimated_num_entries * 100.0)
 	_player_summary:SetText(
 		"|cffd4af37"
 			.. UnitName("player")
@@ -533,7 +535,15 @@ local function drawLogTab(container)
 			.. "\n"
 			.. "#Achievements: "
 			.. _achievements
-			.. "\n\n"
+			.. "\n"
+			.. "Log Progress: "
+			.. num_entries
+			.. "/"
+			.. estimated_num_entries
+			.. ", "
+			.. entry_perc
+			.. "%"
+			.. "\n"
 	)
 	header_frame:AddChild(_player_summary)
 
