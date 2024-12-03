@@ -69,3 +69,20 @@ end)
 -- handler:SetScript("OnEvent", function(self, event, ...)
 -- 	print(in_guild(UnitName("target")))
 -- end)
+
+C_Timer.NewTicker(60, function(self)
+	for i = 1, 40 do
+		local buff_name, _, _, _, _, _, _, _, _, _, _ = UnitBuff("player", i)
+		if buff_name == nil then
+			return
+		end
+		if
+			buff_name == "Warchief’s Blessing"
+			or buff_name == "Rallying Cry of the Dragonslayer"
+			or buff_name == "Spirit of Zandalar"
+		then
+			CancelUnitBuff("player", i)
+			print("OnlyFangs: Removing buff" .. buff_name .. ".")
+		end
+	end
+end)
