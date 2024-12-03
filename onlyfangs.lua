@@ -287,6 +287,12 @@ local function SlashHandler(msg, editbox)
 			OnlyFangsRaceInChat = nil
 			print("Reload to remove race image in chat")
 		end
+	elseif cmd == "achievementAlertChatFrame" then
+		local opt = ""
+		for substring in args:gmatch("%S+") do
+			OnlyFangsPrintChatFrame = tonumber(substring)
+		end
+		ns.printToChatFrame("OnlyFangs Achievements alerts will be printed to this frame.")
 	end
 end
 

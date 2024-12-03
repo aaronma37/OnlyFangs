@@ -40,6 +40,14 @@ local function getThisWeekPeriodStart()
 	return tonumber(this_week_start_time), tonumber(this_week_start_time - WEEK_SECONDS)
 end
 
+ns.printToChatFrame = function(msg)
+	if OnlyFangsPrintChatFrame and _G["ChatFrame" .. OnlyFangsPrintChatFrame] then
+		_G["ChatFrame" .. OnlyFangsPrintChatFrame]:AddMessage(msg)
+	else
+		print(msg)
+	end
+end
+
 local REALM_NAME = GetRealmName()
 REALM_NAME = REALM_NAME:gsub("%s+", "")
 
@@ -693,7 +701,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				local _sender_short, _ = string.split("-", sender)
 
 				if _event_type == "Achievement" then
-					print(
+					ns.printToChatFrame(
 						"|cff33ff99"
 							.. _race_name
 							.. (_sender_short or "")
@@ -704,7 +712,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 							.. ")|r"
 					)
 				elseif _event_type == "Milestone" then
-					print(
+					ns.printToChatFrame(
 						"|cff33ff99"
 							.. _race_name
 							.. (_sender_short or "")
@@ -715,7 +723,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 							.. ")|r"
 					)
 				elseif _event_type == "Failure" then
-					print(
+					ns.printToChatFrame(
 						"|cffB32133"
 							.. _race_name
 							.. (_sender_short or "")

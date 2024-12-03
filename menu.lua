@@ -2171,6 +2171,7 @@ local function drawMonitorTab(container)
 		end
 		header_label:SetText(_monitor_text)
 		player_search_box:SetList(_characters)
+		font_container:Hide()
 	end
 
 	ping_button:SetText("Ping")
@@ -2418,9 +2419,10 @@ local function createMenu()
 
 	local function SelectGroup(container, event, group)
 		container:ReleaseChildren()
+		font_container:Hide()
+		guild_member_font_container:Hide()
 
 		if ticker_handler ~= nil then
-			guild_member_font_container:Hide()
 			ticker_handler:Cancel()
 			ticker_handler = nil
 		end
