@@ -1719,7 +1719,7 @@ local guild_member_font_strings = {} -- idx/columns
 local guild_member_header_strings = {} -- columns
 local guild_member_row_backgrounds = {} --idx
 local guild_member_max_rows = 48 --idx
-local guild_member_row_height = 10
+local guild_member_row_height = 10.38
 local guild_member_Width = 850
 for idx, v in ipairs(guild_member_subtitle_data) do
 	guild_member_header_strings[v[1]] = guild_member_font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -1805,167 +1805,87 @@ local function setGuildMemberData()
 end
 
 local function DrawAccountabilityTab(container)
-	local function updateLabelData(_label_tbls, player_name_short)
-		if ns.guild_member_addon_info[player_name_short] ~= nil then
-			_label_tbls["party_mode_label"]:SetText(ns.guild_member_addon_info[player_name_short].party_mode)
-			_label_tbls["first_recorded_label"]:SetText(
-				date("%m/%d/%y", ns.guild_member_addon_info[player_name_short].first_recorded or 0)
-			)
-
-			if
-				ns.guild_member_addon_info[player_name_short].achievements == nil
-				or #ns.guild_member_addon_info[player_name_short].achievements > 0
-				or #ns.guild_member_addon_info[player_name_short].passive_achievements > 0
-			then
-				local inline_text = ""
-				for i, achievement_name in ipairs(ns.guild_member_addon_info[player_name_short].achievements) do
-					if _G.achievements[achievement_name] then
-						inline_text = inline_text
-							.. "|T"
-							.. _G.achievements[achievement_name].icon_path
-							.. ":16:16:0:0:64:64:4:60:4:60|t"
-					end
-				end
-				for i, achievement_name in ipairs(ns.guild_member_addon_info[player_name_short].passive_achievements) do
-					if _G.passive_achievements[achievement_name] then
-						inline_text = inline_text
-							.. "|T"
-							.. _G.passive_achievements[achievement_name].icon_path
-							.. ":16:16:0:0:64:64:4:60:4:60|t"
-					end
-				end
-				_label_tbls["achievement_label"]:SetText(inline_text)
-				_label_tbls["achievement_label"]:SetCallback("OnEnter", function(widget)
-					GameTooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
-					GameTooltip:AddLine("achievements")
-					for i, achievement_name in ipairs(ns.guild_member_addon_info[player_name_short].achievements) do
-						if _G.achievements[achievement_name] then
-							GameTooltip:AddLine(_G.achievements[achievement_name].title)
-						end
-					end
-					for i, achievement_name in
-						ipairs(ns.guild_member_addon_info[player_name_short].passive_achievements)
-					do
-						if _G.passive_achievements[achievement_name] then
-							GameTooltip:AddLine(_G.passive_achievements[achievement_name].title)
-						end
-					end
-					GameTooltip:Show()
-				end)
-				_label_tbls["achievement_label"]:SetCallback("OnLeave", function(widget)
-					GameTooltip:Hide()
-				end)
-			else
-				_label_tbls["achievement_label"]:SetText("")
-			end
-			_label_tbls["hc_tag_label"]:SetText(
-				ns.guild_member_addon_info[player_name_short].hardcore_player_name or ""
-			)
-		end
-
-		local player_name_long = player_name_short .. "-" .. GetSpacelessRealmName()
-		if ns.guild_online[player_name_long] ~= nil then
-			local version_text
-			if
-				(ns.guild_member_addon_info[player_name_long] and ns.guild_online[player_name_long])
-				or player_name_short == UnitName("player")
-			then
-				if player_name_short == UnitName("player") then
-					version_text = GetAddOnMetadata("OnlyFangs", "Version")
-				else
-					version_text = ns.guild_member_addon_info[player_name_long]
-				end
-
-				if ns.guild_member_addon_info[player_name_long]["version_status"] == "updated" then
-					version_text = "|c0000ff00" .. version_text .. "|r"
-				else
-					version_text = "|c00ffff00" .. version_text .. "|r"
-				end
-			else
-				version_text = "|c00ff0000Not detected|r"
-			end
-			_label_tbls["version_label"]:SetText(version_text)
-
-			_label_tbls["level_label"]:SetText(ns.guild_online[player_name_long].level)
-		end
-	end
-	local function addEntry(_scroll_frame, player_name_short, _self_name)
-		--local _player_name = player_name_short .. "-" .. GetSpacelessRealmName()
-		local entry = AceGUI:Create("SimpleGroup")
-		entry:SetLayout("Flow")
-		entry:SetFullWidth(true)
-		_scroll_frame:AddChild(entry)
-
-		local name_label = AceGUI:Create("Label")
-		name_label:SetWidth(110)
-		name_label:SetText(player_name_short)
-		name_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(name_label)
-		guild_member_entry_tbl[player_name_short] = {}
-
-		local level_label = AceGUI:Create("Label")
-		level_label:SetWidth(50)
-		level_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(level_label)
-		guild_member_entry_tbl[player_name_short]["level_label"] = level_label
-
-		local version_label = AceGUI:Create("Label")
-		version_label:SetWidth(80)
-		version_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(version_label)
-		guild_member_entry_tbl[player_name_short]["version_label"] = version_label
-
-		local party_mode_label = AceGUI:Create("Label")
-		party_mode_label:SetWidth(75)
-		party_mode_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(party_mode_label)
-		guild_member_entry_tbl[player_name_short]["party_mode_label"] = party_mode_label
-
-		local first_recorded_label = AceGUI:Create("Label")
-		first_recorded_label:SetWidth(85)
-		first_recorded_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(first_recorded_label)
-		guild_member_entry_tbl[player_name_short]["first_recorded_label"] = first_recorded_label
-
-		local achievement_label = AceGUI:Create("InteractiveLabel")
-		achievement_label:SetWidth(320)
-		achievement_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(achievement_label)
-		guild_member_entry_tbl[player_name_short]["achievement_label"] = achievement_label
-
-		local hc_tag_label = AceGUI:Create("Label")
-		hc_tag_label:SetWidth(75)
-		hc_tag_label:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-		entry:AddChild(hc_tag_label)
-		guild_member_entry_tbl[player_name_short]["hc_tag_label"] = hc_tag_label
-
-		updateLabelData(guild_member_entry_tbl[player_name_short], player_name_short) -- , _player_name)
-	end
-
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("List")
+	scroll_container:SetLayout("Fill")
 	onlyfangs_tab_container:AddChild(scroll_container)
 
 	local scroll_frame = AceGUI:Create("ScrollFrame")
-	scroll_frame:SetLayout("List")
+	scroll_frame:SetLayout("Flow")
+	scroll_frame:SetFullWidth(true)
+	scroll_frame:SetFullHeight(true)
 	scroll_container:AddChild(scroll_frame)
+
 	guild_member_font_container:SetParent(scroll_container.frame)
 	guild_member_font_container:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT")
 	guild_member_font_container:SetHeight(400)
 	guild_member_font_container:SetWidth(200)
-	setGuildMemberData()
-
-	ticker_handler = C_Timer.NewTicker(1, function()
-		setGuildMemberData()
-	end)
-
 	guild_member_font_container:Show()
-	scroll_container.frame:HookScript("OnHide", function()
-		guild_member_font_container:Hide()
+
+	local _name = AceGUI:Create("Label")
+	local _streamer_name = AceGUI:Create("Label")
+	local _lvl = AceGUI:Create("Label")
+	local _version = AceGUI:Create("Label")
+	local function refreshGuildVersions()
+		_name_txt = ""
+		_streamer_name_txt = ""
+		_lvl_txt = ""
+		_version_txt = ""
+
+		for i = 1, GetNumGuildMembers() do
+			local player_name_long, _, _, _, _, _, _, _, online, _, _ = GetGuildRosterInfo(i)
+			if online then
+				local player_name_short = string.split("-", player_name_long)
+				_name_txt = _name_txt .. "\n" .. player_name_short
+				_lvl_txt = _lvl_txt .. "\n" .. (ns.guild_online[player_name_long].level or "")
+
+				_streamer_name_txt = _streamer_name_txt
+					.. "\n"
+					.. (ns.streamer_map[player_name_long] or OnlyFangsStreamerMap[player_name_long] or "?")
+
+				local version_text = ""
+				if ns.guild_member_addon_info[player_name_long] then
+					version_text = ns.guild_member_addon_info[player_name_long]["version"] or ""
+					version_text = "|c0000ff00" .. version_text .. "|r"
+				end
+				if version_text == "" then
+					version_text = "|c00ff0000Not detected|r"
+				end
+
+				_version_txt = _version_txt .. "\n" .. version_text
+			end
+		end
+
+		_name:SetText(_name_txt)
+		_streamer_name:SetText(_streamer_name_txt)
+		_lvl:SetText(_lvl_txt)
+		_version:SetText(_version_txt)
+	end
+
+	refreshGuildVersions()
+
+	_name:SetWidth(100)
+	_name:SetFont(main_font, 10, "")
+	scroll_frame:AddChild(_name)
+
+	_streamer_name:SetWidth(120)
+	scroll_frame:AddChild(_streamer_name)
+
+	_lvl:SetWidth(30)
+	scroll_frame:AddChild(_lvl)
+
+	_version:SetWidth(150)
+	scroll_frame:AddChild(_version)
+
+	ticker_handler = C_Timer.NewTicker(1, function(self)
+		if scroll_frame:IsShown() == false then
+			self:Cancel()
+		end
+		refreshGuildVersions()
 	end)
 end
+
 local function drawTestTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
@@ -2498,6 +2418,12 @@ local function createMenu()
 
 	local function SelectGroup(container, event, group)
 		container:ReleaseChildren()
+
+		if ticker_handler ~= nil then
+			guild_member_font_container:Hide()
+			ticker_handler:Cancel()
+			ticker_handler = nil
+		end
 		if group == "PointsTab" then
 			drawEventTypeTab(container)
 		elseif group == "LogTab" then
