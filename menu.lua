@@ -1503,7 +1503,7 @@ local function drawEventTypeTab(container, _title, _frames)
 				_direct_ach_date_box:SetWidth(100)
 				_direct_ach_date_box:SetText(_direct_ach_data["Date"])
 				_direct_ach_date_box:SetCallback("OnEnterPressed", function(self, val, _d)
-					_direct_ach_data["Date"] = _d
+					_direct_ach_data["Date"] = _d - 1730639674
 					refreshCommitLabel()
 				end)
 
@@ -2113,6 +2113,8 @@ local function drawCharacterTab(container)
 						.. #_unique_char_meta["#achievements"]
 						.. ", #Milestones: "
 						.. #_unique_char_meta["#milestones"]
+						.. ", GUID: "
+						.. _unique_char_meta["guid"]
 				)
 			end
 			_inline:AddChild(_inline_info_left)
@@ -2209,32 +2211,72 @@ local function drawMonitorTab(container)
 	main_frame:SetFullHeight(true)
 	scroll_container:AddChild(main_frame)
 
-	if OnlyFangsMonitor then
-		for k, v in
-			spairs(OnlyFangsMonitor, function(t, a, b)
-				local d = string.gsub(a, "%a+", "")
-				d = string.gsub(d, "_", "")
+	local header_label = AceGUI:Create("InteractiveLabel")
+	header_label:SetFullWidth(true)
+	header_label:SetHeight(10000)
+	header_label:SetFont(main_font, 10, "")
+	header_label:SetColor(1, 1, 1)
 
-				local d2 = string.gsub(b, "%a+", "")
-				d2 = string.gsub(d2, "_", "")
+	local _characters = {}
 
-				return d > d2
-			end)
-		do
-			local _d = string.gsub(k, "%a+", "")
-			_d = string.gsub(_d, "_", "")
-			local _date = date("%m/%d/%y, %H:%M", _d)
-			local header_label = AceGUI:Create("InteractiveLabel")
-			header_label:SetFullWidth(true)
-			header_label:SetHeight(60)
-			header_label.font_strings = {}
-			header_label:SetFont(main_font, 10, "")
-			header_label:SetColor(1, 1, 1)
+	local player_search_box = AceGUI:Create("Dropdown")
+	local ping_button = AceGUI:Create("Button")
+	local _monitor_text = ""
+	local _current_name = nil
+	local function refreshMonitor(_filter_name)
+		_current_name = _filter_name
+		_monitor_text = ""
+		_characters = {}
+		if OnlyFangsMonitor then
+			for k, v in
+				spairs(OnlyFangsMonitor, function(t, a, b)
+					local d = string.gsub(a, "%a+", "")
+					d = string.gsub(d, "_", "")
 
-			header_label:SetText("[" .. _date .. "] - " .. v)
-			main_frame:AddChild(header_label)
+					local d2 = string.gsub(b, "%a+", "")
+					d2 = string.gsub(d2, "_", "")
+
+					return d > d2
+				end)
+			do
+				local _d = string.gsub(k, "%a+", "")
+				_d = string.gsub(_d, "_", "")
+				local _date = date("%m/%d/%y, %H:%M", _d)
+				local _name, _ = string.split(":", v)
+				_characters[_name] = _name
+				if _filter_name == nil or _name == _filter_name then
+					_monitor_text = _monitor_text .. "\n[" .. _date .. "] - " .. v
+				end
+			end
 		end
+		header_label:SetText(_monitor_text)
+		player_search_box:SetList(_characters)
 	end
+
+	ping_button:SetText("Ping")
+	ping_button:SetHeight(25)
+	ping_button:SetWidth(200)
+	ping_button:SetDisabled(true)
+	ping_button:SetCallback("OnClick", function(self)
+		if _current_name then
+			ns.pingForRecords(_current_name)
+		end
+	end)
+
+	player_search_box:SetLabel("Character Select")
+	player_search_box:SetList(_characters)
+	player_search_box:SetHeight(25)
+	player_search_box:SetWidth(200)
+	player_search_box:SetCallback("OnValueChanged", function(self, val, _name)
+		refreshMonitor(_name)
+		ping_button:SetText("Ping " .. _name)
+		ping_button:SetDisabled(false)
+	end)
+
+	refreshMonitor()
+	main_frame:AddChild(player_search_box)
+	main_frame:AddChild(ping_button)
+	main_frame:AddChild(header_label)
 end
 
 local function drawLeaderboardTab(container)
