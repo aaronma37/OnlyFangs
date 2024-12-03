@@ -198,7 +198,11 @@ local function checkAndAddKeyList()
 		end
 	end
 	num_keys = #key_list[guild_name]
-	random_key_counter = random(0, num_keys - 1)
+	if num_keys > 1 then
+		random_key_counter = random(0, num_keys - 1)
+	else
+		random_key_counter = 0
+	end
 end
 
 local function getNextEntry()
