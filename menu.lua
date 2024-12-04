@@ -450,56 +450,84 @@ local function drawLogTab(container)
 	_header:SetText("Summary")
 	header_frame:AddChild(_header)
 
-	local orc_all_time, orc_last_week, orc_this_week = ns.getScore("Orc")
-	local troll_all_time, troll_last_week, troll_this_week = ns.getScore("Troll")
-	local tauren_all_time, tauren_last_week, tauren_this_week = ns.getScore("Tauren")
-	local undead_all_time, undead_last_week, undead_this_week = ns.getScore("Undead")
+	local orc_all_time, orc_last_week, orc_this_week, orc_deaths_all_time, orc_deaths_last_week, orc_deaths_this_week =
+		ns.getScore("Orc")
+	local troll_all_time, troll_last_week, troll_this_week, troll_deaths_all_time, troll_deaths_last_week, troll_deaths_this_week =
+		ns.getScore("Troll")
+	local tauren_all_time, tauren_last_week, tauren_this_week, tauren_deaths_all_time, tauren_deaths_last_week, tauren_deaths_this_week =
+		ns.getScore("Tauren")
+	local undead_all_time, undead_last_week, undead_this_week, undead_deaths_all_time, undead_deaths_last_week, undead_deaths_this_week =
+		ns.getScore("Undead")
 
 	local space1 = AceGUI:Create("Label")
-	space1:SetWidth(140)
+	space1:SetWidth(200)
 	space1:SetHeight(60)
 	space1:SetText(
-		"|cffd4af37All Time:|r \n"
+		"|cffd4af37All Time Points/Deaths|r \n"
 			.. "Orc: "
 			.. orc_all_time
+			.. "/"
+			.. orc_deaths_all_time
 			.. "\nTroll: "
 			.. troll_all_time
+			.. "/"
+			.. troll_deaths_all_time
 			.. "\nTauren: "
 			.. tauren_all_time
+			.. "/"
+			.. tauren_deaths_all_time
 			.. "\nUndead: "
 			.. undead_all_time
+			.. "/"
+			.. undead_deaths_all_time
 	)
 	header_frame:AddChild(space1)
 
 	local last_week = AceGUI:Create("Label")
-	last_week:SetWidth(140)
+	last_week:SetWidth(200)
 	last_week:SetHeight(60)
 	last_week:SetText(
-		"|cffd4af37Last Week:|r \n"
+		"|cffd4af37Last Week Points/Deaths|r \n"
 			.. "Orc: "
 			.. orc_last_week
+			.. "/"
+			.. orc_deaths_last_week
 			.. "\nTroll: "
 			.. troll_last_week
+			.. "/"
+			.. troll_deaths_last_week
 			.. "\nTauren: "
 			.. tauren_last_week
+			.. "/"
+			.. tauren_deaths_last_week
 			.. "\nUndead: "
 			.. undead_last_week
+			.. "/"
+			.. undead_deaths_last_week
 	)
 	header_frame:AddChild(last_week)
 
 	local this_week = AceGUI:Create("Label")
-	this_week:SetWidth(140)
+	this_week:SetWidth(200)
 	this_week:SetHeight(60)
 	this_week:SetText(
-		"|cffd4af37This Week:|r \n"
+		"|cffd4af37This Week Points/Deaths|r \n"
 			.. "Orc: "
 			.. (orc_this_week or -1)
+			.. "/"
+			.. orc_deaths_this_week
 			.. "\nTroll: "
 			.. (troll_this_week or -1)
+			.. "/"
+			.. troll_deaths_this_week
 			.. "\nTauren: "
 			.. (tauren_this_week or -1)
+			.. "/"
+			.. tauren_deaths_this_week
 			.. "\nUndead: "
 			.. (undead_this_week or -1)
+			.. "/"
+			.. undead_deaths_this_week
 	)
 	header_frame:AddChild(this_week)
 
@@ -2131,11 +2159,11 @@ local function drawMonitorTab(container)
 	main_frame:SetFullHeight(true)
 	scroll_container:AddChild(main_frame)
 
-	local header_label = AceGUI:Create("InteractiveLabel")
-	header_label:SetFullWidth(true)
-	header_label:SetHeight(10000)
-	header_label:SetFont(main_font, 10, "")
-	header_label:SetColor(1, 1, 1)
+	local _monitor_data_label = AceGUI:Create("Label")
+	_monitor_data_label:SetFullWidth(true)
+	_monitor_data_label:SetHeight(10000)
+	_monitor_data_label:SetFont(main_font, 10, "")
+	_monitor_data_label:SetColor(1, 1, 1)
 
 	local _characters = {}
 
@@ -2169,7 +2197,7 @@ local function drawMonitorTab(container)
 				end
 			end
 		end
-		header_label:SetText(_monitor_text)
+		_monitor_data_label:SetText(_monitor_text)
 		player_search_box:SetList(_characters)
 		font_container:Hide()
 	end
@@ -2197,7 +2225,7 @@ local function drawMonitorTab(container)
 	refreshMonitor()
 	main_frame:AddChild(player_search_box)
 	main_frame:AddChild(ping_button)
-	main_frame:AddChild(header_label)
+	main_frame:AddChild(_monitor_data_label)
 end
 
 local function drawLeaderboardTab(container)

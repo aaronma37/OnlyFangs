@@ -82,7 +82,7 @@ C_Timer.NewTicker(60, function(self)
 			or buff_name == "Spirit of Zandalar"
 		then
 			CancelUnitBuff("player", i)
-			print("OnlyFangs: Removing buff" .. buff_name .. ".")
+			print("OnlyFangs: Removing buff " .. buff_name .. ".")
 		end
 	end
 end)

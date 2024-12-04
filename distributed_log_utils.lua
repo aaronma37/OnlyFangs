@@ -95,6 +95,9 @@ end
 local top_players_daily = {}
 local top_players_weekly = {}
 local top_players_all_time = {}
+local deaths_by_race_this_week = {}
+local deaths_by_race_last_week = {}
+local deaths_by_race_all_time = {}
 
 ns.getTopPlayers = function()
 	local top_daily_list = {}
@@ -361,7 +364,12 @@ local function toMessage(key, log_event)
 end
 
 ns.getScore = function(team_name)
-	return estimated_score[team_name], last_week_estimated_score[team_name], this_week_estimated_score[team_name]
+	return estimated_score[team_name],
+		last_week_estimated_score[team_name],
+		this_week_estimated_score[team_name],
+		deaths_by_race_all_time[team_name],
+		deaths_by_race_last_week[team_name],
+		deaths_by_race_this_week[team_name]
 end
 
 local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, current_adjusted_time, pts)
@@ -409,10 +417,41 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 
 	local adjusted_time = fromAdjustedTime(_event_log[DATE_IDX])
 	local race_name = ns.id_race[_event_log[RACE_IDX]]
+
+	if
+		_event_log[EVENT_IDX] == 4
+		or _event_log[EVENT_IDX] == 166
+		or _event_log[EVENT_IDX] == 167
+		or _event_log[EVENT_IDX] == 139
+		or _event_log[EVENT_IDX] == 141
+		or _event_log[EVENT_IDX] == 146
+	then
+		deaths_by_race_all_time[race_name] = deaths_by_race_all_time[race_name] + 1
+	end
 	if adjusted_time > this_week_period_start then
 		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _adjusted_pts
+		if
+			_event_log[EVENT_IDX] == 4
+			or _event_log[EVENT_IDX] == 166
+			or _event_log[EVENT_IDX] == 167
+			or _event_log[EVENT_IDX] == 139
+			or _event_log[EVENT_IDX] == 141
+			or _event_log[EVENT_IDX] == 146
+		then
+			deaths_by_race_this_week[race_name] = deaths_by_race_this_week[race_name] + 1
+		end
 	elseif adjusted_time > last_week_period_start then
 		distributed_log.last_week_points[race_name] = distributed_log.last_week_points[race_name] + _adjusted_pts
+		if
+			_event_log[EVENT_IDX] == 4
+			or _event_log[EVENT_IDX] == 166
+			or _event_log[EVENT_IDX] == 167
+			or _event_log[EVENT_IDX] == 139
+			or _event_log[EVENT_IDX] == 141
+			or _event_log[EVENT_IDX] == 146
+		then
+			deaths_by_race_last_week[race_name] = deaths_by_race_last_week[race_name] + 1
+		end
 	end
 end
 
@@ -487,6 +526,11 @@ ns.aggregateLog = function()
 	top_players_weekly = {}
 	top_players_all_time = {}
 	ns.already_achieved = {}
+
+	deaths_by_race_all_time = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
+	deaths_by_race_this_week = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
+	deaths_by_race_last_week = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
+
 	local duplicate_check = {}
 	local duplicate_count = 0
 	local current_adjusted_time = adjustedTime()
