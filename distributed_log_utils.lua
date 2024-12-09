@@ -31,7 +31,7 @@ local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
 local DAY_SECONDS = 86400
 local OUT_CSV = false
 
-local NUM_ENTRY_OFF = 5
+local NUM_ENTRY_OFF = 7
 
 local dl_recorder_limiter = true
 

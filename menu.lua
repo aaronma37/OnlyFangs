@@ -1438,6 +1438,8 @@ local function drawEventTypeTab(container, _title, _frames)
 					local char_string_name = "nil"
 					if off_char_name then
 						char_string_name = "'" .. off_char_name .. "'"
+					else
+						char_string_name = "''"
 					end
 					ns.sendOffEvent(
 						"AdjustPoints",
@@ -1861,6 +1863,8 @@ local function DrawAccountabilityTab(container)
 		_lvl_txt = ""
 		_version_txt = ""
 
+		local _num_wrong_by_race = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
+
 		for i = 1, GetNumGuildMembers() do
 			local player_name_long, _, _, _, _, _, _, _, online, _, _ = GetGuildRosterInfo(i)
 			if online then
@@ -1876,6 +1880,24 @@ local function DrawAccountabilityTab(container)
 				if ns.guild_member_addon_info[player_name_long] then
 					version_text = ns.guild_member_addon_info[player_name_long]["version"] or ""
 					version_text = "|c0000ff00" .. version_text .. "|r"
+					-- if
+					-- 	OnlyFangsStreamerMap[player_name_long]
+					-- 	and ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]
+					-- then
+					-- 	local _, _, subversions =
+					-- 		string.split(".", ns.guild_member_addon_info[player_name_long]["version"])
+					-- 	subversions = tonumber(subversions)
+					-- 	if subversions ~= 8 then
+					-- 		_num_wrong_by_race[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]] = _num_wrong_by_race[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]]
+					-- 			+ (8 - subversions)
+					-- 		print(
+					-- 			OnlyFangsStreamerMap[player_name_long],
+					-- 			"," .. ns.guild_member_addon_info[player_name_long]["version"],
+					-- 			", " .. ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]],
+					-- 			", -" .. (8 - subversions) .. "pts"
+					-- 		)
+					-- 	end
+					-- end
 				end
 				if version_text == "" then
 					version_text = "|c00ff0000Not detected|r"
@@ -1884,6 +1906,10 @@ local function DrawAccountabilityTab(container)
 				_version_txt = _version_txt .. "\n" .. version_text
 			end
 		end
+		-- for k, v in pairs(_num_wrong_by_race) do
+		-- 	print(k, v)
+		-- end
+		-- print("=====================")
 
 		_name:SetText(_name_txt)
 		_streamer_name:SetText(_streamer_name_txt)
