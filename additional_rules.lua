@@ -54,9 +54,31 @@ rule_event_handler:SetScript("OnEvent", function(self, event, ...)
 	end
 end)
 
+local function notReceivingItems()
+	local _money = GetTargetTradeMoney()
+	if _money ~= 0 then
+		print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not receive gold from outside of the guild.")
+		return false
+	end
+	for i = 1, 6 do
+		local _item_name, texture, quantity, quality, isUsable, enchant = GetTradeTargetItemInfo(i)
+		if _item_name then
+			print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not receive items from outside of the guild.")
+			return false
+		end
+	end
+
+	local _item_name, texture, quantity, quality, isUsable, enchant = GetTradePlayerItemInfo(7)
+	if _item_name then
+		print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not receive enchants from outside of the guild.")
+		return false
+	end
+	return true
+end
+
 TradeFrameTradeButton:SetScript("OnClick", function()
 	local target_trader = TradeFrameRecipientNameText:GetText()
-	if in_guild(target_trader) or CanEditOfficerNote() then
+	if in_guild(target_trader) or notReceivingItems() or CanEditOfficerNote() then
 		AcceptTrade()
 	else
 		print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not trade outside of the guild.")
