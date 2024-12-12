@@ -9,7 +9,7 @@ _event.type = "Milestone"
 _event.title = "1st 315 Skinning"
 _event.icon_path = "Interface\\ICONS\\INV_BannerPVP_01"
 _event.pts = 100
-_event.description = "First to obtain reach 315 skinning gets this milestone!"
+_event.description = "First to reach 315 skinning gets this milestone!"
 _event.subtype = "General"
 
 -- Aggregation
