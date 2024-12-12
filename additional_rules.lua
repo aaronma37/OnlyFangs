@@ -2,9 +2,15 @@ local addonName, ns = ...
 local rule_event_handler = nil
 rule_event_handler = CreateFrame("frame")
 
+local REALM_NAME = GetRealmName()
+REALM_NAME = REALM_NAME:gsub("%s+", "")
+
 local mail_button = {}
 
 local in_guild = function(_n)
+	if OnlyFangsStreamerMap[_n .. "-" .. REALM_NAME] ~= nil then
+		return true
+	end
 	for g_idx = 1, GetNumGuildMembers() do
 		member_name, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(g_idx)
 		local player_name_short = string.split("-", member_name)
@@ -22,9 +28,7 @@ local on_mail_show = function()
 				self:Cancel()
 			end
 			for i = 1, 7 do
-				local _name = _G["MailItem" .. tostring(i) .. "Sender"]:GetText()
-				-- local _name = _G["MailItem" .. tostring(i) .. "Subject"]:GetText()
-
+				local _, _, _name = GetInboxHeaderInfo(i)
 				if _name == nil or in_guild(_name) then
 					_G["MailItem" .. tostring(i)]:SetAlpha(1.0)
 					_G["MailItem" .. tostring(i)]:EnableMouse(1)
