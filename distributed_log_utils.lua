@@ -57,6 +57,7 @@ local player_name = UnitName("player")
 local this_player_guid_tag = player_name .. "-" .. player_guid_last_four
 ns.already_achieved = {}
 ns.streamer_to_race = {}
+ns.most_recent_info = {}
 
 local function spairs(t, order)
 	local keys = {}
@@ -397,8 +398,12 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 	if streamer_name then
 		if top_players_all_time[streamer_name] == nil then
 			top_players_all_time[streamer_name] = { ["pts"] = 0 }
+		end
+		if ns.most_recent_info[streamer_name] == nil or ns.most_recent_info[streamer_name] < _event_log[DATE_IDX] then
+			ns.most_recent_info[streamer_name] = _event_log[DATE_IDX]
 			ns.streamer_to_race[streamer_name] = ns.id_race[_event_log[RACE_IDX]]
 		end
+
 		top_players_all_time[streamer_name].pts = top_players_all_time[streamer_name].pts + _adjusted_pts
 
 		if _event_log[DATE_IDX] + WEEK_SECONDS > current_adjusted_time then

@@ -111,6 +111,10 @@ ns.refreshGuildList = function(force_refresh)
 		if OnlyFangsStreamerMap[name] == nil or ns.streamer_map[name] == nil or force_refresh then
 			-- local _, streamer_name = string.split(STREAMER_TAG_DELIM, "~Yazpad~ Some other Stuff")
 			local _, streamer_name = string.split(STREAMER_TAG_DELIM, _public_note)
+			if streamer_name then
+				streamer_name = string.lower(streamer_name)
+				streamer_name = streamer_name:gsub("^%l", string.upper)
+			end
 			OnlyFangsStreamerMap[name] = streamer_name
 			ns.streamer_map[name] = streamer_name
 		end
@@ -122,6 +126,11 @@ ns.refreshGuildList = function(force_refresh)
 				level = level,
 				classDisplayName = classDisplayName,
 			}
+		end
+	end
+	if force_refresh then
+		for k, v in pairs(OnlyFangsStreamerMap) do
+			OnlyFangsStreamerMap[k] = string.lower(v):gsub("^%l", string.upper)
 		end
 	end
 end
