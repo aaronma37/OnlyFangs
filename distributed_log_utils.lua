@@ -58,6 +58,7 @@ local this_player_guid_tag = player_name .. "-" .. player_guid_last_four
 ns.already_achieved = {}
 ns.streamer_to_race = {}
 ns.most_recent_info = {}
+ns.versions = {}
 
 local function spairs(t, order)
 	local keys = {}
@@ -672,6 +673,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 		if command == COMM_COMMAND_HEARTBEAT then
 			local _addon_version, _num_entries, _orc_score, _undead_score, _tauren_score, _troll_score, _fletcher, _date, _race_id, _event_id, _class_id, _add_args =
 				string.split(COMM_FIELD_DELIM, data)
+			ns.versions[_addon_version] = 1
 			ns.guild_member_addon_info[sender] = { ["version"] = _addon_version, ["version_status"] = "updated" }
 			if _date ~= nil and lruGet(_fletcher) == nil then
 				local _new_data =
@@ -1130,5 +1132,30 @@ C_Timer.NewTicker(55, function(self)
 
 	if in_guild then
 		CTL:SendAddonMessage("ALERT", COMM_NAME, comm_message, COMM_CHANNEL)
+	end
+end)
+
+C_Timer.After(20, function()
+	local _my_major, _my_minor, _my_patch = string.split(".", GetAddOnMetadata("OnlyFangs", "Version"))
+	for k, v in pairs(ns.versions) do
+		local major, minor, _patch = string.split(".", k)
+		_patch = tonumber(_patch)
+		_my_patch = tonumber(_my_patch)
+		if _my_patch < _patch then
+			ns.printToChatFrame(
+				"OnlyFangs: Your addon is out of date.  This version is: "
+					.. _my_major
+					.. "."
+					.. _my_minor
+					.. "."
+					.. _my_patch
+					.. ",  Newest Version detected is: "
+					.. major
+					.. "."
+					.. minor
+					.. "."
+					.. _patch
+			)
+		end
 	end
 end)
