@@ -496,12 +496,16 @@ ns.getStreamerInfo = function(streamer_name)
 			end
 			local event_name = ns.id_event[v["value"][EVENT_IDX]]
 			if ns.event[event_name].type == "Achievement" then
-				_character_meta[unique_char]["#achievements"][#_character_meta[unique_char]["#achievements"] + 1] =
-					ns.event[event_name].title
+				_character_meta[unique_char]["#achievements"][event_name] = {
+					["title"] = ns.event[event_name].title,
+					["date"] = date("%m/%d/%y, %H:%M", fromAdjustedTime(v["value"][DATE_IDX])),
+				}
 				streamer_meta["#achievements"] = streamer_meta["#achievements"] + 1
 			elseif ns.event[event_name].type == "Milestone" then
-				_character_meta[unique_char]["#milestones"][#_character_meta[unique_char]["#milestones"] + 1] =
-					ns.event[event_name].title
+				_character_meta[unique_char]["#milestones"][event_name] = {
+					["title"] = ns.event[event_name].title,
+					["date"] = date("%m/%d/%y, %H:%M", fromAdjustedTime(v["value"][DATE_IDX])),
+				}
 				streamer_meta["#milestones"] = streamer_meta["#milestones"] + 1
 			elseif ns.event[event_name].type == "Failure" then
 				_character_meta[unique_char]["status"] = "Dead"

@@ -1965,6 +1965,28 @@ local function drawTestTab(container)
 end
 
 local function drawCharacterTab(container)
+	local function spairs(t, order)
+		local keys = {}
+		for k in pairs(t) do
+			keys[#keys + 1] = k
+		end
+
+		if order then
+			table.sort(keys, function(a, b)
+				return order(t, a, b)
+			end)
+		else
+			table.sort(keys)
+		end
+
+		local i = 0
+		return function()
+			i = i + 1
+			if keys[i] then
+				return keys[i], t[keys[i]]
+			end
+		end
+	end
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
@@ -1986,12 +2008,12 @@ local function drawCharacterTab(container)
 	local left_frame = AceGUI:Create("ScrollFrame")
 	left_frame:SetLayout("Flow")
 	left_frame:SetWidth(400)
-	left_frame:SetHeight(700)
+	left_frame:SetHeight(2000)
 
 	local right_frame = AceGUI:Create("ScrollFrame")
 	right_frame:SetLayout("Flow")
 	right_frame:SetWidth(500)
-	right_frame:SetHeight(700)
+	right_frame:SetHeight(2000)
 
 	local function refreshInfo()
 		local _left_header = AceGUI:Create("Heading")
@@ -2094,21 +2116,56 @@ local function drawCharacterTab(container)
 			_inline:AddChild(_inline_info_left)
 
 			local _txt = ""
-			local _inline_info_right = AceGUI:Create("Label")
-			_inline_info_right:SetFullWidth(true)
-			_inline_info_right:SetHeight(400)
-			_inline_info_right:SetFont(main_font, 12, "")
+			local _inline_info_date = AceGUI:Create("Label")
+			_inline_info_date:SetWidth(330)
+			_inline_info_date:SetHeight(400)
+			_inline_info_date:SetFont(main_font, 12, "")
 			_txt = "|cffd4af37Achievements|r"
 			if streamer_name and streamer_name ~= "" then
-				for _, _v in ipairs(_unique_char_meta["#achievements"]) do
-					_txt = _txt .. "\n" .. _v
+				for _, _v in
+					spairs(_unique_char_meta["#achievements"], function(t, a, b)
+						return t[a]["date"] < t[b]["date"]
+					end)
+				do
+					_txt = _txt .. "\n" .. _v["title"] .. " "
 				end
 
 				_txt = _txt .. "\n\n|cffd4af37Milestones|r"
-				for _, _v in ipairs(_unique_char_meta["#milestones"]) do
-					_txt = _txt .. "\n" .. _v
+				for _, _v in
+					spairs(_unique_char_meta["#milestones"], function(t, a, b)
+						return t[a]["date"] < t[b]["date"]
+					end)
+				do
+					_txt = _txt .. "\n" .. _v["title"] .. " "
+				end
+				_inline_info_date:SetText(_txt)
+			end
+			_inline:AddChild(_inline_info_date)
+
+			local _inline_info_right = AceGUI:Create("Label")
+			_inline_info_right:SetWidth(100)
+			_inline_info_right:SetHeight(400)
+			_inline_info_right:SetFont(main_font, 12, "")
+			_txt = ""
+			if streamer_name and streamer_name ~= "" then
+				for _, _v in
+					spairs(_unique_char_meta["#achievements"], function(t, a, b)
+						return t[a]["date"] < t[b]["date"]
+					end)
+				do
+					_txt = _txt .. "\n" .. _v["date"] .. " "
+				end
+
+				_txt = _txt .. "\n\n|cffd4af37|r"
+				for _, _v in
+					spairs(_unique_char_meta["#milestones"], function(t, a, b)
+						return t[a]["date"] < t[b]["date"]
+					end)
+				do
+					_txt = _txt .. "\n" .. _v["date"] .. " "
 				end
 				_inline_info_right:SetText(_txt)
+				_inline_info_right:SetColor(0.6, 0.6, 0.6)
 			end
 			_inline:AddChild(_inline_info_right)
 		end
