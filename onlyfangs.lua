@@ -52,6 +52,11 @@ local onlyfangs_minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject(addo
 		local tauren_all_time, tauren_last_week, tauren_this_week = ns.getScore("Tauren")
 		local undead_all_time, undead_last_week, undead_this_week = ns.getScore("Undead")
 
+		orc_this_week = orc_this_week * (ns.modifiers["Orc"] or 1)
+		troll_this_week = troll_this_week * (ns.modifiers["Troll"] or 1)
+		tauren_this_week = tauren_this_week * (ns.modifiers["Tauren"] or 1)
+		undead_this_week = undead_this_week * (ns.modifiers["Undead"] or 1)
+
 		tooltip:AddLine("All Time Score:")
 		tooltip:AddDoubleLine("Orc:", orc_all_time, 1, 1, 1, 1, 1, 1)
 		tooltip:AddDoubleLine("Troll:", troll_all_time, 1, 1, 1, 1, 1, 1)
@@ -89,6 +94,29 @@ ns.refreshGuildList = function(force_refresh)
 		local _, _this_week_start, _ = string.split("~", guild_info_text)
 		if _this_week_start and tonumber(_this_week_start) then
 			OnlyFangsWeekStart = tonumber(_this_week_start)
+		end
+
+		local _, _winners, _losers, _modifiers = string.split("$", guild_info_text)
+		ns.past_winners = {}
+		ns.past_losers = {}
+		ns.modifiers = {}
+		if _winners then
+			for value in string.gmatch(_winners, "([^,]+)") do
+				ns.past_winners[#ns.past_winners + 1] = value
+			end
+		end
+
+		if _losers then
+			for value in string.gmatch(_losers, "([^,]+)") do
+				ns.past_losers[#ns.past_losers + 1] = value
+			end
+		end
+
+		if _modifiers then
+			for value in string.gmatch(_modifiers, "([^,]+)") do
+				local _race, modifier = string.split(":", value)
+				ns.modifiers[_race] = tonumber(modifier)
+			end
 		end
 	end
 	-- Create a new dictionary of just online people every time roster is updated

@@ -304,12 +304,12 @@ local function drawFrontPage(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Fill")
+	scroll_container:SetLayout("Flow")
 	onlyfangs_tab_container:AddChild(scroll_container)
 
 	local main_frame = AceGUI:Create("SimpleGroup")
 	main_frame:SetLayout("Flow")
-	main_frame:SetFullWidth(true)
+	main_frame:SetWidth(600)
 	main_frame:SetFullHeight(true)
 	scroll_container:AddChild(main_frame)
 
@@ -335,22 +335,22 @@ local function drawFrontPage(container)
 	)
 	main_frame:AddChild(space1)
 
-	local space2 = AceGUI:Create("Label")
-	space2:SetWidth(300)
-	space2:SetFullHeight(true)
-	space2:SetFont(main_font, 36, "")
-	space2:SetText(
-		"\n\n\n\n|cffd4af37Last Week:|r \n"
-			.. "Orc: "
-			.. orc_last_week
-			.. "\nTroll: "
-			.. troll_last_week
-			.. "\nTauren: "
-			.. tauren_last_week
-			.. "\nUndead: "
-			.. undead_last_week
-	)
-	main_frame:AddChild(space2)
+	-- local space2 = AceGUI:Create("Label")
+	-- space2:SetWidth(300)
+	-- space2:SetFullHeight(true)
+	-- space2:SetFont(main_font, 36, "")
+	-- space2:SetText(
+	-- 	"\n\n\n\n|cffd4af37Last Week:|r \n"
+	-- 		.. "Orc: "
+	-- 		.. orc_last_week
+	-- 		.. "\nTroll: "
+	-- 		.. troll_last_week
+	-- 		.. "\nTauren: "
+	-- 		.. tauren_last_week
+	-- 		.. "\nUndead: "
+	-- 		.. undead_last_week
+	-- )
+	-- main_frame:AddChild(space2)
 
 	local space3 = AceGUI:Create("Label")
 	space3:SetWidth(300)
@@ -359,15 +359,60 @@ local function drawFrontPage(container)
 	space3:SetText(
 		"\n\n\n\n|cffd4af37This Week:|r \n"
 			.. "Orc: "
-			.. orc_this_week
+			.. orc_this_week * (ns.modifiers["Orc"] or 1)
 			.. "\nTroll: "
-			.. troll_this_week
+			.. troll_this_week * (ns.modifiers["Troll"] or 1)
 			.. "\nTauren: "
-			.. tauren_this_week
+			.. tauren_this_week * (ns.modifiers["Tauren"] or 1)
 			.. "\nUndead: "
-			.. undead_this_week
+			.. undead_this_week * (ns.modifiers["Undead"] or 1)
 	)
 	main_frame:AddChild(space3)
+
+	local _right_past_winners_frame = AceGUI:Create("SimpleGroup")
+	_right_past_winners_frame:SetLayout("Flow")
+	_right_past_winners_frame:SetWidth(400)
+	_right_past_winners_frame:SetFullHeight(true)
+	scroll_container:AddChild(_right_past_winners_frame)
+
+	local _right_past_winners_frame_heading = AceGUI:Create("Heading")
+	_right_past_winners_frame_heading:SetFullWidth(true)
+	_right_past_winners_frame_heading:SetText("Past Placings")
+	_right_past_winners_frame:AddChild(_right_past_winners_frame_heading)
+
+	local _right_past_winners_frame_winners = AceGUI:Create("Label")
+	_right_past_winners_frame_winners:SetWidth(240)
+	local winners_txt = "|cffd4af37Winner/Loser|r"
+	for i = 1, 20 do
+		if ns.past_winners ~= nil and #ns.past_winners >= i and ns.past_losers ~= nil and #ns.past_losers >= i then
+			winners_txt = winners_txt .. "\nWeek " .. i .. ": " .. ns.past_winners[i] .. " / " .. ns.past_losers[i]
+		else
+			winners_txt = winners_txt .. "\n"
+		end
+	end
+	_right_past_winners_frame_winners:SetText(winners_txt)
+	_right_past_winners_frame:AddChild(_right_past_winners_frame_winners)
+
+	local _right_frame_modifiers = AceGUI:Create("Label")
+	_right_frame_modifiers:SetWidth(120)
+	local modifiers_txt = "|cffd4af37This Weeks Modifiers|r"
+	if ns.past_losers then
+		for _k, _modifier_num in pairs(ns.modifiers) do
+			if _modifier_num > 1 then
+				modifiers_txt = modifiers_txt .. "\n" .. _k .. ": |cff00ff00" .. _modifier_num .. "x|r"
+			elseif _modifier_num < 1 then
+				modifiers_txt = modifiers_txt .. "\n" .. _k .. ": |cffff0000" .. _modifier_num .. "x|r"
+			else
+				modifiers_txt = modifiers_txt .. "\n" .. _k .. ": " .. _modifier_num .. "x"
+			end
+		end
+	end
+
+	for i = 1, 16 do
+		modifiers_txt = modifiers_txt .. "\n"
+	end
+	_right_frame_modifiers:SetText(modifiers_txt)
+	_right_past_winners_frame:AddChild(_right_frame_modifiers)
 end
 
 local function drawLogTab(container)
