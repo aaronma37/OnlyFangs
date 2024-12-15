@@ -886,6 +886,9 @@ end)
 ns.sendEvent = function(event_name)
 	local guild_name, in_guild = guildName()
 	local _, _, _race_id = UnitRace("Player")
+	if OnlyFangsOverrideRace and ns.race_id[OnlyFangsOverrideRace] ~= nil then
+		_race_id = ns.race_id[OnlyFangsOverrideRace]
+	end
 	local _, _, _class_id = UnitClass("Player")
 	local _fletcher, _event = ns.stampEvent(adjustedTime(), _race_id, ns.event_id[event_name], tonumber(_class_id))
 	local comm_message = COMM_COMMAND_DIRECT_EVENT
@@ -1029,7 +1032,18 @@ working_checker = C_Timer.NewTicker(10, function()
 			print("|cff33ff99OnlyFangs: Addon is not connected.  Log off and log back in to fix.|r")
 		else
 			local _version = ns.guild_member_addon_info[UnitName("player") .. "-" .. REALM_NAME]["version"] or ""
-			print("|cff33ff99OnlyFangs: Addon is connected and working. Version: " .. _version .. "|r")
+
+			local _race_id = ""
+			if OnlyFangsOverrideRace and ns.race_id[OnlyFangsOverrideRace] ~= nil then
+				_race_id = ns.race_id[OnlyFangsOverrideRace]
+			end
+
+			print(
+				"|cff33ff99OnlyFangs: Addon is connected and working. Version: "
+					.. _version
+					.. ", Team "
+					.. (OnlyFangsOverrideRace or UnitRace("player") .. "|r")
+			)
 			working_checker:Cancel()
 		end
 	end

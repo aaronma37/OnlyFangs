@@ -9,7 +9,7 @@
 
 ## DefaultState: enabled
 ## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut, OnlyMonitorOn, OnlyFangsPrintChatFrame
-## SavedVariablesPerCharacter: 
+## SavedVariablesPerCharacter: OnlyFangsOverrideRace
 
 events/event_globals.lua
 
@@ -23,6 +23,7 @@ events/achievements/equip_first_rare.lua
 events/achievements/equip_first_epic.lua
 events/achievements/equip_scarlet_tabard.lua
 events/achievements/equip_first_tabard.lua
+events/achievements/get_40_mount.lua
 
 events/milestones/all_professions.lua
 events/milestones/first_to_find.lua

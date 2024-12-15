@@ -302,6 +302,30 @@ local function SlashHandler(msg, editbox)
 			OnlyFangsPrintChatFrame = tonumber(substring)
 		end
 		ns.printToChatFrame("OnlyFangs Achievements alerts will be printed to this frame.")
+	elseif cmd == "overrideRace" then
+		local opt = ""
+		for substring in args:gmatch("%S+") do
+			opt = substring
+		end
+		local set_correctly = false
+		if opt == "Orc" or opt == "orc" then
+			set_correctly = true
+			OnlyFangsOverrideRace = "Orc"
+		elseif opt == "Troll" or opt == "troll" then
+			set_correctly = true
+			OnlyFangsOverrideRace = "Troll"
+		elseif opt == "Tauren" or opt == "tauren" then
+			set_correctly = true
+			OnlyFangsOverrideRace = "Tauren"
+		elseif opt == "Undead" or opt == "undead" then
+			set_correctly = true
+			OnlyFangsOverrideRace = "Undead"
+		end
+		if set_correctly then
+			ns.printToChatFrame("Overriding race to " .. OnlyFangsOverrideRace)
+		else
+			ns.printToChatFrame("Incorrect command. ")
+		end
 	end
 end
 

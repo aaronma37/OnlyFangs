@@ -288,7 +288,7 @@ local function setLogData()
 				if pt_str > 0 then
 					pt_str = "|cff00FF00+" .. pt_str .. "|r"
 				elseif pt_str < 0 then
-					pt_str = "|cffFF0000-" .. pt_str .. "|r"
+					pt_str = "|cffFF0000" .. pt_str .. "|r"
 				end
 			end
 			font_strings[i]["Points"]:SetText(pt_str)
@@ -1750,7 +1750,7 @@ local guild_member_header_strings = {} -- columns
 local guild_member_row_backgrounds = {} --idx
 local guild_member_max_rows = 48 --idx
 local guild_member_row_height = 10.38
-local guild_member_Width = 850
+local guild_member_Width = 340
 for idx, v in ipairs(guild_member_subtitle_data) do
 	guild_member_header_strings[v[1]] = guild_member_font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	if idx == 1 then
@@ -1838,14 +1838,31 @@ local function DrawAccountabilityTab(container)
 	local scroll_container = AceGUI:Create("SimpleGroup")
 	scroll_container:SetFullWidth(true)
 	scroll_container:SetFullHeight(true)
-	scroll_container:SetLayout("Fill")
+	scroll_container:SetLayout("Flow")
 	onlyfangs_tab_container:AddChild(scroll_container)
 
 	local scroll_frame = AceGUI:Create("ScrollFrame")
 	scroll_frame:SetLayout("Flow")
-	scroll_frame:SetFullWidth(true)
+	scroll_frame:SetWidth(450)
 	scroll_frame:SetFullHeight(true)
 	scroll_container:AddChild(scroll_frame)
+
+	local _gap = AceGUI:Create("SimpleGroup")
+	_gap:SetLayout("Flow")
+	_gap:SetWidth(20)
+	_gap:SetFullHeight(true)
+	scroll_container:AddChild(_gap)
+
+	local right_frame = AceGUI:Create("SimpleGroup")
+	right_frame:SetLayout("Flow")
+	right_frame:SetWidth(550)
+	right_frame:SetFullHeight(true)
+	scroll_container:AddChild(right_frame)
+
+	local _right_frame_header = AceGUI:Create("Heading")
+	_right_frame_header:SetFullWidth(true)
+	_right_frame_header:SetText("Versions out of Date by Race")
+	right_frame:AddChild(_right_frame_header)
 
 	guild_member_font_container:SetParent(scroll_container.frame)
 	guild_member_font_container:SetPoint("TOPLEFT", scroll_container.frame, "TOPLEFT")
@@ -1857,6 +1874,11 @@ local function DrawAccountabilityTab(container)
 	local _streamer_name = AceGUI:Create("Label")
 	local _lvl = AceGUI:Create("Label")
 	local _version = AceGUI:Create("Label")
+	local _orc_score_label_right = AceGUI:Create("Label")
+	local _tauren_score_label_right = AceGUI:Create("Label")
+	local _undead_score_label_right = AceGUI:Create("Label")
+	local _troll_score_label_right = AceGUI:Create("Label")
+
 	local function refreshGuildVersions()
 		_name_txt = ""
 		_streamer_name_txt = ""
@@ -1864,7 +1886,10 @@ local function DrawAccountabilityTab(container)
 		_version_txt = ""
 
 		local _num_wrong_by_race = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
+		local _out_of_date = { ["Orc"] = {}, ["Troll"] = {}, ["Undead"] = {}, ["Tauren"] = {} }
 
+		local _my_major, _my_minor, _my_patch = string.split(".", GetAddOnMetadata("OnlyFangs", "Version"))
+		_my_patch = tonumber(_my_patch)
 		for i = 1, GetNumGuildMembers() do
 			local player_name_long, _, _, _, _, _, _, _, online, _, _ = GetGuildRosterInfo(i)
 			if online then
@@ -1880,24 +1905,22 @@ local function DrawAccountabilityTab(container)
 				if ns.guild_member_addon_info[player_name_long] then
 					version_text = ns.guild_member_addon_info[player_name_long]["version"] or ""
 					version_text = "|c0000ff00" .. version_text .. "|r"
-					-- if
-					-- 	OnlyFangsStreamerMap[player_name_long]
-					-- 	and ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]
-					-- then
-					-- 	local _, _, subversions =
-					-- 		string.split(".", ns.guild_member_addon_info[player_name_long]["version"])
-					-- 	subversions = tonumber(subversions)
-					-- 	if subversions ~= 8 then
-					-- 		_num_wrong_by_race[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]] = _num_wrong_by_race[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]]
-					-- 			+ (8 - subversions)
-					-- 		print(
-					-- 			OnlyFangsStreamerMap[player_name_long],
-					-- 			"," .. ns.guild_member_addon_info[player_name_long]["version"],
-					-- 			", " .. ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]],
-					-- 			", -" .. (8 - subversions) .. "pts"
-					-- 		)
-					-- 	end
-					-- end
+					if
+						OnlyFangsStreamerMap[player_name_long]
+						and ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]
+					then
+						local _, _, subversions =
+							string.split(".", ns.guild_member_addon_info[player_name_long]["version"])
+						subversions = tonumber(subversions)
+						if subversions ~= _my_patch then
+							_num_wrong_by_race[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]] = _num_wrong_by_race[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]]
+								+ (_my_patch - subversions)
+							_out_of_date[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]][#_out_of_date[ns.streamer_to_race[OnlyFangsStreamerMap[player_name_long]]] + 1] = player_name_short
+								.. " |cff8080801.0."
+								.. subversions
+								.. "|r"
+						end
+					end
 				end
 				if version_text == "" then
 					version_text = "|c00ff0000Not detected|r"
@@ -1906,15 +1929,50 @@ local function DrawAccountabilityTab(container)
 				_version_txt = _version_txt .. "\n" .. version_text
 			end
 		end
-		-- for k, v in pairs(_num_wrong_by_race) do
-		-- 	print(k, v)
-		-- end
-		-- print("=====================")
 
 		_name:SetText(_name_txt)
 		_streamer_name:SetText(_streamer_name_txt)
 		_lvl:SetText(_lvl_txt)
 		_version:SetText(_version_txt)
+		local _orc_score_label_right_txt = "|c00d4af37Orc: -" .. _num_wrong_by_race["Orc"] .. "|r"
+		for _idx = 1, 50 do
+			if #_out_of_date["Orc"] >= _idx then
+				_orc_score_label_right_txt = _orc_score_label_right_txt .. "\n" .. _out_of_date["Orc"][_idx]
+			else
+				_orc_score_label_right_txt = _orc_score_label_right_txt .. "\n"
+			end
+		end
+		_orc_score_label_right:SetText(_orc_score_label_right_txt)
+
+		local _tauren_score_label_right_txt = "|c00d4af37Tauren: -" .. _num_wrong_by_race["Tauren"] .. " pts|r"
+		for _idx = 1, 50 do
+			if #_out_of_date["Tauren"] >= _idx then
+				_tauren_score_label_right_txt = _tauren_score_label_right_txt .. "\n" .. _out_of_date["Tauren"][_idx]
+			else
+				_tauren_score_label_right_txt = _tauren_score_label_right_txt .. "\n"
+			end
+		end
+		_tauren_score_label_right:SetText(_tauren_score_label_right_txt)
+
+		local _undead_score_label_right_txt = "|c00d4af37Undead: -" .. _num_wrong_by_race["Undead"] .. " pts|r"
+		for _idx = 1, 50 do
+			if #_out_of_date["Undead"] >= _idx then
+				_undead_score_label_right_txt = _undead_score_label_right_txt .. "\n" .. _out_of_date["Undead"][_idx]
+			else
+				_undead_score_label_right_txt = _undead_score_label_right_txt .. "\n"
+			end
+		end
+		_undead_score_label_right:SetText(_undead_score_label_right_txt)
+
+		local _troll_score_label_right_txt = "|c00d4af37Troll: -" .. _num_wrong_by_race["Troll"] .. " pts|r"
+		for _idx = 1, 50 do
+			if #_out_of_date["Troll"] >= _idx then
+				_troll_score_label_right_txt = _troll_score_label_right_txt .. "\n" .. _out_of_date["Troll"][_idx]
+			else
+				_troll_score_label_right_txt = _troll_score_label_right_txt .. "\n"
+			end
+		end
+		_troll_score_label_right:SetText(_troll_score_label_right_txt)
 	end
 
 	refreshGuildVersions()
@@ -1931,6 +1989,22 @@ local function DrawAccountabilityTab(container)
 
 	_version:SetWidth(150)
 	scroll_frame:AddChild(_version)
+
+	_orc_score_label_right:SetWidth(130)
+	_orc_score_label_right:SetFont(main_font, 10, "")
+	right_frame:AddChild(_orc_score_label_right)
+
+	_tauren_score_label_right:SetWidth(130)
+	_tauren_score_label_right:SetFont(main_font, 10, "")
+	right_frame:AddChild(_tauren_score_label_right)
+
+	_undead_score_label_right:SetWidth(130)
+	_undead_score_label_right:SetFont(main_font, 10, "")
+	right_frame:AddChild(_undead_score_label_right)
+
+	_troll_score_label_right:SetWidth(130)
+	_troll_score_label_right:SetFont(main_font, 10, "")
+	right_frame:AddChild(_troll_score_label_right)
 
 	ticker_handler = C_Timer.NewTicker(1, function(self)
 		if scroll_frame:IsShown() == false then
@@ -2567,7 +2641,13 @@ deathlog_menu = createMenu()
 ns.showMenu = function()
 	local num_entries, estimated_num_entries = ns.logProgress()
 	local entry_perc = string.format("%.2f", num_entries / estimated_num_entries * 100.0)
-	deathlog_menu:SetVersion(GetAddOnMetadata("OnlyFangs", "Version") .. " - " .. entry_perc .. "% logs found.")
+	deathlog_menu:SetVersion(
+		GetAddOnMetadata("OnlyFangs", "Version")
+			.. " - "
+			.. entry_perc
+			.. "% logs found, Team "
+			.. (OnlyFangsOverrideRace or UnitRace("player"))
+	)
 	local tab_table = {}
 	for _, v in ipairs(Deathlog_L.tab_table) do
 		if v["value"] == "TestingPoints" then

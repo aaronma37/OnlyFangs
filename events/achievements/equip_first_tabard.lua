@@ -10,7 +10,7 @@ _event.subtype = "GeneralAchievement"
 _event.title = "Equip your Guild Tabard."
 _event.icon_path = ""
 _event.pts = 1
-_event.description = "|cffddddddEquip your first guild tabard.|r."
+_event.description = "|cffddddddEquip your first guild tabard.|r"
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)
