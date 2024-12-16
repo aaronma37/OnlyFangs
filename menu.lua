@@ -356,17 +356,31 @@ local function drawFrontPage(container)
 	space3:SetWidth(300)
 	space3:SetFullHeight(true)
 	space3:SetFont(main_font, 36, "")
-	space3:SetText(
-		"\n\n\n\n|cffd4af37This Week:|r \n"
-			.. "Orc: "
-			.. orc_this_week * (ns.modifiers["Orc"] or 1)
-			.. "\nTroll: "
-			.. troll_this_week * (ns.modifiers["Troll"] or 1)
-			.. "\nTauren: "
-			.. tauren_this_week * (ns.modifiers["Tauren"] or 1)
-			.. "\nUndead: "
-			.. undead_this_week * (ns.modifiers["Undead"] or 1)
-	)
+	if ns.modifiers then
+		space3:SetText(
+			"\n\n\n\n|cffd4af37This Week:|r \n"
+				.. "Orc: "
+				.. math.floor(orc_this_week * (ns.modifiers["Orc"] or 1))
+				.. "\nTroll: "
+				.. math.floor(troll_this_week * (ns.modifiers["Troll"] or 1))
+				.. "\nTauren: "
+				.. math.floor(tauren_this_week * (ns.modifiers["Tauren"] or 1))
+				.. "\nUndead: "
+				.. math.floor(undead_this_week * (ns.modifiers["Undead"] or 1))
+		)
+	else
+		space3:SetText(
+			"\n\n\n\n|cffd4af37This Week:|r \n"
+				.. "Orc: "
+				.. orc_this_week
+				.. "\nTroll: "
+				.. troll_this_week
+				.. "\nTauren: "
+				.. tauren_this_week
+				.. "\nUndead: "
+				.. undead_this_week
+		)
+	end
 	main_frame:AddChild(space3)
 
 	local _right_past_winners_frame = AceGUI:Create("SimpleGroup")

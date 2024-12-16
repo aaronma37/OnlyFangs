@@ -52,10 +52,12 @@ local onlyfangs_minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject(addo
 		local tauren_all_time, tauren_last_week, tauren_this_week = ns.getScore("Tauren")
 		local undead_all_time, undead_last_week, undead_this_week = ns.getScore("Undead")
 
-		orc_this_week = orc_this_week * (ns.modifiers["Orc"] or 1)
-		troll_this_week = troll_this_week * (ns.modifiers["Troll"] or 1)
-		tauren_this_week = tauren_this_week * (ns.modifiers["Tauren"] or 1)
-		undead_this_week = undead_this_week * (ns.modifiers["Undead"] or 1)
+		if ns.modifiers then
+			orc_this_week = math.floor(orc_this_week * (ns.modifiers["Orc"] or 1))
+			troll_this_week = math.floor(troll_this_week * (ns.modifiers["Troll"] or 1))
+			tauren_this_week = math.floor(tauren_this_week * (ns.modifiers["Tauren"] or 1))
+			undead_this_week = math.floor(undead_this_week * (ns.modifiers["Undead"] or 1))
+		end
 
 		tooltip:AddLine("All Time Score:")
 		tooltip:AddDoubleLine("Orc:", orc_all_time, 1, 1, 1, 1, 1, 1)
