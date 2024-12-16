@@ -43,14 +43,14 @@ local environment_damage = {
 local REALM_NAME = GetRealmName()
 REALM_NAME = REALM_NAME:gsub("%s+", "")
 
-local main_font = Deathlog_L.main_font
+local main_font = OnlyFangs_L.main_font
 
 local onlyfangs_tab_container = nil
 
 local class_tbl = ns.class_tbl
 local race_tbl = ns.race_id
 local zone_tbl = deathlog_zone_tbl
-local instance_tbl = Deathlog_L.instance_map
+local instance_tbl = OnlyFangs_L.instance_map
 
 local deathlog_menu = nil
 
@@ -181,7 +181,7 @@ local subtitle_data = {
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local font_container = CreateFrame("Frame")
+local font_container = CreateFrame("Frame", "of_font_container_log")
 font_container:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 font_container:SetSize(100, 100)
 font_container:Show()
@@ -764,7 +764,7 @@ local function drawLogTab(container)
 	if font_container.page_str == nil then
 		font_container.page_str = font_container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		font_container.page_str:SetText("Page " .. page_number)
-		font_container.page_str:SetFont(Deathlog_L.menu_font, 14, "")
+		font_container.page_str:SetFont(OnlyFangs_L.menu_font, 14, "")
 		font_container.page_str:SetJustifyV("BOTTOM")
 		font_container.page_str:SetJustifyH("CENTER")
 		font_container.page_str:SetTextColor(0.7, 0.7, 0.7)
@@ -2643,7 +2643,7 @@ local function createMenu()
 
 	onlyfangs_tab_container = AceGUI:Create("OnlyFangsTabGroup") -- "InlineGroup" is also good
 	local tab_table = {}
-	for _, v in ipairs(Deathlog_L.tab_table) do
+	for _, v in ipairs(OnlyFangs_L.tab_table) do
 		if v["value"] == "TestingPoints" then
 			if ns.enable_testing == true then
 				tab_table[#tab_table + 1] = v
@@ -2708,7 +2708,7 @@ ns.showMenu = function()
 			.. (OnlyFangsOverrideRace or UnitRace("player"))
 	)
 	local tab_table = {}
-	for _, v in ipairs(Deathlog_L.tab_table) do
+	for _, v in ipairs(OnlyFangs_L.tab_table) do
 		if v["value"] == "TestingPoints" then
 			if ns.enable_testing == true then
 				tab_table[#tab_table + 1] = v

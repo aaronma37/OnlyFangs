@@ -240,7 +240,7 @@ local function Constructor()
 	statustext:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 10)
 	statustext:SetHeight(20)
 	statustext:SetTextColor(1, 1, 1, 1)
-	statustext:SetFont(Deathlog_L.menu_font, 16)
+	statustext:SetFont(OnlyFangs_L.menu_font, 16)
 	statustext:SetJustifyH("RIGHT")
 	statustext:SetText("")
 
@@ -259,12 +259,12 @@ local function Constructor()
 	title:SetAllPoints(titlebg)
 
 	local titletext = title:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	titletext:SetFont(Deathlog_L.menu_font, 40, "OUTLINE")
+	titletext:SetFont(OnlyFangs_L.menu_font, 40, "OUTLINE")
 	titletext:SetTextColor(1, 1, 1, 1)
 	titletext:SetPoint("TOP", titlebg, "TOP", 0, -38)
 
 	local versiontext = title:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	versiontext:SetFont(Deathlog_L.menu_font, 16)
+	versiontext:SetFont(OnlyFangs_L.menu_font, 16)
 	versiontext:SetTextColor(1, 1, 1, 1)
 	versiontext:SetPoint("BOTTOMLEFT", titletext, "BOTTOMRIGHT", 5, 0)
 

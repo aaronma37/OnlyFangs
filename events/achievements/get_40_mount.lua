@@ -10,7 +10,7 @@ _event.title = "Obtain 40 Mount"
 _event.subtype = "GeneralAchievement"
 _event.icon_path = "Interface\\ICONS\\INV_BannerPVP_01"
 _event.pts = 10
-_event.description = "Obtain a level 40 mount."
+_event.description = "Obtain a level 40 mount.  Mount up to get this achievement."
 
 -- Aggregation
 _event.aggregrate = function(distributed_log, event_log)

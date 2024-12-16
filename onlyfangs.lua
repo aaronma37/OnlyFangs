@@ -45,7 +45,7 @@ local onlyfangs_minimap_button = LibStub("LibDataBroker-1.1"):NewDataObject(addo
 	end,
 	OnTooltipShow = function(tooltip)
 		tooltip:AddLine(addonName)
-		tooltip:AddLine(Deathlog_L.minimap_btn_left_click)
+		tooltip:AddLine(OnlyFangs_L.minimap_btn_left_click)
 
 		local orc_all_time, orc_last_week, orc_this_week = ns.getScore("Orc")
 		local troll_all_time, troll_last_week, troll_this_week = ns.getScore("Troll")

@@ -21,14 +21,14 @@ along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 --
 local addonName, ns = ...
 
-ns.instance_tbl = Deathlog_L.instance_tbl
+ns.instance_tbl = OnlyFangs_L.instance_tbl
 
 ns.id_to_instance_tbl = {}
 for k, v in pairs(ns.instance_tbl) do
 	ns.id_to_instance_tbl[v[1]] = v[3]
 end
 
-ns.zone_tbl = Deathlog_L.deathlog_zone_tbl
+ns.zone_tbl = OnlyFangs_L.deathlog_zone_tbl
 
 ns.class_tbl = {
 	["Warrior"] = 1,
