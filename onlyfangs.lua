@@ -30,7 +30,12 @@ local player_guid = UnitGUID("player")
 local STREAMER_TAG_DELIM = "~"
 local guild_loaded = false
 
+local REALM_NAME = GetRealmName()
+REALM_NAME = REALM_NAME:gsub("%s+", "")
+
 local player_name = UnitName("Player")
+
+local player_name_with_realm_name = player_name .. "-" .. REALM_NAME
 
 local onlyfangs_minimap_button_stub = nil
 local onlyfangs_minimap_button_info = {}
@@ -128,6 +133,22 @@ ns.refreshGuildList = function(force_refresh)
 	for i = 1, numTotal, 1 do
 		local name, rankName, rankIndex, level, classDisplayName, zone, _public_note, _officer_note, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
 			GetGuildRosterInfo(i)
+
+		if name == player_name_with_realm_name then
+			if rankName == "Orc" and OnlyFangsOverrideRace ~= "Orc" then
+				OnlyFangsOverrideRace = "Orc"
+				print("Onlyfangs: Joining team Orc")
+			elseif rankName == "Troll" and OnlyFangsOverrideRace ~= "Troll" then
+				OnlyFangsOverrideRace = "Troll"
+				print("Onlyfangs: Joining team Troll")
+			elseif opt == "Tauren" and OnlyFangsOverrideRace ~= "Tauren" then
+				OnlyFangsOverrideRace = "Tauren"
+				print("Onlyfangs: Joining team Tauren")
+			elseif opt == "Undead" and OnlyFangsOverrideRace ~= "Undead" then
+				OnlyFangsOverrideRace = "Undead"
+				print("Onlyfangs: Joining team Undead")
+			end
+		end
 
 		-- For testing
 		-- if name == "Jaytullobald-DefiasPillager" then
@@ -332,30 +353,6 @@ local function SlashHandler(msg, editbox)
 			OnlyFangsPrintChatFrame = tonumber(substring)
 		end
 		ns.printToChatFrame("OnlyFangs Achievements alerts will be printed to this frame.")
-	elseif cmd == "overrideRace" then
-		local opt = ""
-		for substring in args:gmatch("%S+") do
-			opt = substring
-		end
-		local set_correctly = false
-		if opt == "Orc" or opt == "orc" then
-			set_correctly = true
-			OnlyFangsOverrideRace = "Orc"
-		elseif opt == "Troll" or opt == "troll" then
-			set_correctly = true
-			OnlyFangsOverrideRace = "Troll"
-		elseif opt == "Tauren" or opt == "tauren" then
-			set_correctly = true
-			OnlyFangsOverrideRace = "Tauren"
-		elseif opt == "Undead" or opt == "undead" then
-			set_correctly = true
-			OnlyFangsOverrideRace = "Undead"
-		end
-		if set_correctly then
-			ns.printToChatFrame("Overriding race to " .. OnlyFangsOverrideRace)
-		else
-			ns.printToChatFrame("Incorrect command. ")
-		end
 	end
 end
 

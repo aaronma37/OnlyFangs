@@ -391,7 +391,7 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 		_char_name = _char_name:gsub("^%l", string.upper)
 		_char_name = _char_name .. "-" .. REALM_NAME
 	else
-		_adjusted_pts = ns.event[_event_name].pts
+		_adjusted_pts = pts
 	end
 
 	local streamer_name = ns.streamer_map[_char_name] or OnlyFangsStreamerMap[_char_name]
@@ -496,11 +496,23 @@ ns.getStreamerInfo = function(streamer_name)
 			end
 			local event_name = ns.id_event[v["value"][EVENT_IDX]]
 			if ns.event[event_name].type == "Achievement" then
-				_character_meta[unique_char]["#achievements"][event_name] = {
-					["title"] = ns.event[event_name].title,
-					["date"] = date("%m/%d/%y, %H:%M", fromAdjustedTime(v["value"][DATE_IDX])),
-				}
-				streamer_meta["#achievements"] = streamer_meta["#achievements"] + 1
+				if _character_meta[unique_char]["#achievements"][event_name] then
+					if
+						_character_meta[unique_char]["#achievements"][event_name]["date"]
+						> date("%m/%d/%y, %H:%M", fromAdjustedTime(v["value"][DATE_IDX]))
+					then
+						_character_meta[unique_char]["#achievements"][event_name] = {
+							["title"] = ns.event[event_name].title,
+							["date"] = date("%m/%d/%y, %H:%M", fromAdjustedTime(v["value"][DATE_IDX])),
+						}
+					end
+				else
+					_character_meta[unique_char]["#achievements"][event_name] = {
+						["title"] = ns.event[event_name].title,
+						["date"] = date("%m/%d/%y, %H:%M", fromAdjustedTime(v["value"][DATE_IDX])),
+					}
+					streamer_meta["#achievements"] = streamer_meta["#achievements"] + 1
+				end
 			elseif ns.event[event_name].type == "Milestone" then
 				_character_meta[unique_char]["#milestones"][event_name] = {
 					["title"] = ns.event[event_name].title,
@@ -543,6 +555,7 @@ ns.aggregateLog = function()
 
 	local duplicate_check = {}
 	local duplicate_count = 0
+	local duplicates = {}
 	local current_adjusted_time = adjustedTime()
 	local guild_name = guildName()
 	for k, _ in pairs(distributed_log.points) do
@@ -575,7 +588,7 @@ ns.aggregateLog = function()
 				if __name and __guid then
 					local duplicate_check_id = __name .. "-" .. __guid .. "-" .. event_log[EVENT_IDX]
 					if duplicate_check[duplicate_check_id] == nil or event_log[EVENT_IDX] == 2 then
-						duplicate_check[duplicate_check_id] = 1
+						duplicate_check[duplicate_check_id] = k
 						ns.event[event_name].aggregrate(distributed_log, event_log)
 						addPointsToLeaderBoardData(
 							k,
@@ -585,6 +598,9 @@ ns.aggregateLog = function()
 							ns.event[event_name].pts
 						)
 					else
+						duplicates[duplicate_check_id] = duplicates[duplicate_check_id]
+							or { duplicate_check[duplicate_check_id] }
+						duplicates[duplicate_check_id][#duplicates[duplicate_check_id] + 1] = k
 						duplicate_count = duplicate_count + 1
 						-- print("Found Duplicate: " .. duplicate_check_id)
 					end
@@ -600,6 +616,39 @@ ns.aggregateLog = function()
 				end
 			end
 		end
+	end
+
+	-- Resolve duplicates
+	for _duplicate_id, _ in pairs(duplicates) do
+		local first_key = duplicates[_duplicate_id][1]
+
+		local event_log = distributed_log[guild_name]["data"][first_key]["value"]
+		local event_name = ns.id_event[event_log[EVENT_IDX]]
+
+		addPointsToLeaderBoardData(first_key, event_name, event_log, current_adjusted_time, -ns.event[event_name].pts)
+		local earliest_id = first_key
+		local earliest_time = event_log[DATE_IDX]
+		for _, _k in ipairs(duplicates[_duplicate_id]) do
+			local _other_event_log = distributed_log[guild_name]["data"][_k]["value"]
+			if _other_event_log[DATE_IDX] < earliest_time then
+				earliest_id = _k
+				earliest_time = _other_event_log[DATE_IDX]
+			end
+		end
+
+		local _earliest_event_log = distributed_log[guild_name]["data"][earliest_id]["value"]
+		local _earliest_event_name = ns.id_event[_earliest_event_log[EVENT_IDX]]
+		-- if first_key ~= earliest_id then
+		-- 	print("Subtracking ", first_key, -ns.event[event_name].pts)
+		-- 	print("Adding ", earliest_id, ns.event[_earliest_event_name].pts)
+		-- end
+		addPointsToLeaderBoardData(
+			earliest_id,
+			_earliest_event_name,
+			_earliest_event_log,
+			current_adjusted_time,
+			ns.event[event_name].pts
+		)
 	end
 	-- for k, v in pairs(distributed_log.this_week_points) do
 	-- 	if v > 0 then
