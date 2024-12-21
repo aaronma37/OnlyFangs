@@ -59,20 +59,6 @@ local death_tomb_frame = CreateFrame("frame", nil, WorldMapButton)
 death_tomb_frame:SetAllPoints()
 death_tomb_frame:SetFrameLevel(15000)
 
-local death_tomb_frame_tex = death_tomb_frame:CreateTexture(nil, "OVERLAY")
-death_tomb_frame_tex:SetTexture("Interface\\TARGETINGFRAME\\UI-TargetingFrame-Skull")
-death_tomb_frame_tex:SetDrawLayer("OVERLAY", 4)
-death_tomb_frame_tex:SetHeight(25)
-death_tomb_frame_tex:SetWidth(25)
-death_tomb_frame_tex:Hide()
-
-local death_tomb_frame_tex_glow = death_tomb_frame:CreateTexture(nil, "OVERLAY")
-death_tomb_frame_tex_glow:SetTexture("Interface\\Glues/Models/UI_HUMAN/GenericGlow64")
-death_tomb_frame_tex_glow:SetDrawLayer("OVERLAY", 3)
-death_tomb_frame_tex_glow:SetHeight(55)
-death_tomb_frame_tex_glow:SetWidth(55)
-death_tomb_frame_tex_glow:Hide()
-
 local subtitle_data = {
 	{
 		"Date",
@@ -2003,7 +1989,7 @@ local function DrawAccountabilityTab(container)
 		end
 		_orc_score_label_right:SetText(_orc_score_label_right_txt)
 
-		local _tauren_score_label_right_txt = "|c00d4af37Tauren: -" .. _num_wrong_by_race["Tauren"] .. " pts|r"
+		local _tauren_score_label_right_txt = "|c00d4af37Tauren: -" .. _num_wrong_by_race["Tauren"] .. "|r"
 		for _idx = 1, 50 do
 			if #_out_of_date["Tauren"] >= _idx then
 				_tauren_score_label_right_txt = _tauren_score_label_right_txt .. "\n" .. _out_of_date["Tauren"][_idx]
@@ -2013,7 +1999,7 @@ local function DrawAccountabilityTab(container)
 		end
 		_tauren_score_label_right:SetText(_tauren_score_label_right_txt)
 
-		local _undead_score_label_right_txt = "|c00d4af37Undead: -" .. _num_wrong_by_race["Undead"] .. " pts|r"
+		local _undead_score_label_right_txt = "|c00d4af37Undead: -" .. _num_wrong_by_race["Undead"] .. "|r"
 		for _idx = 1, 50 do
 			if #_out_of_date["Undead"] >= _idx then
 				_undead_score_label_right_txt = _undead_score_label_right_txt .. "\n" .. _out_of_date["Undead"][_idx]
@@ -2023,7 +2009,7 @@ local function DrawAccountabilityTab(container)
 		end
 		_undead_score_label_right:SetText(_undead_score_label_right_txt)
 
-		local _troll_score_label_right_txt = "|c00d4af37Troll: -" .. _num_wrong_by_race["Troll"] .. " pts|r"
+		local _troll_score_label_right_txt = "|c00d4af37Troll: -" .. _num_wrong_by_race["Troll"] .. "|r"
 		for _idx = 1, 50 do
 			if #_out_of_date["Troll"] >= _idx then
 				_troll_score_label_right_txt = _troll_score_label_right_txt .. "\n" .. _out_of_date["Troll"][_idx]
@@ -2463,7 +2449,7 @@ local function drawLeaderboardTab(container)
 	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
 		local __f = AceGUI:Create("InlineGroup")
 		__f:SetLayout("Flow")
-		__f:SetHeight(300)
+		__f:SetHeight(250)
 		__f:SetWidth(330)
 		main_frame:AddChild(__f)
 

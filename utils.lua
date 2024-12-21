@@ -19,12 +19,12 @@ along with the Deathlog AddOn. If not, see <http://www.gnu.org/licenses/>.
 --]]
 --
 --
-local addonName, ns = ...
+local _, ns = ...
 
 ns.instance_tbl = OnlyFangs_L.instance_tbl
 
 ns.id_to_instance_tbl = {}
-for k, v in pairs(ns.instance_tbl) do
+for _, v in pairs(ns.instance_tbl) do
 	ns.id_to_instance_tbl[v[1]] = v[3]
 end
 
@@ -52,15 +52,6 @@ ns.id_to_class_tbl = {
 	[8] = "Mage",
 	[9] = "Warlock",
 	[11] = "Druid",
-}
-
-local environment_damage = {
-	[-2] = "Drowning",
-	[-3] = "Falling",
-	[-4] = "Fatigue",
-	[-5] = "Fire",
-	[-6] = "Lava",
-	[-7] = "Slime",
 }
 
 ns.class_colors = {}
@@ -151,17 +142,33 @@ ns.loadRaceInChat = function()
 	end
 	race_in_chat_loaded = true
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(frame, event, message, sender, ...)
-		local _streamer = ns.streamer_map[sender]
 		local _race = ""
-		if _streamer and ns.streamer_to_race and ns.streamer_to_race[_streamer] then
-			if ns.streamer_to_race[_streamer] == "Tauren" then
+		if ns.character_race_type and ns.character_race_type[sender] then
+			if ns.character_race_type[sender] == "Tauren" then
 				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
-			elseif ns.streamer_to_race[_streamer] == "Undead" then
+			elseif ns.character_race_type[sender] == "Undead" then
 				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
-			elseif ns.streamer_to_race[_streamer] == "Troll" then
+			elseif ns.character_race_type[sender] == "Troll" then
 				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
-			elseif ns.streamer_to_race[_streamer] == "Orc" then
+			elseif ns.character_race_type[sender] == "Orc" then
 				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+			end
+		else
+			local _streamer = ns.streamer_map[sender]
+			if _streamer and ns.streamer_to_race and ns.streamer_to_race[_streamer] then
+				if ns.streamer_to_race[_streamer] == "Tauren" then
+					_race =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
+				elseif ns.streamer_to_race[_streamer] == "Undead" then
+					_race =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
+				elseif ns.streamer_to_race[_streamer] == "Troll" then
+					_race =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
+				elseif ns.streamer_to_race[_streamer] == "Orc" then
+					_race =
+						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+				end
 			end
 		end
 		message = _race .. message

@@ -128,6 +128,7 @@ ns.refreshGuildList = function(force_refresh)
 	end
 	-- Create a new dictionary of just online people every time roster is updated
 	ns.guild_online = {}
+	ns.character_race_type = {}
 	local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()
 	ns.num_guild_online = numOnline
 	for i = 1, numTotal, 1 do
@@ -141,13 +142,16 @@ ns.refreshGuildList = function(force_refresh)
 			elseif rankName == "Troll" and OnlyFangsOverrideRace ~= "Troll" then
 				OnlyFangsOverrideRace = "Troll"
 				print("Onlyfangs: Joining team Troll")
-			elseif opt == "Tauren" and OnlyFangsOverrideRace ~= "Tauren" then
+			elseif rankName == "Tauren" and OnlyFangsOverrideRace ~= "Tauren" then
 				OnlyFangsOverrideRace = "Tauren"
 				print("Onlyfangs: Joining team Tauren")
-			elseif opt == "Undead" and OnlyFangsOverrideRace ~= "Undead" then
+			elseif rankName == "Undead" and OnlyFangsOverrideRace ~= "Undead" then
 				OnlyFangsOverrideRace = "Undead"
 				print("Onlyfangs: Joining team Undead")
 			end
+		end
+		if ns.race_id[rankName] then
+			ns.character_race_type[name] = rankName
 		end
 
 		-- For testing

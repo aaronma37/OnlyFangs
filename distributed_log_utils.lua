@@ -31,7 +31,7 @@ local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
 local DAY_SECONDS = 86400
 local OUT_CSV = false
 
-local NUM_ENTRY_OFF = 7
+local NUM_ENTRY_OFF = 8
 
 local dl_recorder_limiter = true
 
@@ -495,7 +495,7 @@ ns.getStreamerInfo = function(streamer_name)
 				_character_meta[unique_char]["guid"] = _last_guid
 			end
 			local event_name = ns.id_event[v["value"][EVENT_IDX]]
-			if ns.event[event_name].type == "Achievement" then
+			if ns.event[event_name].type == "Achievement" and v["value"][EVENT_IDX] ~= 213 then
 				if _character_meta[unique_char]["#achievements"][event_name] then
 					if
 						_character_meta[unique_char]["#achievements"][event_name]["date"]

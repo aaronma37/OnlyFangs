@@ -4,7 +4,7 @@
 ## Author: Yazpad
 ## X-License: GNU GPL3
 ## X-Category: Leveling,Guild
-## Version: 1.0.10
+## Version: 1.0.11
 
 
 ## DefaultState: enabled
@@ -24,6 +24,7 @@ events/achievements/equip_first_epic.lua
 events/achievements/equip_scarlet_tabard.lua
 events/achievements/equip_first_tabard.lua
 events/achievements/get_40_mount.lua
+events/achievements/obtain_40_mount.lua
 
 events/milestones/all_professions.lua
 events/milestones/first_to_find.lua
