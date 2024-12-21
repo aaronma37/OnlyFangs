@@ -1,22 +1,23 @@
-SLASH_GUILDFOUND1 = "/guildfound"
-SLASH_GUILDFOUND2 = "/gf"
+SLASH_WISHLIST1 = "/wishlist"
+SLASH_WISHLIST2 = "/wl"
 
 local AceComm = LibStub("AceComm-3.0")
 local AceSerializer = LibStub("AceSerializer-3.0")
 
 local BROADCAST_INTERVAL = 30
 
-local GuildFoundFrame = CreateFrame("Frame", "GuildFoundFrame")
-local prefix = "GuildFound"
+local WishListFrame = CreateFrame("Frame", "WishListFrame")
+local prefix = "WishList"
 local lastTx = 0
 
 local localPlayerNeeds = {}
 local guildNeeds = {}
+local needersByItem = {}
 
 local debug = true
 
 local function prettyPrint(msg)
-    print("|cffffff00[GuildFound]|r " .. msg)
+    print("|cffffff00[WishList]|r " .. msg)
 end
 
 local function debugPrint(msg)
@@ -39,30 +40,42 @@ local function broadcast()
 end
 
 local function processMessage(msg, from)
---    prettyPrint("Received message from " .. from)
+    -- prettyPrint("Received message from " .. from)
     local success, deserialized = AceSerializer:Deserialize(msg)
     if success then
-        if #deserialized == 0 then
+
+        local priorNeeds = guildNeeds[from]
+
+        if deserialized == {} then
             guildNeeds[from] = nil
         else
             guildNeeds[from] = deserialized
         end
---        DevTools_Dump(guildNeeds)
+
+        -- Populate needersByItem
+        for k, v in pairs(deserialized) do
+            local needers = needersByItem[string.upper(k)] or {}
+            needers[from] = true
+            needersByItem[string.upper(k)] = needers
+        end
+
+        -- check for removed items from wishlist
+        if priorNeeds then
+            for k, v in pairs(priorNeeds) do
+                if not deserialized[k] then
+                    local needers = needersByItem[string.upper(k)] or {}
+                    needers[from] = nil
+                    needersByItem[string.upper(k)] = needers
+                end
+            end
+        end
     else
 --        prettyPrint("Couldn't deserialize message")
     end
 end
 
 local function getNeeders(itemName)
-    local needers = {}
-    for k, v in pairs(guildNeeds) do
-        for _,s in pairs(v) do
-            if string.upper(itemName) == string.upper(s) then
-                needers[#needers + 1] = k
-            end
-        end
-    end
-    return needers
+    return needersByItem[string.upper(itemName)] or {}
 end
 
 local ticker
@@ -86,27 +99,27 @@ local function OnEvent(self, event, ...)
     elseif event == "ADDON_LOADED" then
         local addonName = ...
         if addonName == "OnlyFangs" then
-            if not GuildFound_Saved then
-                GuildFound_Saved = {}
+            if not WishList_Saved then
+                WishList_Saved = {}
             end
-            localPlayerNeeds = GuildFound_Saved.localPlayerNeeds or {}
+            localPlayerNeeds = WishList_Saved.localPlayerNeeds or {}
         end
     elseif event == "PLAYER_LOGOUT" then
-        if not GuildFound_Saved then
-            GuildFound_Saved = {}
+        if not WishList_Saved then
+            WishList_Saved = {}
         end
-        GuildFound_Saved.localPlayerNeeds = localPlayerNeeds
+        WishList_Saved.localPlayerNeeds = localPlayerNeeds
     end
 end
 
 
 
-GuildFoundFrame:RegisterEvent("CHAT_MSG_ADDON")
-GuildFoundFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-GuildFoundFrame:RegisterEvent("ADDON_LOADED")
-GuildFoundFrame:RegisterEvent("PLAYER_LOGOUT")
-GuildFoundFrame:SetScript("OnEvent", OnEvent)
-GuildFoundFrame:SetScript("OnUpdate", OnUpdate)
+WishListFrame:RegisterEvent("CHAT_MSG_ADDON")
+WishListFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+WishListFrame:RegisterEvent("ADDON_LOADED")
+WishListFrame:RegisterEvent("PLAYER_LOGOUT")
+WishListFrame:SetScript("OnEvent", OnEvent)
+WishListFrame:SetScript("OnUpdate", OnUpdate)
 
 
 
@@ -114,21 +127,17 @@ local function SlashCommandHandler(msg)
     if string.sub(msg, 1, 4) == "add " then
         local item = string.sub(msg, 5)
         if string.len(item) > 0 then
-            localPlayerNeeds[#localPlayerNeeds+1] = item
+            localPlayerNeeds[string.upper(item)] = item
             prettyPrint("Added '" .. item .. "' to needed items")
         end        
         broadcast()
     elseif string.sub(msg, 1, 7) == "remove " then
         local item = string.sub(msg, 8)
         if string.len(item) > 0 then
-            for k, v in pairs(localPlayerNeeds) do
-                if string.upper(v) == string.upper(item) then
-                    localPlayerNeeds[k] = nil
-                end
-            end
+            localPlayerNeeds[string.upper(item)] = nil
+            prettyPrint("Removed '" .. item .. "' from needed items")
         end
         broadcast()
-        prettyPrint("Removed '" .. item .. "' from needed items")
     elseif string.sub(msg, 1, 5) == "clear" then
         localPlayerNeeds = {}
         broadcast()
@@ -143,21 +152,24 @@ local function SlashCommandHandler(msg)
         if string.len(item) > 0 then
             prettyPrint("Needers for '" .. item .. "':")
             local needers = getNeeders(item)
-            if #needers == 0 then
-                print("No needers for '" .. item .. "'.")
-            end
+            local i = 0
             for k, v in pairs(needers) do
-                print(" - " .. v)
+                i = i + 1
+                print(" - " .. k)
+            end
+
+            if i == 0 then
+                print("No needers for '" .. item .. "'.")
             end
         end
     elseif string.sub(msg, 1, 4) == "help" then
         prettyPrint("Available commands:")
-        print("|cffffff00/gf help|r print this message")
-        print("|cffffff00/gf add itemName|r add itemName to your list of needed items")
-        print("|cffffff00/gf remove itemName|r remove itemName from your list of needed items")
-        print("|cffffff00/gf clear|r remove all items from your list of needed items")
-        print("|cffffff00/gf list|r print your list of needed items")
-        print("|cffffff00/gf whoneeds itemName|r print a list of guild members that need itemName")
+        print("|cffffff00/wl help|r print this message")
+        print("|cffffff00/wl add itemName|r add itemName to your list of needed items")
+        print("|cffffff00/wl remove itemName|r remove itemName from your list of needed items")
+        print("|cffffff00/wl clear|r remove all items from your list of needed items")
+        print("|cffffff00/wl list|r print your list of needed items")
+        print("|cffffff00/wl whoneeds itemName|r print a list of guild members that need itemName")
     else
         prettyPrint("Unrecognized command: " .. msg)
     end
@@ -167,15 +179,20 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
     local name = tooltip:GetItem()
     --Add the name and path of the item's texture
     local needers = getNeeders(name)
+    local count = 0
+    for k,v in pairs(needers) do count = count + 1 end
+
 
     local max = 6
-    if #needers >= 1 then
+    if count >= 1 then
         tooltip:AddLine("|cffff4040<OF>|r |cffffff00Needed By:|r")
-        for i, v in pairs(needers) do
-            if i < max or #needers == max then
-                tooltip:AddLine("  |cff3ce13f" .. v .. "|r")
+        local i = 0
+        for k, v in pairs(needers) do
+            i = i + 1
+            if i < max or count == max then
+                tooltip:AddLine("  |cff3ce13f" .. k .. "|r")
             else
-                local extra = #needers - max + 1
+                local extra = count - max + 1
                 tooltip:AddLine("  |cffbbbbbb+ " .. tostring(extra) .. " more|r")
                 break
             end
@@ -185,4 +202,4 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
     end
   end)
 
-SlashCmdList["GUILDFOUND"] = SlashCommandHandler
+SlashCmdList["WISHLIST"] = SlashCommandHandler
