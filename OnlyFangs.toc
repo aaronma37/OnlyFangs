@@ -9,7 +9,7 @@
 
 ## DefaultState: enabled
 ## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut, OnlyMonitorOn, OnlyFangsPrintChatFrame
-## SavedVariablesPerCharacter: OnlyFangsOverrideRace
+## SavedVariablesPerCharacter: OnlyFangsOverrideRace, GuildFound_Saved
 
 events/event_globals.lua
 
@@ -65,6 +65,8 @@ Localization/strings_ru.lua
 Localization/localization.lua
 
 embeds.xml
+
+GuildFound.lua
 
 toast.lua
 utils.lua
