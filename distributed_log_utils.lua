@@ -435,6 +435,22 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 		deaths_by_race_all_time[race_name] = deaths_by_race_all_time[race_name] + 1
 	end
 	if adjusted_time > this_week_period_start then
+		if ns.character_race_type and ns.character_race_type[_char_name] then
+			race_name = ns.character_race_type[_char_name]
+			-- if race_name ~= ns.id_race[_event_log[RACE_IDX]] then
+			-- 	print(
+			-- 		_char_name
+			-- 			.. ", achievement: "
+			-- 			.. _event_name
+			-- 			.. ", labeled as: "
+			-- 			.. ns.id_race[_event_log[RACE_IDX]]
+			-- 			.. ", Fixed to: "
+			-- 			.. race_name
+			-- 			.. ", pts: "
+			-- 			.. _adjusted_pts
+			-- 	)
+			-- end
+		end
 		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _adjusted_pts
 		if
 			_event_log[EVENT_IDX] == 4
@@ -548,6 +564,9 @@ ns.getStreamerInfo = function(streamer_name)
 end
 
 ns.aggregateLog = function()
+	if ns.character_race_type == nil then
+		ns.character_race_type = OnlyFangsRaceMap
+	end
 	top_players_daily = {}
 	top_players_weekly = {}
 	top_players_all_time = {}

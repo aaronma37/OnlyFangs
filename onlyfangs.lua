@@ -131,6 +131,7 @@ ns.refreshGuildList = function(force_refresh)
 	ns.character_race_type = {}
 	local numTotal, numOnline, numOnlineAndMobile = GetNumGuildMembers()
 	ns.num_guild_online = numOnline
+	OnlyFangsRaceMap = {}
 	for i = 1, numTotal, 1 do
 		local name, rankName, rankIndex, level, classDisplayName, zone, _public_note, _officer_note, isOnline, status, class, achievementPoints, achievementRank, isMobile, canSoR, repStanding, GUID =
 			GetGuildRosterInfo(i)
@@ -152,6 +153,7 @@ ns.refreshGuildList = function(force_refresh)
 		end
 		if ns.race_id[rankName] then
 			ns.character_race_type[name] = rankName
+			OnlyFangsRaceMap[name] = rankName
 		end
 
 		-- For testing
@@ -207,17 +209,19 @@ local function handleEvent(self, event, ...)
 			ns.current_profession_levels[arg] = lvl
 		end
 	elseif event == "ADDON_LOADED" then
-		OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
-		ns.distributed_log = OnlyFangsDistributedLog
+		local addon_name = ...
+		if addon_name == "OnlyFangs" then
+			OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
+			ns.distributed_log = OnlyFangsDistributedLog
 
-		OnlyFangsKeyList = OnlyFangsKeyList or {}
-		ns.key_list = OnlyFangsKeyList
+			OnlyFangsKeyList = OnlyFangsKeyList or {}
+			ns.key_list = OnlyFangsKeyList
 
-		ns.loadDistributedLog()
-		if OnlyFangsRaceInChat and OnlyFangsRaceInChat == 1 then
-			ns.loadRaceInChat()
+			ns.loadDistributedLog()
+			if OnlyFangsRaceInChat and OnlyFangsRaceInChat == 1 then
+				ns.loadRaceInChat()
+			end
 		end
-		-- ns.fakeEntries()
 	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
 		for bag = 0, 5 do
 			for slot = 0, 16 do
