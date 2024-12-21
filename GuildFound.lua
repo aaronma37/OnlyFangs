@@ -65,6 +65,8 @@ local function getNeeders(itemName)
     return needers
 end
 
+local ticker
+
 local function OnEvent(self, event, ...)
     if event == "CHAT_MSG_ADDON" then
         local pf, msg, channel, _, from = ...
@@ -76,6 +78,10 @@ local function OnEvent(self, event, ...)
         local isLogin, isReload = ...
         if isLogin or isReload then
             C_ChatInfo.RegisterAddonMessagePrefix(prefix)
+            broadcast()
+            ticker = C_Timer.NewTicker(BROADCAST_INTERVAL, function() 
+                broadcast()
+            end)
         end
     elseif event == "ADDON_LOADED" then
         local addonName = ...
@@ -93,12 +99,7 @@ local function OnEvent(self, event, ...)
     end
 end
 
-local function OnUpdate()
-    local t = GetTime()
-    if t - lastTx > BROADCAST_INTERVAL then
-        broadcast()
-    end
-end
+
 
 GuildFoundFrame:RegisterEvent("CHAT_MSG_ADDON")
 GuildFoundFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -106,6 +107,8 @@ GuildFoundFrame:RegisterEvent("ADDON_LOADED")
 GuildFoundFrame:RegisterEvent("PLAYER_LOGOUT")
 GuildFoundFrame:SetScript("OnEvent", OnEvent)
 GuildFoundFrame:SetScript("OnUpdate", OnUpdate)
+
+
 
 local function SlashCommandHandler(msg)
     if string.sub(msg, 1, 4) == "add " then
