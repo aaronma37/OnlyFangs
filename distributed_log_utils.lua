@@ -483,6 +483,10 @@ ns.getStreamerInfo = function(streamer_name)
 			and OnlyFangsStreamerMap[_char_name .. "-" .. REALM_NAME] == streamer_name
 			and _last_guid ~= nil
 		then
+			if ns.character_race_type and ns.character_race_type[_char_name .. "-" .. REALM_NAME] then
+				streamer_meta["race"] = ns.character_race_type[_char_name .. "-" .. REALM_NAME]
+			end
+
 			local unique_char = _char_name .. "-" .. _last_guid
 			if _character_meta[unique_char] == nil then
 				_character_meta[unique_char] = {}
