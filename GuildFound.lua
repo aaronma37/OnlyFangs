@@ -79,7 +79,7 @@ local function OnEvent(self, event, ...)
         end
     elseif event == "ADDON_LOADED" then
         local addonName = ...
-        if addonName == "GuildFound" then
+        if addonName == "OnlyFangs" then
             if not GuildFound_Saved then
                 GuildFound_Saved = {}
             end
