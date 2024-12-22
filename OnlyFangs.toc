@@ -8,8 +8,9 @@
 
 
 ## DefaultState: enabled
+
 ## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut, OnlyMonitorOn, OnlyFangsPrintChatFrame, OnlyFangsRaceMap
-## SavedVariablesPerCharacter: OnlyFangsOverrideRace
+## SavedVariablesPerCharacter: OnlyFangsOverrideRace, WishList_Saved
 
 events/event_globals.lua
 
@@ -65,6 +66,8 @@ Localization/strings_ru.lua
 Localization/localization.lua
 
 embeds.xml
+
+WishList.lua
 
 toast.lua
 utils.lua
