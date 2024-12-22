@@ -39,6 +39,17 @@ local function broadcast()
     sendAddonMessage(serialized)
 end
 
+local function rebuildNeedersByItem()
+    needersByItem = {}
+    for name, v in pairs(guildNeeds) do
+        for k, item in pairs(v) do
+            local needers = needersByItem[string.upper(k)] or {}
+            needers[name] = true
+            needersByItem[string.upper(k)] = needers
+        end
+    end
+end
+
 local function processMessage(msg, from)
     -- prettyPrint("Received message from " .. from)
     local success, deserialized = AceSerializer:Deserialize(msg)
@@ -46,7 +57,7 @@ local function processMessage(msg, from)
 
         local priorNeeds = guildNeeds[from]
 
-        if deserialized == {} then
+        if next(deserialized) == nil then
             guildNeeds[from] = nil
         else
             guildNeeds[from] = deserialized
@@ -115,15 +126,12 @@ local function OnEvent(self, event, ...)
             end
             localPlayerNeeds = WishList_Saved.localPlayerNeeds or {}
             guildNeeds = WishList_Saved.guildNeeds or {}
-            needersByItem = WishList_Saved.needersByItem or {}
+            rebuildNeedersByItem()
         end
     elseif event == "PLAYER_LOGOUT" then
-        if not WishList_Saved then
-            WishList_Saved = {}
-        end
+        WishList_Saved = {}
         WishList_Saved.localPlayerNeeds = localPlayerNeeds
         WishList_Saved.guildNeeds = guildNeeds
-        WishList_Saved.needersByItem = needersByItem
     end
 end
 
@@ -136,7 +144,42 @@ WishListFrame:RegisterEvent("PLAYER_LOGOUT")
 WishListFrame:SetScript("OnEvent", OnEvent)
 WishListFrame:SetScript("OnUpdate", OnUpdate)
 
+WishList = {}
+function WishList:SetFromText(text)
+    clearItems()
+    for token in string.gmatch(text, "[^\r\n]+") do
+        if string.len(token) > 0 then
+            addItem(token)
+        end
+    end
+    broadcast()
+end
 
+function WishList:GetText()
+    local text = ""
+    for k, v in pairs(localPlayerNeeds) do
+        text = text .. v.itemName .. "\n"
+    end
+    return text
+end
+
+function WishList:WhoNeeds(text)
+    return getNeeders(text)
+end
+
+function WishList:ListAll()
+    prettyPrint("All wish lists:")
+    for k, v in pairs(guildNeeds) do
+        print(k)
+        for _, item in pairs(v) do
+            print(" - " .. item.itemName)
+        end
+    end
+end
+
+function WishList:Rebuild()
+    rebuildNeedersByItem()
+end
 
 local function SlashCommandHandler(msg)
     if string.sub(msg, 1, 4) == "add " then
@@ -157,6 +200,8 @@ local function SlashCommandHandler(msg)
         clearItems()
         broadcast()
         prettyPrint("Cleared your list of needed items")
+    elseif string.sub(msg, 1, 7) == "listall" then
+        WishList:ListAll()
     elseif string.sub(msg, 1, 4) == "list" then
         prettyPrint("Needed items:")
         for k, v in pairs(localPlayerNeeds) do
@@ -215,28 +260,5 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
         tooltip:Show()
     end
   end)
-
-WishList = {}
-function WishList:SetFromText(text)
-    clearItems()
-    for token in string.gmatch(text, "[^\r\n]+") do
-        if string.len(token) > 0 then
-            addItem(token)
-        end
-    end
-    broadcast()
-end
-
-function WishList:GetText()
-    local text = ""
-    for k, v in pairs(localPlayerNeeds) do
-        text = text .. v.itemName .. "\n"
-    end
-    return text
-end
-
-function WishList:WhoNeeds(text)
-    return getNeeders(text)
-end
 
 SlashCmdList["WISHLIST"] = SlashCommandHandler
