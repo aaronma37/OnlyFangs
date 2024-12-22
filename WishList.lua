@@ -174,6 +174,11 @@ function WishList:Rebuild()
     rebuildNeedersByItem()
 end
 
+function WishList:ListForCharacter(name)
+    local list = guildNeeds[name]
+    return list or {}
+end
+
 local function SlashCommandHandler(msg)
     if string.sub(msg, 1, 4) == "add " then
         local item = string.sub(msg, 5)

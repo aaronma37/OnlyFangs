@@ -2629,7 +2629,11 @@ local function drawWishListTab(container)
 
 	local search_editbox = AceGUI:Create("EditBox")
 	search_editbox:SetLabel("Item Name:")
-	search_editbox:SetWidth(300)
+	search_editbox:SetWidth(250)
+
+	local listsearch_editbox = AceGUI:Create("EditBox")
+	listsearch_editbox:SetLabel("Character Name:")
+	listsearch_editbox:SetWidth(250)
 
 	local search_result = AceGUI:Create("Label")
 	search_result:SetWidth(500)
@@ -2643,7 +2647,20 @@ local function drawWishListTab(container)
 		search_result:SetText(result)
 	end)
 
+	listsearch_editbox:SetCallback("OnEnterPressed", function(self, _, text)
+		local properCase = text:lower():gsub("^%l", string.upper)
+		local list = WishList:ListForCharacter(properCase)
+		local result = "Wishlist for " .. properCase .. ":\n\n"
+		for k, v in pairs(list) do
+			if v and v.itemName then
+				result = result .. v.itemName .. "\n"
+			end
+		end
+		search_result:SetText(result)
+	end)
+
 	right_frame:AddChild(search_editbox)
+	right_frame:AddChild(listsearch_editbox)
 	right_frame:AddChild(search_result)
 end
 
