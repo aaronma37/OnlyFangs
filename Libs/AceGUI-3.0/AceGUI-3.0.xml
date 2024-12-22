@@ -5,7 +5,6 @@
 	<Script file="widgets\AceGUIContainer-BlizOptionsGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-DropDownGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-Frame.lua"/>
-	<Script file="widgets\AceGUIContainer-Deathlog.lua"/>
 	<Script file="widgets\AceGUIContainer-InlineGroup.lua"/>
 	<Script file="widgets\AceGUIContainer-ScrollFrame.lua"/>
 	<Script file="widgets\AceGUIContainer-SimpleGroup.lua"/>
@@ -20,10 +19,8 @@
 	<Script file="widgets\AceGUIWidget-CheckBox.lua"/>
 	<Script file="widgets\AceGUIWidget-ColorPicker.lua"/>
 	<Script file="widgets\AceGUIWidget-DropDown.lua"/>
-	<Script file="widgets\AceGUIWidget-DeathlogDropDown.lua"/>
 	<Script file="widgets\AceGUIWidget-DropDown-Items.lua"/>
 	<Script file="widgets\AceGUIWidget-EditBox.lua"/>
-	<Script file="widgets\AceGUIWidget-DeathlogEditBox.lua"/>
 	<Script file="widgets\AceGUIWidget-Heading.lua"/>
 	<Script file="widgets\AceGUIWidget-Icon.lua"/>
 	<Script file="widgets\AceGUIWidget-InteractiveLabel.lua"/>
