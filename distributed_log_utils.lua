@@ -31,7 +31,7 @@ local LAUNCH_DATE = 1732186800 - WEEK_SECONDS
 local DAY_SECONDS = 86400
 local OUT_CSV = false
 
-local NUM_ENTRY_OFF = 8
+local NUM_ENTRY_OFF = 9
 
 local dl_recorder_limiter = true
 
@@ -396,13 +396,31 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 
 	local streamer_name = ns.streamer_map[_char_name] or OnlyFangsStreamerMap[_char_name]
 
+	local race_name = ns.id_race[_event_log[RACE_IDX]]
+	if ns.character_race_type and ns.character_race_type[_char_name] then
+		race_name = ns.character_race_type[_char_name]
+		-- if race_name ~= ns.id_race[_event_log[RACE_IDX]] then
+		-- 	print(
+		-- 		_char_name
+		-- 			.. ", achievement: "
+		-- 			.. _event_name
+		-- 			.. ", labeled as: "
+		-- 			.. ns.id_race[_event_log[RACE_IDX]]
+		-- 			.. ", Fixed to: "
+		-- 			.. race_name
+		-- 			.. ", pts: "
+		-- 			.. _adjusted_pts
+		-- 	)
+		-- end
+	end
+
 	if streamer_name then
 		if top_players_all_time[streamer_name] == nil then
 			top_players_all_time[streamer_name] = { ["pts"] = 0 }
 		end
 		if ns.most_recent_info[streamer_name] == nil or ns.most_recent_info[streamer_name] < _event_log[DATE_IDX] then
 			ns.most_recent_info[streamer_name] = _event_log[DATE_IDX]
-			ns.streamer_to_race[streamer_name] = ns.id_race[_event_log[RACE_IDX]]
+			ns.streamer_to_race[streamer_name] = race_name
 		end
 
 		top_players_all_time[streamer_name].pts = top_players_all_time[streamer_name].pts + _adjusted_pts
@@ -422,7 +440,6 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 	end
 
 	local adjusted_time = fromAdjustedTime(_event_log[DATE_IDX])
-	local race_name = ns.id_race[_event_log[RACE_IDX]]
 
 	if
 		_event_log[EVENT_IDX] == 4
@@ -435,22 +452,6 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 		deaths_by_race_all_time[race_name] = deaths_by_race_all_time[race_name] + 1
 	end
 	if adjusted_time > this_week_period_start then
-		if ns.character_race_type and ns.character_race_type[_char_name] then
-			race_name = ns.character_race_type[_char_name]
-			-- if race_name ~= ns.id_race[_event_log[RACE_IDX]] then
-			-- 	print(
-			-- 		_char_name
-			-- 			.. ", achievement: "
-			-- 			.. _event_name
-			-- 			.. ", labeled as: "
-			-- 			.. ns.id_race[_event_log[RACE_IDX]]
-			-- 			.. ", Fixed to: "
-			-- 			.. race_name
-			-- 			.. ", pts: "
-			-- 			.. _adjusted_pts
-			-- 	)
-			-- end
-		end
 		distributed_log.this_week_points[race_name] = distributed_log.this_week_points[race_name] + _adjusted_pts
 		if
 			_event_log[EVENT_IDX] == 4
@@ -564,6 +565,7 @@ ns.getStreamerInfo = function(streamer_name)
 end
 
 ns.aggregateLog = function()
+	ns.most_recent_info = {}
 	if ns.character_race_type == nil then
 		ns.character_race_type = OnlyFangsRaceMap
 	end
@@ -675,7 +677,11 @@ ns.aggregateLog = function()
 	end
 	-- for k, v in pairs(distributed_log.this_week_points) do
 	-- 	if v > 0 then
-	-- 		print(k, v)
+	-- 		if k == "Undead" then
+	-- 			print(k, v * 0.9)
+	-- 		else
+	-- 			print(k, v)
+	-- 		end
 	-- 	end
 	-- end
 	-- print(duplicate_count)
