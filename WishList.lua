@@ -50,8 +50,7 @@ local function rebuildNeedersByItem()
     end
 end
 
-local function processMessage(msg, from)
-    -- prettyPrint("Received message from " .. from)
+local function processMessage(prefix, msg, channel, from)
     local success, deserialized = AceSerializer:Deserialize(msg)
     if success then
 
@@ -103,16 +102,10 @@ end
 
 local ticker
 local function OnEvent(self, event, ...)
-    if event == "CHAT_MSG_ADDON" then
-        local pf, msg, channel, _, from = ...
-        if pf ~= prefix then return end
-        if channel == "GUILD" then
-            processMessage(msg, from)
-        end
-    elseif event == "PLAYER_ENTERING_WORLD" then
+    if event == "PLAYER_ENTERING_WORLD" then
         local isLogin, isReload = ...
         if isLogin or isReload then
-            C_ChatInfo.RegisterAddonMessagePrefix(prefix)
+            AceComm:RegisterComm(prefix, processMessage)
             broadcast()
             ticker = C_Timer.NewTicker(BROADCAST_INTERVAL, function() 
                 broadcast()
