@@ -2466,16 +2466,17 @@ local function drawLeaderboardTab(container)
 			_line:SetWidth(250)
 			local race_img = ""
 			if top_scores[_type][j] and ns.streamer_to_race[top_scores[_type][j].streamer_name] then
-				if ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Tauren" then
+				local _race_name = ns.streamer_to_race[top_scores[_type][j].streamer_name]
+				if _race_name == "Tauren" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
-				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Undead" then
+				elseif _race_name == "Undead" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
-				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Troll" then
+				elseif _race_name == "Troll" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
-				elseif ns.streamer_to_race[top_scores[_type][j].streamer_name] == "Orc" then
+				elseif _race_name == "Orc" then
 					race_img =
 						"|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
 				end
@@ -2620,10 +2621,10 @@ local function drawWishListTab(container)
 	wishlist_editbox:SetHeight(400)
 	wishlist_editbox:SetText(WishList:GetText())
 
-	wishlist_editbox:SetCallback("OnEnterPressed", function(self, _, text) 
+	wishlist_editbox:SetCallback("OnEnterPressed", function(self, _, text)
 		WishList:SetFromText(text)
 	end)
-	
+
 	left_frame:AddChild(wishlist_editbox)
 
 	local search_editbox = AceGUI:Create("EditBox")
@@ -2633,7 +2634,7 @@ local function drawWishListTab(container)
 	local search_result = AceGUI:Create("Label")
 	search_result:SetWidth(500)
 	search_result:SetFullHeight()
-	search_editbox:SetCallback("OnEnterPressed", function(self, _, text) 
+	search_editbox:SetCallback("OnEnterPressed", function(self, _, text)
 		local needers = WishList:WhoNeeds(text)
 		local result = "Who needs " .. text .. ":\n\n"
 		for k, v in pairs(needers) do
@@ -2641,14 +2642,9 @@ local function drawWishListTab(container)
 		end
 		search_result:SetText(result)
 	end)
-	
 
 	right_frame:AddChild(search_editbox)
 	right_frame:AddChild(search_result)
-
-
-
-
 end
 
 local function createMenu()

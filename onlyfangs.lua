@@ -304,6 +304,7 @@ local function handleEvent(self, event, ...)
 			end
 		end
 	elseif event == "GUILD_ROSTER_UPDATE" then
+		ns.refreshGuildList(false)
 		if guild_loaded == false then
 			local guild_name, _, _ = GetGuildInfo("Player")
 			if guild_name ~= nil then
@@ -317,7 +318,6 @@ local function handleEvent(self, event, ...)
 				guild_loaded = true
 			end
 		end
-		ns.refreshGuildList(false)
 	end
 end
 
