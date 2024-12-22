@@ -252,6 +252,9 @@ local function setLogData()
 			font_strings[i]["Streamer Name"]:SetText(_streamer_name)
 			font_strings[i]["Date"]:SetText(date("%m/%d/%y, %H:%M", _event["Date"] + 1730639674))
 			font_strings[i]["Race"]:SetText(ns.id_race[_event["Race"]])
+			if ns.character_race_type and ns.character_race_type[_char_name .. "-" .. REALM_NAME] then
+				font_strings[i]["Race"]:SetText(ns.character_race_type[_char_name .. "-" .. REALM_NAME])
+			end
 			font_strings[i]["Class"]:SetText(ns.id_class[_event["Class"]] or "")
 			font_strings[i]["Event"]:SetText(ns.event[_event_name].title or "")
 			font_strings[i]["Type"]:SetText(ns.event[_event_name].type or "")
