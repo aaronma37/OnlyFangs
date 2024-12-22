@@ -78,8 +78,19 @@ local function getNeeders(itemName)
     return needersByItem[string.upper(itemName)] or {}
 end
 
-local ticker
+local function addItem(itemName)
+    localPlayerNeeds[string.upper(itemName)] = {itemName = itemName}
+end
 
+local function removeItem(itemName)
+    localPlayerNeeds[string.upper(itemName)] = nil
+end
+
+local function clearItems()
+    localPlayerNeeds = {}
+end
+
+local ticker
 local function OnEvent(self, event, ...)
     if event == "CHAT_MSG_ADDON" then
         local pf, msg, channel, _, from = ...
@@ -103,12 +114,16 @@ local function OnEvent(self, event, ...)
                 WishList_Saved = {}
             end
             localPlayerNeeds = WishList_Saved.localPlayerNeeds or {}
+            guildNeeds = WishList_Saved.guildNeeds or {}
+            needersByItem = WishList_Saved.needersByItem or {}
         end
     elseif event == "PLAYER_LOGOUT" then
         if not WishList_Saved then
             WishList_Saved = {}
         end
         WishList_Saved.localPlayerNeeds = localPlayerNeeds
+        WishList_Saved.guildNeeds = guildNeeds
+        WishList_Saved.needersByItem = needersByItem
     end
 end
 
@@ -127,25 +142,25 @@ local function SlashCommandHandler(msg)
     if string.sub(msg, 1, 4) == "add " then
         local item = string.sub(msg, 5)
         if string.len(item) > 0 then
-            localPlayerNeeds[string.upper(item)] = item
+            addItem(item)
             prettyPrint("Added '" .. item .. "' to needed items")
         end        
         broadcast()
     elseif string.sub(msg, 1, 7) == "remove " then
         local item = string.sub(msg, 8)
         if string.len(item) > 0 then
-            localPlayerNeeds[string.upper(item)] = nil
+            removeItem(item)
             prettyPrint("Removed '" .. item .. "' from needed items")
         end
         broadcast()
     elseif string.sub(msg, 1, 5) == "clear" then
-        localPlayerNeeds = {}
+        clearItems()
         broadcast()
         prettyPrint("Cleared your list of needed items")
     elseif string.sub(msg, 1, 4) == "list" then
         prettyPrint("Needed items:")
         for k, v in pairs(localPlayerNeeds) do
-            print(" - " .. v)
+            print(" - " .. v.itemName)
         end
     elseif string.sub(msg, 1, 9) == "whoneeds " then
         local item = string.sub(msg, 10)
@@ -182,8 +197,7 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
     local count = 0
     for k,v in pairs(needers) do count = count + 1 end
 
-
-    local max = 6
+    local max = 5
     if count >= 1 then
         tooltip:AddLine("|cffff4040<OF>|r |cffffff00Needed By:|r")
         local i = 0
@@ -201,5 +215,28 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
         tooltip:Show()
     end
   end)
+
+WishList = {}
+function WishList:SetFromText(text)
+    clearItems()
+    for token in string.gmatch(text, "[^\r\n]+") do
+        if string.len(token) > 0 then
+            addItem(token)
+        end
+    end
+    broadcast()
+end
+
+function WishList:GetText()
+    local text = ""
+    for k, v in pairs(localPlayerNeeds) do
+        text = text .. v.itemName .. "\n"
+    end
+    return text
+end
+
+function WishList:WhoNeeds(text)
+    return getNeeders(text)
+end
 
 SlashCmdList["WISHLIST"] = SlashCommandHandler

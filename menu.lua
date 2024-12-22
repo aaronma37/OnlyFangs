@@ -2575,6 +2575,79 @@ local function drawLeaderboardTab(container)
 	main_frame:AddChild(reset_button)
 end
 
+local function drawWishListTab(container)
+	local scroll_container = AceGUI:Create("SimpleGroup")
+	scroll_container:SetFullWidth(true)
+	scroll_container:SetFullHeight(true)
+	scroll_container:SetLayout("Fill")
+	onlyfangs_tab_container:AddChild(scroll_container)
+
+	local main_frame = AceGUI:Create("ScrollFrame")
+	main_frame:SetLayout("Flow")
+	main_frame:SetFullWidth(true)
+	main_frame:SetHeight(100)
+	scroll_container:AddChild(main_frame)
+
+	local left_frame = AceGUI:Create("ScrollFrame")
+	left_frame:SetLayout("Flow")
+	left_frame:SetWidth(500)
+	left_frame:SetHeight(2000)
+
+	local right_frame = AceGUI:Create("ScrollFrame")
+	right_frame:SetLayout("Flow")
+	right_frame:SetWidth(500)
+	right_frame:SetHeight(2000)
+
+	main_frame:AddChild(left_frame)
+	main_frame:AddChild(right_frame)
+
+	local _left_header = AceGUI:Create("Heading")
+	_left_header:SetFullWidth(true)
+	_left_header:SetText("My WishList")
+	left_frame:AddChild(_left_header)
+
+	local _right_header = AceGUI:Create("Heading")
+	_right_header:SetFullWidth(true)
+	_right_header:SetText("Search Guild")
+	right_frame:AddChild(_right_header)
+
+	local wishlist_editbox = AceGUI:Create("MultiLineEditBox")
+	wishlist_editbox:SetLabel("Enter item names, one per line:")
+	wishlist_editbox:SetWidth(480)
+	wishlist_editbox:SetHeight(400)
+	wishlist_editbox:SetText(WishList:GetText())
+
+	wishlist_editbox:SetCallback("OnEnterPressed", function(self, _, text) 
+		WishList:SetFromText(text)
+	end)
+	
+	left_frame:AddChild(wishlist_editbox)
+
+	local search_editbox = AceGUI:Create("EditBox")
+	search_editbox:SetLabel("Item Name:")
+	search_editbox:SetWidth(300)
+
+	local search_result = AceGUI:Create("Label")
+	search_result:SetWidth(500)
+	search_result:SetFullHeight()
+	search_editbox:SetCallback("OnEnterPressed", function(self, _, text) 
+		local needers = WishList:WhoNeeds(text)
+		local result = "Who needs " .. text .. ":\n\n"
+		for k, v in pairs(needers) do
+			result = result .. k .. "\n"
+		end
+		search_result:SetText(result)
+	end)
+	
+
+	right_frame:AddChild(search_editbox)
+	right_frame:AddChild(search_result)
+
+
+
+
+end
+
 local function createMenu()
 	local ace_deathlog_menu = AceGUI:Create("OnlyFangsMenu")
 	_G["AceOnlyFangsMenu"] = ace_deathlog_menu.frame -- Close on <ESC>
@@ -2672,6 +2745,8 @@ local function createMenu()
 			drawMonitorTab(container)
 		elseif group == "CharacterTab" then
 			drawCharacterTab(container)
+		elseif group == "WishListTab" then
+			drawWishListTab(container)
 		end
 	end
 
