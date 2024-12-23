@@ -101,8 +101,10 @@ local function loadLevelEvent(_metadata)
 			end
 			local lvl = UnitLevel("player")
 			if lvl >= _event.lvl and sent == false then
-				ns.triggerEvent(_event.name)
-				sent = true
+				C_Timer.After(15, function()
+					ns.triggerEvent(_event.name)
+					sent = true
+				end)
 			end
 		end
 	end)

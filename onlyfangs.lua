@@ -210,17 +210,15 @@ local function handleEvent(self, event, ...)
 		end
 	elseif event == "ADDON_LOADED" then
 		local addon_name = ...
-		if addon_name == "OnlyFangs" then
-			OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
-			ns.distributed_log = OnlyFangsDistributedLog
+		OnlyFangsDistributedLog = OnlyFangsDistributedLog or {}
+		ns.distributed_log = OnlyFangsDistributedLog
 
-			OnlyFangsKeyList = OnlyFangsKeyList or {}
-			ns.key_list = OnlyFangsKeyList
+		OnlyFangsKeyList = OnlyFangsKeyList or {}
+		ns.key_list = OnlyFangsKeyList
 
-			ns.loadDistributedLog()
-			if OnlyFangsRaceInChat and OnlyFangsRaceInChat == 1 then
-				ns.loadRaceInChat()
-			end
+		ns.loadDistributedLog()
+		if OnlyFangsRaceInChat and OnlyFangsRaceInChat == 1 then
+			ns.loadRaceInChat()
 		end
 	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
 		for bag = 0, 5 do

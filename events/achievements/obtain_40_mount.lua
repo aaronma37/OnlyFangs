@@ -58,7 +58,9 @@ _event_handler:SetScript("OnEvent", function(self, e, _target, _, spell_id)
 		return
 	end
 	if spell_list[spell_id] ~= nil and _target == "player" then
-		ns.triggerEvent(_event.name)
-		sent = true
+		C_Timer.After(5, function()
+			ns.triggerEvent(_event.name)
+			sent = true
+		end)
 	end
 end)
