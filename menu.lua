@@ -2394,11 +2394,14 @@ local function drawMonitorTab(container)
 			do
 				local _d = string.gsub(k, "%a+", "")
 				_d = string.gsub(_d, "_", "")
-				local _date = date("%m/%d/%y, %H:%M", _d)
-				local _name, _ = string.split(":", v)
-				_characters[_name] = _name
-				if _filter_name == nil or _name == _filter_name then
-					_monitor_text = _monitor_text .. "\n[" .. _date .. "] - " .. v
+				_d = string.split(" ", _d)
+				if _d then
+					local _date = date("%m/%d/%y, %H:%M", _d)
+					local _name, _ = string.split(":", v)
+					_characters[_name] = _name
+					if _filter_name == nil or _name == _filter_name then
+						_monitor_text = _monitor_text .. "\n[" .. _date .. "] - " .. v
+					end
 				end
 			end
 		end
