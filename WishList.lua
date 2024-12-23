@@ -15,6 +15,7 @@ local guildNeeds = {}
 local needersByItem = {}
 
 local debug = true
+local isShiftPressed = false
 
 local function prettyPrint(msg)
     print("|cffffff00[WishList]|r " .. msg)
@@ -125,6 +126,9 @@ local function OnEvent(self, event, ...)
         WishList_Saved = {}
         WishList_Saved.localPlayerNeeds = localPlayerNeeds
         WishList_Saved.guildNeeds = guildNeeds
+    elseif event == "MODIFIER_STATE_CHANGED" then
+        key, down = ...
+        isShiftPressed = (key == "LSHIFT" or key == "RSHIFT") and down == 1
     end
 end
 
@@ -134,6 +138,7 @@ WishListFrame:RegisterEvent("CHAT_MSG_ADDON")
 WishListFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 WishListFrame:RegisterEvent("ADDON_LOADED")
 WishListFrame:RegisterEvent("PLAYER_LOGOUT")
+WishListFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
 WishListFrame:SetScript("OnEvent", OnEvent)
 WishListFrame:SetScript("OnUpdate", OnUpdate)
 
@@ -172,6 +177,11 @@ end
 
 function WishList:Rebuild()
     rebuildNeedersByItem()
+end
+
+function WishList:ListForCharacter(name)
+    local list = guildNeeds[name]
+    return list or {}
 end
 
 local function SlashCommandHandler(msg)
@@ -241,11 +251,11 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
         local i = 0
         for k, v in pairs(needers) do
             i = i + 1
-            if i < max or count == max then
+            if i < max or count == max or isShiftPressed then
                 tooltip:AddLine("  |cff3ce13f" .. k .. "|r")
             else
                 local extra = count - max + 1
-                tooltip:AddLine("  |cffbbbbbb+ " .. tostring(extra) .. " more|r")
+                tooltip:AddLine("  |cffbbbbbb+ " .. tostring(extra) .. " more (hold shift)|r")
                 break
             end
         end
