@@ -255,7 +255,7 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
                 tooltip:AddLine("  |cff3ce13f" .. k .. "|r")
             else
                 local extra = count - max + 1
-                tooltip:AddLine("  |cffbbbbbb+ " .. tostring(extra) .. " more|r")
+                tooltip:AddLine("  |cffbbbbbb+ " .. tostring(extra) .. " more (hold shift)|r")
                 break
             end
         end
