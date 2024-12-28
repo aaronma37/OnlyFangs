@@ -6,6 +6,7 @@ local AceSerializer = LibStub("AceSerializer-3.0")
 
 local BROADCAST_INTERVAL = 30
 local EXPIRE_SECONDS = 60 * 60 * 24 * 4 -- 4 days
+local DEFAULT_LAST_UPDATE = 1735319993
 
 local WishListFrame = CreateFrame("Frame", "WishListFrame")
 local prefix = "WishList"
@@ -42,7 +43,10 @@ end
 local function removeExpired(wishlist)
     local t = GetServerTime()
     for k, v in pairs(wishlist) do
-        if not v.lastUpdate or t - v.lastUpdate > EXPIRE_SECONDS then
+        if not v.lastUpdate then
+            v.lastUpdate = DEFAULT_LAST_UPDATE
+        end
+        if t - v.lastUpdate > EXPIRE_SECONDS then
             wishlist[k] = nil
         end
     end
@@ -52,15 +56,6 @@ local function renewLocalPlayerNeeds()
     local t = GetServerTime()
     for k, v in pairs(localPlayerNeeds) do
         if v then 
-            v.lastUpdate = t
-        end
-    end
-end
-
-local function initItemLastUpdate()
-    local t = GetServerTime()
-    for k, v in pairs(localPlayerNeeds) do
-        if v and not v.lastUpdate then
             v.lastUpdate = t
         end
     end
@@ -151,7 +146,6 @@ local function OnEvent(self, event, ...)
             localPlayerNeeds = WishList_Saved.localPlayerNeeds or {}
             guildNeeds = WishList_Saved.guildNeeds or {}
             rebuildNeedersByItem()
-            initItemLastUpdate()
         end
     elseif event == "PLAYER_LOGOUT" then
         WishList_Saved = {}
