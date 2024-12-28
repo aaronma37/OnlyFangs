@@ -68,6 +68,7 @@ Localization/localization.lua
 embeds.xml
 
 WishList.lua
+TradeSkills.lua
 
 toast.lua
 utils.lua
