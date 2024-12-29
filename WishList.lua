@@ -6,7 +6,7 @@ local AceSerializer = LibStub("AceSerializer-3.0")
 
 local BROADCAST_INTERVAL = 30
 local EXPIRE_SECONDS = 60 * 60 * 24 * 4 -- 4 days
-local DEFAULT_LAST_UPDATE = 1735319993
+local DEFAULT_LAST_UPDATE = 1735160400 -- Wednesday 12/25 @ 4pm eastern, expires after sunday 12/19 meeting
 
 local WishListFrame = CreateFrame("Frame", "WishListFrame")
 local prefix = "WishList"
