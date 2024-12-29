@@ -2330,6 +2330,7 @@ local function drawCharacterTab(container)
 end
 
 local function drawMonitorTab(container)
+	local show_critical_logs = false
 	local function spairs(t, order)
 		local keys = {}
 		for k in pairs(t) do
@@ -2400,7 +2401,17 @@ local function drawMonitorTab(container)
 					local _name, _ = string.split(":", v)
 					_characters[_name] = _name
 					if _filter_name == nil or _name == _filter_name then
-						_monitor_text = _monitor_text .. "\n[" .. _date .. "] - " .. v
+						if show_critical_logs == true then
+							if
+								string.find(v, "Used AH")
+								or string.find(v, "Received enchantment")
+								or string.find(v, "Auction won")
+							then
+								_monitor_text = _monitor_text .. "\n[" .. _date .. "] - " .. v
+							end
+						else
+							_monitor_text = _monitor_text .. "\n[" .. _date .. "] - " .. v
+						end
 					end
 				end
 			end
@@ -2430,9 +2441,17 @@ local function drawMonitorTab(container)
 		ping_button:SetDisabled(false)
 	end)
 
+	local critical_only_check_box = AceGUI:Create("CheckBox")
+	critical_only_check_box:SetLabel("Show Critical Logs Only")
+	critical_only_check_box:SetCallback("OnValueChanged", function(self, val, v)
+		show_critical_logs = v
+		refreshMonitor()
+	end)
+
 	refreshMonitor()
 	main_frame:AddChild(player_search_box)
 	main_frame:AddChild(ping_button)
+	main_frame:AddChild(critical_only_check_box)
 	main_frame:AddChild(_monitor_data_label)
 end
 
