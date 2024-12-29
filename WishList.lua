@@ -5,10 +5,11 @@ local AceComm = LibStub("AceComm-3.0")
 local AceSerializer = LibStub("AceSerializer-3.0")
 
 local BROADCAST_INTERVAL = 30
+local EXPIRE_SECONDS = 60 * 60 * 24 * 4 -- 4 days
+local DEFAULT_LAST_UPDATE = 1735160400 -- Wednesday 12/25 @ 4pm eastern, expires after sunday 12/19 meeting
 
 local WishListFrame = CreateFrame("Frame", "WishListFrame")
 local prefix = "WishList"
-local lastTx = 0
 
 local localPlayerNeeds = {}
 local guildNeeds = {}
@@ -30,7 +31,6 @@ end
 local function sendAddonMessage(msg)
     if prefix then
         local msgChannel = "GUILD"
-        lastTx = GetTime()
         AceComm:SendCommMessage(prefix, msg, msgChannel)
     end
 end
@@ -40,9 +40,31 @@ local function broadcast()
     sendAddonMessage(serialized)
 end
 
+local function removeExpired(wishlist)
+    local t = GetServerTime()
+    for k, v in pairs(wishlist) do
+        if not v.lastUpdate then
+            v.lastUpdate = DEFAULT_LAST_UPDATE
+        end
+        if t - v.lastUpdate > EXPIRE_SECONDS then
+            wishlist[k] = nil
+        end
+    end
+end
+
+local function renewLocalPlayerNeeds()
+    local t = GetServerTime()
+    for k, v in pairs(localPlayerNeeds) do
+        if v then 
+            v.lastUpdate = t
+        end
+    end
+end
+
 local function rebuildNeedersByItem()
     needersByItem = {}
     for name, v in pairs(guildNeeds) do
+        removeExpired(v)
         for k, item in pairs(v) do
             local needers = needersByItem[string.upper(k)] or {}
             needers[name] = true
@@ -60,6 +82,8 @@ local function processMessage(prefix, msg, channel, from)
         if next(deserialized) == nil then
             guildNeeds[from] = nil
         else
+            -- expire old wishlist items
+            removeExpired(deserialized)
             guildNeeds[from] = deserialized
         end
 
@@ -90,7 +114,8 @@ local function getNeeders(itemName)
 end
 
 local function addItem(itemName)
-    localPlayerNeeds[string.upper(itemName)] = {itemName = itemName}
+    local t = GetServerTime()
+    localPlayerNeeds[string.upper(itemName)] = {itemName = itemName, lastUpdate = t}
 end
 
 local function removeItem(itemName)
@@ -184,6 +209,11 @@ function WishList:ListForCharacter(name)
     return list or {}
 end
 
+function WishList:Renew()
+    renewLocalPlayerNeeds()
+    broadcast()
+end
+
 local function SlashCommandHandler(msg)
     if string.sub(msg, 1, 4) == "add " then
         local item = string.sub(msg, 5)
@@ -233,6 +263,9 @@ local function SlashCommandHandler(msg)
         print("|cffffff00/wl clear|r remove all items from your list of needed items")
         print("|cffffff00/wl list|r print your list of needed items")
         print("|cffffff00/wl whoneeds itemName|r print a list of guild members that need itemName")
+    elseif string.sub(msg, 1, 5) == "renew" then
+        WishList:Renew()
+        prettyPrint("Wishlist item experations reset.")
     else
         prettyPrint("Unrecognized command: " .. msg)
     end
