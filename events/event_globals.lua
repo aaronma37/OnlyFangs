@@ -3,6 +3,7 @@ ns.item_id_obs = {}
 ns.item_id_epic_obs = {}
 ns.last_attack_source = nil
 ns.kill_target_exec = {}
+ns.unit_died_exec = {}
 
 ns.event = {}
 ns.event_order = {}
@@ -221,6 +222,22 @@ ns.event_id = {
 	["EquipFirstTabard"] = 212,
 	["Get40Mount"] = 213,
 	["Obtain40Mount"] = 214,
+	--["Dungeon Complete: Ragefire Chasm"] = 215,
+	["Blackrock Depths"] = 216,
+	["Lower Blackrock Spire"] = 217,
+	["Upper Blackrock Spire"] = 218,
+	["Scholomance"] = 219,
+	["Stratholme (Live)"] = 220,
+	["Stratholme (Undead)"] = 221,
+	["Dire Maul East"] = 222,
+	["Dire Maul West"] = 223,
+	["Dire Maul North"] = 224,
+	["Gather Gromsblood"] = 225,
+	["Gather Dreamfoil"] = 226,
+	["Gather Sungrass"] = 227,
+	["Gather Black Lotus"] = 228,
+	["Gather Stonescale Eel"] = 229,
+	["Gather Elemental Fire"] = 230,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
@@ -453,7 +470,7 @@ ns.triggerEvent = function(event_name)
 		return
 	end
 	if ns.event[event_name].test_only == nil or ns.enable_testing then
-		if ns.already_achieved[event_name] == nil then
+		if ns.already_achieved[event_name] == nil or ns.event[event_name].repeatable then
 			ns.showToast(ns.event[event_name].title, ns.event[event_name].icon_path, ns.event[event_name].type)
 			ns.sendEvent(event_name)
 		end

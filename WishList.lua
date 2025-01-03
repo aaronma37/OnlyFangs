@@ -126,6 +126,18 @@ local function clearItems()
     localPlayerNeeds = {}
 end
 
+local function allExpired(wishlist)
+    local t = GetServerTime()
+    local count = 0
+    for k, v in pairs(wishlist) do
+        count = count + 1
+        if v and v.lastUpdate and t - v.lastUpdate < EXPIRE_SECONDS then
+            return false
+        end
+    end
+    return count > 0
+end
+
 local ticker
 local function OnEvent(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
@@ -146,6 +158,11 @@ local function OnEvent(self, event, ...)
             localPlayerNeeds = WishList_Saved.localPlayerNeeds or {}
             guildNeeds = WishList_Saved.guildNeeds or {}
             rebuildNeedersByItem()
+            C_Timer.After(5, function()
+                if allExpired(localPlayerNeeds) then
+                    prettyPrint("All the items on your wishlist have expired. Modify your wishlist or type |cff00ff00/wl renew|r to refresh.")
+                end
+            end)
         end
     elseif event == "PLAYER_LOGOUT" then
         WishList_Saved = {}
@@ -274,6 +291,7 @@ end
 GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
     local name = tooltip:GetItem()
     --Add the name and path of the item's texture
+    if not name then return end
     local needers = getNeeders(name)
     local count = 0
     for k,v in pairs(needers) do count = count + 1 end

@@ -10,7 +10,7 @@
 ## DefaultState: enabled
 
 ## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut, OnlyMonitorOn, OnlyFangsPrintChatFrame, OnlyFangsRaceMap
-## SavedVariablesPerCharacter: OnlyFangsOverrideRace, WishList_Saved
+## SavedVariablesPerCharacter: OnlyFangsOverrideRace, WishList_Saved, OnlyFangsGatheredMaterials
 
 events/event_globals.lua
 
@@ -51,6 +51,8 @@ events/failures/lava_death.lua
 events/failures/fire_death.lua
 events/failures/fatigue_death.lua
 
+events/raid/dungeon.lua
+events/raid/gathering.lua
 
 events/commands/adjust_points.lua
 

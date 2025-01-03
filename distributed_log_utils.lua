@@ -610,7 +610,8 @@ ns.aggregateLog = function()
 				end
 			else
 				local __name, __f, __guid = string.split("-", k)
-				if __name and __guid then
+				local repeatable = ns.event[event_name].repeatable
+				if __name and __guid and not repeatable then
 					local duplicate_check_id = __name .. "-" .. __guid .. "-" .. event_log[EVENT_IDX]
 					if duplicate_check[duplicate_check_id] == nil or event_log[EVENT_IDX] == 2 then
 						duplicate_check[duplicate_check_id] = k
