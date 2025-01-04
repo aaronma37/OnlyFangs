@@ -58,7 +58,7 @@ ns.class_colors = {}
 for k, _ in pairs(ns.class_tbl) do
 	ns.class_colors[k] = RAID_CLASS_COLORS[string.upper(k)]
 end
-ns.class_colors["Shaman"]:SetRGBA(36 / 255, 89 / 255, 255 / 255, 1)
+ns.class_colors["Shaman"] = CreateColor(36 / 255, 89 / 255, 255 / 255)
 
 ns.race_id = {
 	["Human"] = 1,
