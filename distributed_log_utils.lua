@@ -865,7 +865,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 						"|cffB32133"
 							.. _race_name
 							.. (_sender_short or "")
-							.. ""
+							.. " "
 							.. ns.event[_event_name].title
 							.. _level_text
 							.. " ("
