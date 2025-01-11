@@ -857,13 +857,19 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 							.. ")|r"
 					)
 				elseif _event_type == "Failure" then
+					local _level_text = ""
+					if ns.guild_online and ns.guild_online[sender] and ns.guild_online[sender].level then
+						_level_text = " at lvl. " .. ns.guild_online[sender].level
+					end
+
 					ns.printToChatFrame(
 						"|cffB32133"
 							.. _race_name
 							.. (_sender_short or "")
 							.. " "
 							.. ns.event[_event_name].title
-							.. ". ("
+							.. _level_text
+							.. " ("
 							.. (ns.event[_event_name].pts or "")
 							.. ")|r"
 					)
