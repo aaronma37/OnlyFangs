@@ -834,7 +834,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				end
 				local _sender_short, _ = string.split("-", sender)
 
-				if _event_type == "Achievement" then
+				if _event_type == "Achievement" or _event_type == "Raid Prep" then
 					ns.printToChatFrame(
 						"|cff33ff99"
 							.. _race_name
