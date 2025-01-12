@@ -186,6 +186,7 @@ local function loadEvent(item_metadata)
                     OnlyFangsGatheredMaterials[item] = OnlyFangsGatheredMaterials[item] - item_metadata.quantity
                     ns.triggerEvent(_event.name)
                 end
+                lootAllowed = false
             end
         end
     end)
