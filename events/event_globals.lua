@@ -222,7 +222,7 @@ ns.event_id = {
 	["EquipFirstTabard"] = 212,
 	["Get40Mount"] = 213,
 	["Obtain40Mount"] = 214,
-	--["Dungeon Complete: Ragefire Chasm"] = 215,
+	--["Dungeon Complete: Ragefire Chasm"] = 215, -- removed
 	["Blackrock Depths"] = 216,
 	["Lower Blackrock Spire"] = 217,
 	["Upper Blackrock Spire"] = 218,
@@ -238,6 +238,7 @@ ns.event_id = {
 	["Gather Black Lotus"] = 228,
 	["Gather Stonescale Eel"] = 229,
 	["Gather Elemental Fire"] = 230,
+	["Gather Righteous Orb"] = 231,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
