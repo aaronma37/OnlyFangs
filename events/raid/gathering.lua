@@ -1,12 +1,12 @@
 local addonName, ns = ...
 
 local items = {
-    {["name"] = "Gromsblood", ["quantity"] = 20, ["pts"] = 2},
-    {["name"] = "Dreamfoil", ["quantity"] = 20, ["pts"] = 1},
-    {["name"] = "Sungrass", ["quantity"] = 20, ["pts"] = 1},
+    {["name"] = "Gromsblood", ["quantity"] = 50, ["pts"] = 5},
+    {["name"] = "Dreamfoil", ["quantity"] = 50, ["pts"] = 3},
+    {["name"] = "Sungrass", ["quantity"] = 50, ["pts"] = 3},
     {["name"] = "Black Lotus", ["quantity"] = 1, ["pts"] = 1},
-    {["name"] = "Stonescale Eel", ["quantity"] = 20, ["pts"] = 1},
-    {["name"] = "Elemental Fire", ["quantity"] = 10, ["pts"] = 1}, 
+    {["name"] = "Stonescale Eel", ["quantity"] = 50, ["pts"] = 3},
+    {["name"] = "Elemental Fire", ["quantity"] = 25, ["pts"] = 1}, 
     {["name"] = "Righteous Orb", ["quantity"] = 1, ["pts"] = 1}, 
 }
 
@@ -149,12 +149,16 @@ local function loadEvent(item_metadata)
     _event:RegisterEvent("LOOT_SLOT_CLEARED")
     _event:RegisterEvent("LOOT_ITEM_ROLL_WON")
     _event:RegisterEvent("CHAT_MSG_LOOT")
+    _event:RegisterEvent("MAIL_SHOW")
+    _event:RegisterEvent("TRADE_SHOW")
 
     local lootInfo = nil
     local lootAllowed = false
 
     _event:SetScript("OnEvent", function(self, event, ...) 
-        if event == "LOOT_READY" then
+        if event == "MAIL_SHOW" or event == "TRADE_SHOW" then
+            lootAllowed = false
+        elseif event == "LOOT_READY" then
             lootInfo = GetLootInfo()
             lootAllowed = false
         elseif event == "LOOT_CLOSED" then
