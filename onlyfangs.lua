@@ -245,7 +245,7 @@ local function handleEvent(self, event, ...)
 		end
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		-- local time, token, hidding, source_serial, source_name, caster_flags, caster_flags2, target_serial, target_name, target_flags, target_flags2, ability_id, ability_name, ability_type, extraSpellID, extraSpellName, extraSchool = CombatLogGetCurrentEventInfo()
-		local _, ev, ok, _, source_name, _, target_name, target_guid, _, cc, _, environmental_type, overkill_swing, _, range_dmg, overkill_range, _, swing_crit, _, _, range_crit =
+		local _, ev, ok, _, source_name, _, target_name, target_guid, enemy_name, cc, _, environmental_type, overkill_swing, _, range_dmg, overkill_range, _, swing_crit, _, _, range_crit =
 			CombatLogGetCurrentEventInfo()
 		-- print(ev, source_name, cc, target_guid)
 
@@ -300,7 +300,12 @@ local function handleEvent(self, event, ...)
 					ns.last_attack_source = -7
 				end
 			end
+		elseif ev == "UNIT_DIED" then
+			if ns.unit_died_exec[enemy_name] then
+				ns.unit_died_exec[enemy_name]()
+			end
 		end
+
 	elseif event == "GUILD_ROSTER_UPDATE" then
 		ns.refreshGuildList(false)
 		if guild_loaded == false then

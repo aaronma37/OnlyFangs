@@ -167,6 +167,7 @@ end
 local distributed_log = nil
 local key_list = nil
 ns.claimed_milestones = {}
+ns.dungeon_log = {}
 
 local function updateThisWeeksPoints(_event, event_log)
 	if _event and _event.pts and event_log[2] and ns.id_race[event_log[2]] then
@@ -574,6 +575,7 @@ ns.aggregateLog = function()
 	top_players_weekly = {}
 	top_players_all_time = {}
 	ns.already_achieved = {}
+	ns.dungeon_log = {}
 	ns.duplicate_tracker = {}
 
 	deaths_by_race_all_time = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
@@ -610,9 +612,28 @@ ns.aggregateLog = function()
 						ns.event[event_name].pts
 					)
 				end
+			elseif ns.event[event_name].type == "Raid Prep" and ns.event[event_name].subtype == "Dungeon" then
+				local __name, __f, __guid = string.split("-", k)
+				local adjusted_time = fromAdjustedTime(event_log[DATE_IDX])
+				if not adjusted_time then return end
+				local date = date("%Y-%m-%d", adjusted_time)
+				local key = __name .. "-" .. date .. "-" .. event_name
+				ns.dungeon_log[key] = ns.dungeon_log[key] or 0
+				ns.dungeon_log[key] = ns.dungeon_log[key] + 1
+				if ns.dungeon_log[key] <= ns.event[event_name].max_daily then
+					ns.event[event_name].aggregrate(distributed_log, event_log)
+					addPointsToLeaderBoardData(
+						k,
+						event_name,
+						event_log,
+						current_adjusted_time,
+						ns.event[event_name].pts
+					)
+				end
 			else
 				local __name, __f, __guid = string.split("-", k)
-				if __name and __guid then
+				local repeatable = ns.event[event_name].repeatable
+				if __name and __guid and not repeatable then
 					local duplicate_check_id = __name .. "-" .. __guid .. "-" .. event_log[EVENT_IDX]
 					if duplicate_check[duplicate_check_id] == nil or event_log[EVENT_IDX] == 2 then
 						duplicate_check[duplicate_check_id] = k
@@ -838,7 +859,7 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 				end
 				local _sender_short, _ = string.split("-", sender)
 
-				if _event_type == "Achievement" then
+				if _event_type == "Achievement" or _event_type == "Raid Prep" then
 					ns.printToChatFrame(
 						"|cff33ff99"
 							.. _race_name
