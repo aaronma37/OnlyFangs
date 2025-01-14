@@ -249,6 +249,7 @@ ns.event_id = {
 	["Gather Goldthorn"] = 239,
 	["Gather Wild Steelbloom"] = 240,
 	["Gather Grave Moss"] = 241,
+	["First to Find Pattern: Shifting Cloak"] = 242,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
