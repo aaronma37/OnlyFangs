@@ -2674,7 +2674,11 @@ local function drawWishListTab(container)
 		local needers = WishList:WhoNeeds(text)
 		local result = "Who needs " .. text .. ":\n\n"
 		for k, v in pairs(needers) do
-			result = result .. k .. "\n"
+			local _race_icon = ""
+			if OnlyFangsRaceInWishList and OnlyFangsRaceInWishList == 1 then
+				_race_icon = ns.getRaceIconString(k)
+			end
+			result = result .. _race_icon .. k .. "\n"
 		end
 		search_result:SetText(result)
 	end)

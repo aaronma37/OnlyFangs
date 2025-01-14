@@ -372,6 +372,18 @@ local function SlashHandler(msg, editbox)
 			OnlyFangsStreamerNameInChat = nil
 			print("Reload to remove streamer names in chat")
 		end
+	elseif cmd == "raceInWishList" then
+		local opt = ""
+		for substring in args:gmatch("%S+") do
+			opt = substring
+		end
+		if opt == "1" then
+			OnlyFangsRaceInWishList = 1
+			-- print("Reload to see ")
+		else
+			OnlyFangsRaceInWishList = nil
+			-- print("Reload to remove streamer names in chat")
+		end
 	elseif cmd == "achievementAlertChatFrame" then
 		local opt = ""
 		for substring in args:gmatch("%S+") do

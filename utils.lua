@@ -23,6 +23,9 @@ local _, ns = ...
 
 ns.instance_tbl = OnlyFangs_L.instance_tbl
 
+local REALM_NAME = GetRealmName()
+REALM_NAME = REALM_NAME:gsub("%s+", "")
+
 ns.id_to_instance_tbl = {}
 for _, v in pairs(ns.instance_tbl) do
 	ns.id_to_instance_tbl[v[1]] = v[3]
@@ -134,6 +137,36 @@ ns.getVersion = function()
 	return tonumber(major), tonumber(minor), tonumber(patch), tostring(hash), tostring(buildType)
 end
 ns.getVersion()
+
+ns.getRaceIconString = function(character_name_without_realm)
+	local character_name = character_name_without_realm .. "-" .. REALM_NAME
+	local _race = ""
+	if ns.character_race_type and ns.character_race_type[character_name] then
+		if ns.character_race_type[character_name] == "Tauren" then
+			_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
+		elseif ns.character_race_type[character_name] == "Undead" then
+			_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
+		elseif ns.character_race_type[character_name] == "Troll" then
+			_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
+		elseif ns.character_race_type[character_name] == "Orc" then
+			_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+		end
+	else
+		local _streamer = ns.streamer_map[character_name]
+		if _streamer and ns.streamer_to_race and ns.streamer_to_race[_streamer] then
+			if ns.streamer_to_race[_streamer] == "Tauren" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:0:16:16:32|t "
+			elseif ns.streamer_to_race[_streamer] == "Undead" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:16:32:16:32|t "
+			elseif ns.streamer_to_race[_streamer] == "Troll" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:32:48:16:32|t "
+			elseif ns.streamer_to_race[_streamer] == "Orc" then
+				_race = "|TInterface\\Glues\\CHARACTERCREATE\\UI-CHARACTERCREATE-RACES:16:16:0:0:64:64:48:64:16:32|t "
+			end
+		end
+	end
+	return _race
+end
 
 local race_in_chat_loaded = false
 ns.loadRaceInChat = function()

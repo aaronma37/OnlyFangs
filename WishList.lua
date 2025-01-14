@@ -1,6 +1,6 @@
 SLASH_WISHLIST1 = "/wishlist"
 SLASH_WISHLIST2 = "/wl"
-
+local _, ns = ...
 local AceComm = LibStub("AceComm-3.0")
 local AceSerializer = LibStub("AceSerializer-3.0")
 
@@ -303,7 +303,9 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
         for k, v in pairs(needers) do
             i = i + 1
             if i < max or count == max or isShiftPressed then
-                tooltip:AddLine("  |cff3ce13f" .. k .. "|r")
+            	local _race_icon = ""
+            	if OnlyFangsRaceInWishList and OnlyFangsRaceInWishList == 1 then _race_icon = ns.getRaceIconString(k) end
+                tooltip:AddLine("  " .. _race_icon .. "|cff3ce13f" .. k .. "|r")
             else
                 local extra = count - max + 1
                 tooltip:AddLine("  |cffbbbbbb+ " .. tostring(extra) .. " more (hold shift)|r")
