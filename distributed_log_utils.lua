@@ -166,6 +166,7 @@ end
 local distributed_log = nil
 local key_list = nil
 ns.claimed_milestones = {}
+ns.dungeon_log = {}
 
 local function updateThisWeeksPoints(_event, event_log)
 	if _event and _event.pts and event_log[2] and ns.id_race[event_log[2]] then
@@ -573,6 +574,7 @@ ns.aggregateLog = function()
 	top_players_weekly = {}
 	top_players_all_time = {}
 	ns.already_achieved = {}
+	ns.dungeon_log = {}
 
 	deaths_by_race_all_time = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
 	deaths_by_race_this_week = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
@@ -599,6 +601,24 @@ ns.aggregateLog = function()
 		then
 			if ns.event[event_name].type == "Milestone" then
 				if ns.claimed_milestones[event_name] == k then
+					ns.event[event_name].aggregrate(distributed_log, event_log)
+					addPointsToLeaderBoardData(
+						k,
+						event_name,
+						event_log,
+						current_adjusted_time,
+						ns.event[event_name].pts
+					)
+				end
+			elseif ns.event[event_name].type == "Raid Prep" and ns.event[event_name].subtype == "Dungeon" then
+				local __name, __f, __guid = string.split("-", k)
+				local adjusted_time = fromAdjustedTime(event_log[DATE_IDX])
+				if not adjusted_time then return end
+				local date = date("%Y-%m-%d", adjusted_time)
+				local key = __name .. "-" .. date .. "-" .. event_name
+				ns.dungeon_log[key] = ns.dungeon_log[key] or 0
+				ns.dungeon_log[key] = ns.dungeon_log[key] + 1
+				if ns.dungeon_log[key] <= ns.event[event_name].max_daily then
 					ns.event[event_name].aggregrate(distributed_log, event_log)
 					addPointsToLeaderBoardData(
 						k,

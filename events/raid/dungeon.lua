@@ -20,11 +20,13 @@ local function loadEvent(target_metadata)
 	-- General info
 	_event.name = _name
 	_event.type = "Raid Prep"
+	_event.subtype = "Dungeon"
 	_event.title = _name
 	_event.pts = target_metadata.pts
 	_event.test_only = target_metadata.test_only
     _event.repeatable = 1
 	_event.description = "|cffddddddBe" .. target_metadata.dungeon_name .. " |cffdddddd.|r"
+	_event.max_daily = 5
 
 	-- Aggregation
 	_event.aggregrate = function(distributed_log, event_log)
