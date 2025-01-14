@@ -96,16 +96,16 @@ local function loadLevelEvent(_metadata)
 				end
 			end)
 		elseif e == "PLAYER_ENTERING_WORLD" then
-			if sent == true then
-				return
-			end
-			local lvl = UnitLevel("player")
-			if lvl >= _event.lvl and sent == false then
-				C_Timer.After(15, function()
-					ns.triggerEvent(_event.name)
-					sent = true
-				end)
-			end
+			-- if sent == true then
+			-- 	return
+			-- end
+			-- local lvl = UnitLevel("player")
+			-- if lvl >= _event.lvl and sent == false then
+			-- 	C_Timer.After(15, function()
+			-- 		ns.triggerEvent(_event.name)
+			-- 		sent = true
+			-- 	end)
+			-- end
 		end
 	end)
 end
