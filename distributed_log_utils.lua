@@ -762,15 +762,17 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					{ tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id), _add_args }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				lruSet(_fletcher, _new_data)
-				if ns.event[_event_name].type == "Milestone" then
-					if ns.claimed_milestones[_event_name] == nil then
+				if _event_name ~= nil then
+					if ns.event[_event_name].type == "Milestone" then
+						if ns.claimed_milestones[_event_name] == nil then
+							ns.event[_event_name].aggregrate(distributed_log, _new_data)
+							ns.claimed_milestones[_event_name] = _fletcher
+							updateThisWeeksPoints(ns.event[_event_name], _new_data)
+						end
+					else
 						ns.event[_event_name].aggregrate(distributed_log, _new_data)
-						ns.claimed_milestones[_event_name] = _fletcher
 						updateThisWeeksPoints(ns.event[_event_name], _new_data)
 					end
-				else
-					ns.event[_event_name].aggregrate(distributed_log, _new_data)
-					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
 			-- print(_num_entries, _addon_version, sender)
