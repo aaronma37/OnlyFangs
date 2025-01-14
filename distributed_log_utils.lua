@@ -59,6 +59,7 @@ ns.already_achieved = {}
 ns.streamer_to_race = {}
 ns.most_recent_info = {}
 ns.versions = {}
+ns.duplicate_tracker = {}
 
 local function spairs(t, order)
 	local keys = {}
@@ -575,6 +576,7 @@ ns.aggregateLog = function()
 	top_players_all_time = {}
 	ns.already_achieved = {}
 	ns.dungeon_log = {}
+	ns.duplicate_tracker = {}
 
 	deaths_by_race_all_time = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
 	deaths_by_race_this_week = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
@@ -688,6 +690,7 @@ ns.aggregateLog = function()
 		-- 	print("Subtracking ", first_key, -ns.event[event_name].pts)
 		-- 	print("Adding ", earliest_id, ns.event[_earliest_event_name].pts)
 		-- end
+		ns.duplicate_tracker[_duplicate_id] = earliest_id
 		addPointsToLeaderBoardData(
 			earliest_id,
 			_earliest_event_name,
@@ -783,15 +786,17 @@ event_handler:SetScript("OnEvent", function(self, e, ...)
 					{ tonumber(_date), tonumber(_race_id), tonumber(_event_id), tonumber(_class_id), _add_args }
 				local _event_name = ns.id_event[tonumber(_event_id)]
 				lruSet(_fletcher, _new_data)
-				if ns.event[_event_name].type == "Milestone" then
-					if ns.claimed_milestones[_event_name] == nil then
+				if _event_name ~= nil then
+					if ns.event[_event_name].type == "Milestone" then
+						if ns.claimed_milestones[_event_name] == nil then
+							ns.event[_event_name].aggregrate(distributed_log, _new_data)
+							ns.claimed_milestones[_event_name] = _fletcher
+							updateThisWeeksPoints(ns.event[_event_name], _new_data)
+						end
+					else
 						ns.event[_event_name].aggregrate(distributed_log, _new_data)
-						ns.claimed_milestones[_event_name] = _fletcher
 						updateThisWeeksPoints(ns.event[_event_name], _new_data)
 					end
-				else
-					ns.event[_event_name].aggregrate(distributed_log, _new_data)
-					updateThisWeeksPoints(ns.event[_event_name], _new_data)
 				end
 			end
 			-- print(_num_entries, _addon_version, sender)

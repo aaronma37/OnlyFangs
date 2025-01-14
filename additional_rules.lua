@@ -53,8 +53,10 @@ rule_event_handler:SetScript("OnEvent", function(self, event, ...)
 	if event == "MAIL_SHOW" or event == "MAIL_INBOX_UPDATE" then
 		on_mail_show()
 	elseif event == "AUCTION_HOUSE_SHOW" then
-		CloseAuctionHouse()
-		print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not trade outside of the guild.")
+		if CanEditOfficerNote() == false then
+			CloseAuctionHouse()
+			print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not trade outside of the guild.")
+		end
 	end
 end)
 
