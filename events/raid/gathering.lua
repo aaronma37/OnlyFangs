@@ -1,13 +1,23 @@
 local addonName, ns = ...
 
 local items = {
-    {["name"] = "Gromsblood", ["quantity"] = 50, ["pts"] = 5},
-    {["name"] = "Dreamfoil", ["quantity"] = 50, ["pts"] = 3},
-    {["name"] = "Sungrass", ["quantity"] = 50, ["pts"] = 3},
+    {["name"] = "Gromsblood", ["quantity"] = 20, ["pts"] = 3},
+    {["name"] = "Dreamfoil", ["quantity"] = 20, ["pts"] = 2},
+    {["name"] = "Sungrass", ["quantity"] = 40, ["pts"] = 1},
     {["name"] = "Black Lotus", ["quantity"] = 1, ["pts"] = 1},
-    {["name"] = "Stonescale Eel", ["quantity"] = 50, ["pts"] = 3},
-    {["name"] = "Elemental Fire", ["quantity"] = 25, ["pts"] = 1}, 
-    {["name"] = "Righteous Orb", ["quantity"] = 1, ["pts"] = 1}, 
+    {["name"] = "Stonescale Eel", ["quantity"] = 20, ["pts"] = 2},
+    {["name"] = "Elemental Fire", ["quantity"] = 20, ["pts"] = 2}, 
+    {["name"] = "Oily Blackmouth", ["quantity"] = 30, ["pts"] = 2},
+    {["name"] = "Stranglekelp", ["quantity"] = 30, ["pts"] = 1},
+    {["name"] = "Mountain Silversage", ["quantity"] = 20, ["pts"] = 1}, 
+    {["name"] = "Plaguebloom", ["quantity"] = 20, ["pts"] = 1},
+    {["name"] = "Icecap", ["quantity"] = 20, ["pts"] = 1},
+    {["name"] = "Winterfall Firewater", ["quantity"] = 20, ["pts"] = 2},
+    {["name"] = "Blindweed", ["quantity"] = 20, ["pts"] = 1},
+    {["name"] = "Ghost Mushroom", ["quantity"] = 30, ["pts"] = 1},
+    {["name"] = "Goldthorn", ["quantity"] = 35, ["pts"] = 1},
+    {["name"] = "Wild Steelbloom", ["quantity"] = 35, ["pts"] = 1},
+    {["name"] = "Grave Moss", ["quantity"] = 25, ["pts"] = 1},
 }
 
 

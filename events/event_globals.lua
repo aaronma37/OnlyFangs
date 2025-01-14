@@ -238,7 +238,17 @@ ns.event_id = {
 	["Gather Black Lotus"] = 228,
 	["Gather Stonescale Eel"] = 229,
 	["Gather Elemental Fire"] = 230,
-	["Gather Righteous Orb"] = 231,
+	["Gather Oily Blackmouth"] = 231,
+	["Gather Stranglekelp"] = 232,
+	["Gather Mountain Silversage"] = 233,
+	["Gather Plaguebloom"] = 234,
+	["Gather Icecap"] = 235,
+	["Gather Winterfall Firewater"] = 236,
+	["Gather Blindweed"] = 237,
+	["Gather Ghost Mushroom"] = 238,
+	["Gather Goldthorn"] = 239,
+	["Gather Wild Steelbloom"] = 240,
+	["Gather Grave Moss"] = 241,
 }
 ns.id_event = {}
 for k, v in pairs(ns.event_id) do
