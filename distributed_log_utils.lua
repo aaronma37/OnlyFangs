@@ -59,6 +59,7 @@ ns.already_achieved = {}
 ns.streamer_to_race = {}
 ns.most_recent_info = {}
 ns.versions = {}
+ns.duplicate_tracker = {}
 
 local function spairs(t, order)
 	local keys = {}
@@ -573,6 +574,7 @@ ns.aggregateLog = function()
 	top_players_weekly = {}
 	top_players_all_time = {}
 	ns.already_achieved = {}
+	ns.duplicate_tracker = {}
 
 	deaths_by_race_all_time = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
 	deaths_by_race_this_week = { ["Orc"] = 0, ["Troll"] = 0, ["Undead"] = 0, ["Tauren"] = 0 }
@@ -667,6 +669,7 @@ ns.aggregateLog = function()
 		-- 	print("Subtracking ", first_key, -ns.event[event_name].pts)
 		-- 	print("Adding ", earliest_id, ns.event[_earliest_event_name].pts)
 		-- end
+		ns.duplicate_tracker[_duplicate_id] = earliest_id
 		addPointsToLeaderBoardData(
 			earliest_id,
 			_earliest_event_name,

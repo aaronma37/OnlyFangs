@@ -242,18 +242,21 @@ local function setLogData()
 		local _event = list[idx]
 		local _event_name = ns.eventName(_event["Event"])
 		if _event_name then
-			local _char_name, _ = string.split("-", _event["Name"])
+			local _fletcher = _event["Name"]
+			local _char_name, _, __guid = string.split("-", _event["Name"])
+			local _char_real_name = _char_name .. "-" .. REALM_NAME
+			local _duplicate_check_id = _char_name .. "-" .. __guid .. "-" .. _event["Event"]
 			font_strings[i]["Name"]:SetText(_char_name)
 
 			local _streamer_name = ""
 			if _char_name ~= nil then
-				_streamer_name = ns.streamer_map[_char_name .. "-" .. REALM_NAME] or ""
+				_streamer_name = ns.streamer_map[_char_real_name] or ""
 			end
 			font_strings[i]["Streamer Name"]:SetText(_streamer_name)
 			font_strings[i]["Date"]:SetText(date("%m/%d/%y, %H:%M", _event["Date"] + 1730639674))
 			font_strings[i]["Race"]:SetText(ns.id_race[_event["Race"]])
-			if ns.character_race_type and ns.character_race_type[_char_name .. "-" .. REALM_NAME] then
-				font_strings[i]["Race"]:SetText(ns.character_race_type[_char_name .. "-" .. REALM_NAME])
+			if ns.character_race_type and ns.character_race_type[_char_real_name] then
+				font_strings[i]["Race"]:SetText(ns.character_race_type[_char_real_name])
 			end
 			font_strings[i]["Class"]:SetText(ns.id_class[_event["Class"]] or "")
 			font_strings[i]["Event"]:SetText(ns.event[_event_name].title or "")
@@ -266,6 +269,13 @@ local function setLogData()
 			end
 			if ns.event[_event_name].type == "Milestone" and ns.claimed_milestones[_event_name] ~= _event["Name"] then
 				pt_str = "|cff808080already claimed|r"
+			end
+			if
+				ns.event[_event_name].type == "Achievement"
+				and ns.duplicate_tracker[_duplicate_check_id]
+				and ns.duplicate_tracker[_duplicate_check_id] ~= _fletcher
+			then
+				pt_str = "|cff808080already counted|r"
 			end
 			if _event_name == "AdjustPoints" then
 				local str = "return " .. _event["AdditionalArgs"]
