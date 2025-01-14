@@ -53,6 +53,8 @@ local item_metadata = {
 	{ ["item_id"] = 13520, ["item_name"] = "Recipe: Flask of Distilled Wisdom", ["rarity"] = "uncommon", ["pts"] = 50 },
 	{ ["item_id"] = 13521, ["item_name"] = "Recipe: Flask of Supreme Power", ["rarity"] = "uncommon", ["pts"] = 50 },
 	{ ["item_id"] = 13518, ["item_name"] = "Recipe: Flask of Petrification", ["rarity"] = "uncommon", ["pts"] = 50 },
+	{ ["item_id"] = 18518, ["item_name"] = "Pattern: Hide of the Wild", ["rarity"] = "epic", ["pts"] = 100 },
+	{ ["item_id"] = 18519, ["item_name"] = "Pattern: Shifting Cloak", ["rarity"] = "epic", ["pts"] = 100 },
 }
 
 local function loadEvent(item_metadata)
