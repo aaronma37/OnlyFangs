@@ -175,3 +175,18 @@ ns.loadRaceInChat = function()
 		return false, message, sender, ... -- don't hide this message
 	end)
 end
+
+local streamer_name_in_chat_loaded = false
+ns.loadStreamerNameInChat = function()
+	if streamer_name_in_chat_loaded == true then
+		return
+	end
+	streamer_name_in_chat_loaded = true
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(frame, event, message, sender, ...)
+		local _streamer = ns.streamer_map[sender]
+		if _streamer then
+			sender = _streamer
+		end
+		return false, message, sender, ... -- don't hide this message
+	end)
+end

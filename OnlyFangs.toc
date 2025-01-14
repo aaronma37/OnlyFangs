@@ -9,7 +9,7 @@
 
 ## DefaultState: enabled
 
-## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut, OnlyMonitorOn, OnlyFangsPrintChatFrame, OnlyFangsRaceMap
+## SavedVariables: OnlyFangsDistributedLog, OnlyFangsStreamerMap, OnlyFangsKeyList, OnlyFangsWeekStart, OnlyFangsRaceInChat, OnlyFangsMonitor, OnlyCSVOut, OnlyMonitorOn, OnlyFangsPrintChatFrame, OnlyFangsRaceMap, OnlyFangsStreamerNameInChat
 ## SavedVariablesPerCharacter: OnlyFangsOverrideRace, WishList_Saved, OnlyFangsGatheredMaterials
 
 events/event_globals.lua

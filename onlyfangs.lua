@@ -220,6 +220,9 @@ local function handleEvent(self, event, ...)
 		if OnlyFangsRaceInChat and OnlyFangsRaceInChat == 1 then
 			ns.loadRaceInChat()
 		end
+		if OnlyFangsStreamerNameInChat and OnlyFangsStreamerNameInChat == 1 then
+			ns.loadStreamerNameInChat()
+		end
 	elseif event == "UNIT_INVENTORY_CHANGED" then -- CUSTOM EVENT
 		for bag = 0, 5 do
 			for slot = 0, 16 do
@@ -305,7 +308,6 @@ local function handleEvent(self, event, ...)
 				ns.unit_died_exec[enemy_name]()
 			end
 		end
-
 	elseif event == "GUILD_ROSTER_UPDATE" then
 		ns.refreshGuildList(false)
 		if guild_loaded == false then
@@ -357,6 +359,18 @@ local function SlashHandler(msg, editbox)
 		else
 			OnlyFangsRaceInChat = nil
 			print("Reload to remove race image in chat")
+		end
+	elseif cmd == "streamerNameInChat" then
+		local opt = ""
+		for substring in args:gmatch("%S+") do
+			opt = substring
+		end
+		if opt == "1" then
+			OnlyFangsStreamerNameInChat = 1
+			ns.loadStreamerNameInChat()
+		else
+			OnlyFangsStreamerNameInChat = nil
+			print("Reload to remove streamer names in chat")
 		end
 	elseif cmd == "achievementAlertChatFrame" then
 		local opt = ""
