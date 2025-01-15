@@ -41,13 +41,6 @@ local item_metadata = {
 	{ ["item_id"] = 19445, ["item_name"] = "Formula: Enchant Weapon - Agility", ["rarity"] = "common", ["pts"] = 50 },
 	{ ["item_id"] = 2555, ["item_name"] = "Recipe: Swiftness Potion", ["rarity"] = "uncommon", ["pts"] = 50 },
 	{ ["item_id"] = 2553, ["item_name"] = "Recipe: Elixir of Minor Agility", ["rarity"] = "uncommon", ["pts"] = 50 },
-	{
-		["item_id"] = 18518,
-		["item_name"] = "Pattern: Hide of the Wild",
-		["rarity"] = "epic",
-		["pts"] = 50,
-		["test_only"] = 1,
-	},
 	{ ["item_id"] = 6663, ["item_name"] = "Recipe: Elixir of Giant Growth", ["rarity"] = "uncommon", ["pts"] = 50 },
 	{ ["item_id"] = 7054, ["item_name"] = "Robe of Power", ["rarity"] = "rare", ["pts"] = 50 },
 	{ ["item_id"] = 13520, ["item_name"] = "Recipe: Flask of Distilled Wisdom", ["rarity"] = "uncommon", ["pts"] = 50 },
