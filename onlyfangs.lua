@@ -360,6 +360,10 @@ local function SlashHandler(msg, editbox)
 			OnlyFangsRaceInChat = nil
 			print("Reload to remove race image in chat")
 		end
+	elseif cmd == nil then
+		ns.showMenu()
+	elseif cmd == "settings" then
+		Settings.OpenToCategory(addonName)
 	elseif cmd == "streamerNameInChat" then
 		local opt = ""
 		for substring in args:gmatch("%S+") do
@@ -394,7 +398,63 @@ local function SlashHandler(msg, editbox)
 end
 
 SLASH_ONLYFANGS1 = "/onlyfangs"
+SLASH_ONLYFANGS2 = "/of"
 SlashCmdList["ONLYFANGS"] = SlashHandler
+
+local options = {
+	name = addonName,
+	handler = OnlyFangsOptionHandler,
+	type = "group",
+	args = {
+		race_icon_in_chat = {
+			type = "toggle",
+			name = "Race Icon in Chat",
+			desc = "Toggles whether race icons show up in chat.",
+			width = 1.3,
+			get = function()
+				if OnlyFangsRaceInChat == nil or OnlyFangsRaceInChat == false then
+					OnlyFangsRaceInChat = false
+				end
+				if OnlyFangsRaceInChat == 1 then
+					return true
+				else
+					return false
+				end
+			end,
+			set = function()
+				if OnlyFangsRaceInChat == nil or OnlyFangsRaceInChat == false then
+					OnlyFangsRaceInChat = 1
+					ns.loadRaceInChat()
+				else
+					OnlyFangsRaceInChat = nil
+				end
+			end,
+		},
+		race_icon_in_wishlist = {
+			type = "toggle",
+			name = "Race Icon in Wishlist Menu and Tooltip",
+			desc = "Toggles whether race icons show up in wishlist menu and tooltip.",
+			width = 1.3,
+			get = function()
+				if OnlyFangsRaceInWishList == nil or OnlyFangsRaceInWishList == false then
+					OnlyFangsRaceInWishList = false
+				end
+				if OnlyFangsRaceInWishList == 1 then
+					return true
+				else
+					return false
+				end
+			end,
+			set = function()
+				if OnlyFangsRaceInWishList == nil or OnlyFangsRaceInWishList == false then
+					OnlyFangsRaceInWishList = 1
+				else
+					OnlyFangsRaceInWishList = nil
+				end
+			end,
+		},
+	},
+}
 
 LibStub("AceConfig-3.0"):RegisterOptionsTable("OnlyFangs", options)
 optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("OnlyFangs", "OnlyFangs", nil)
