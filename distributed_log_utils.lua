@@ -98,6 +98,7 @@ end
 local top_players_daily = {}
 local top_players_weekly = {}
 local top_players_all_time = {}
+local top_players_raidprep = {}
 local deaths_by_race_this_week = {}
 local deaths_by_race_last_week = {}
 local deaths_by_race_all_time = {}
@@ -106,6 +107,7 @@ ns.getTopPlayers = function()
 	local top_daily_list = {}
 	local top_weekly_list = {}
 	local top_all_time_list = {}
+	local top_raidprep_list = {}
 
 	-- Ordered
 	for k, v in
@@ -132,7 +134,15 @@ ns.getTopPlayers = function()
 		top_all_time_list[#top_all_time_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
 	end
 
-	return top_daily_list, top_weekly_list, top_all_time_list
+	for k, v in
+		spairs(top_players_raidprep, function(t, a, b)
+			return t[a].pts > t[b].pts
+		end)
+	do
+		top_raidprep_list[#top_raidprep_list + 1] = { ["streamer_name"] = k, ["pts"] = v.pts }
+	end
+
+	return top_daily_list, top_weekly_list, top_all_time_list, top_raidprep_list
 end
 
 local estimated_score_num_entries = 0
@@ -439,6 +449,13 @@ local function addPointsToLeaderBoardData(_fletcher, _event_name, _event_log, cu
 			end
 			top_players_daily[streamer_name].pts = top_players_daily[streamer_name].pts + _adjusted_pts
 		end
+
+		if ns.event[_event_name].type == "Raid Prep" then
+			if top_players_raidprep[streamer_name] == nil then
+				top_players_raidprep[streamer_name] = { ["pts"] = 0 }
+			end
+			top_players_raidprep[streamer_name].pts = top_players_raidprep[streamer_name].pts + _adjusted_pts
+		end
 	end
 
 	local adjusted_time = fromAdjustedTime(_event_log[DATE_IDX])
@@ -518,7 +535,7 @@ ns.getStreamerInfo = function(streamer_name)
 				_character_meta[unique_char]["guid"] = _last_guid
 			end
 			local event_name = ns.id_event[v["value"][EVENT_IDX]]
-			if ns.event[event_name].type == "Achievement" and v["value"][EVENT_IDX] ~= 213 then
+			if ns.event[event_name] and ns.event[event_name].type == "Achievement" and v["value"][EVENT_IDX] ~= 213 then
 				if _character_meta[unique_char]["#achievements"][event_name] then
 					if
 						_character_meta[unique_char]["#achievements"][event_name]["date"]
@@ -536,13 +553,13 @@ ns.getStreamerInfo = function(streamer_name)
 					}
 					streamer_meta["#achievements"] = streamer_meta["#achievements"] + 1
 				end
-			elseif ns.event[event_name].type == "Milestone" then
+			elseif ns.event[event_name] and ns.event[event_name].type == "Milestone" then
 				_character_meta[unique_char]["#milestones"][event_name] = {
 					["title"] = ns.event[event_name].title,
 					["date"] = date("%m/%d/%y, %H:%M", fromAdjustedTime(v["value"][DATE_IDX])),
 				}
 				streamer_meta["#milestones"] = streamer_meta["#milestones"] + 1
-			elseif ns.event[event_name].type == "Failure" then
+			elseif ns.event[event_name] and ns.event[event_name].type == "Failure" then
 				_character_meta[unique_char]["status"] = "Dead"
 				streamer_meta["#deaths"] = streamer_meta["#deaths"] + 1
 			end
@@ -574,6 +591,7 @@ ns.aggregateLog = function()
 	top_players_daily = {}
 	top_players_weekly = {}
 	top_players_all_time = {}
+	top_players_raidprep = {}
 	ns.already_achieved = {}
 	ns.dungeon_log = {}
 	ns.duplicate_tracker = {}
