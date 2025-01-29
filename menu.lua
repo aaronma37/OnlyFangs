@@ -2480,8 +2480,8 @@ local function drawLeaderboardTab(container)
 
 	local _frames = {}
 	local top_scores = {}
-	top_scores["Daily"], top_scores["Weekly"], top_scores["All Time"] = ns.getTopPlayers()
-	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
+	top_scores["Daily"], top_scores["Weekly"], top_scores["All Time"], top_scores["Raid Prep"] = ns.getTopPlayers()
+	for _, _type in ipairs({ "Raid Prep", "Weekly", "All Time" }) do
 		local __f = AceGUI:Create("InlineGroup")
 		__f:SetLayout("Flow")
 		__f:SetHeight(250)
@@ -2536,7 +2536,7 @@ local function drawLeaderboardTab(container)
 		end
 	end
 
-	for _, _type in ipairs({ "Daily", "Weekly", "All Time" }) do
+	for _, _type in ipairs({ "Raid Prep", "Weekly", "All Time" }) do
 		local __f = AceGUI:Create("InlineGroup")
 		__f:SetLayout("Flow")
 		__f:SetHeight(300)
