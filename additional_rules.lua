@@ -104,11 +104,7 @@ C_Timer.NewTicker(60, function(self)
 		if buff_name == nil then
 			return
 		end
-		if
-			buff_name == "Warchief’s Blessing"
-			or buff_name == "Rallying Cry of the Dragonslayer"
-			or buff_name == "Spirit of Zandalar"
-		then
+		if buff_name == "Spirit of Zandalar" then
 			CancelUnitBuff("player", i)
 			print("OnlyFangs: Removing buff " .. buff_name .. ".")
 		end
